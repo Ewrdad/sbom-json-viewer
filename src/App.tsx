@@ -1,111 +1,434 @@
-import { useEffect, useState } from "react";
-import { Renderer } from "./renderer/renderer";
-import { convertJsonToBom } from "./lib/bomConverter";
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ViewProvider, useView } from "./context/ViewContext";
+import { Layout } from "./components/layout/Layout";
+const DashboardView = lazy(() =>
+  import("./components/views/DashboardView").then((module) => ({
+    default: module.DashboardView,
+  })),
+);
+const ComponentExplorer = lazy(() =>
+  import("./components/views/ComponentExplorer").then((module) => ({
+    default: module.ComponentExplorer,
+  })),
+);
+const DependencyGraph = lazy(() =>
+  import("./components/views/DependencyGraph").then((module) => ({
+    default: module.DependencyGraph,
+  })),
+);
+const DependencyTree = lazy(() =>
+  import("./components/views/DependencyTree").then((module) => ({
+    default: module.DependencyTree,
+  })),
+);
+import { type Bom } from "@cyclonedx/cyclonedx-library/Models";
+import { Upload } from "lucide-react";
+import { getSbomSizeProfile } from "./lib/sbomSizing";
+
+// Why: defer heavy view bundles until the user selects them for large SBOMs.
+
+function AppContent({
+  sbom,
+  formattedSbom,
+  sbomStats,
+  currentFile,
+  setCurrentFile,
+  onImport,
+}: {
+  sbom: any;
+  formattedSbom: any;
+  sbomStats: any;
+  currentFile: string;
+  setCurrentFile: (f: string) => void;
+  onImport: (file: File) => void;
+}) {
+  const { activeView } = useView();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { componentCount, isLarge } = getSbomSizeProfile(sbom);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onImport(file);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full p-6 pb-0">
+      <header className="flex items-center justify-between pb-6 border-b mb-6 flex-none">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            {activeView.charAt(0).toUpperCase() + activeView.slice(1)}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Viewing: {currentFile}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-[10px]">
+            {componentCount.toLocaleString()} components
+          </Badge>
+          {isLarge && (
+            <Badge variant="outline" className="text-[10px]">
+              Large SBOM mode
+            </Badge>
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json"
+            className="hidden"
+          />
+          <Button variant="outline" size="sm" onClick={handleImportClick}>
+            <Upload className="h-4 w-4 mr-2" />
+            Upload SBOM
+          </Button>
+          <div className="w-px h-8 bg-border mx-2" />
+          <Button
+            variant={
+              currentFile === "sample-simple.cyclonedx.json"
+                ? "default"
+                : "outline"
+            }
+            size="sm"
+            onClick={() => setCurrentFile("sample-simple.cyclonedx.json")}
+          >
+            Simple Sample
+          </Button>
+          <Button
+            variant={
+              currentFile === "sbom.cyclonedx.json" ? "default" : "outline"
+            }
+            size="sm"
+            onClick={() => setCurrentFile("sbom.cyclonedx.json")}
+          >
+            Full SBOM
+          </Button>
+          <Button
+            variant={
+              currentFile === "sbom-huge.json" ? "default" : "outline"
+            }
+            size="sm"
+            onClick={() => setCurrentFile("sbom-huge.json")}
+          >
+            Huge SBOM (20k)
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex-1 overflow-hidden">
+        <Suspense
+          fallback={
+            <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+              Preparing view...
+            </div>
+          }
+        >
+          {activeView === "dashboard" && (
+            <DashboardView sbom={sbom} preComputedStats={sbomStats} />
+          )}
+          {activeView === "explorer" && <ComponentExplorer sbom={sbom} />}
+          {activeView === "tree" && (
+            <DependencyTree sbom={sbom} formattedData={formattedSbom} />
+          )}
+          {activeView === "graph" && (
+            <DependencyGraph sbom={sbom} formattedData={formattedSbom} />
+          )}
+        </Suspense>
+      </div>
+    </div>
+  );
+}
+
+type ProgressReporter = (loaded: number, total: number | null) => void;
+
+const readStreamToText = async (
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  onProgress?: ProgressReporter,
+  totalBytes: number | null = null,
+): Promise<string> => {
+  const decoder = new TextDecoder();
+  const chunks: string[] = [];
+  let loaded = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      loaded += value.length;
+      chunks.push(decoder.decode(value, { stream: true }));
+      onProgress?.(loaded, totalBytes);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  chunks.push(decoder.decode());
+  return chunks.join("");
+};
+
+const streamResponseText = async (
+  response: Response,
+  onProgress?: ProgressReporter,
+): Promise<string> => {
+  const lengthHeader = response.headers?.get?.("content-length");
+  const total = lengthHeader ? Number(lengthHeader) : null;
+  const reader = response.body?.getReader?.();
+  if (reader) {
+    const text = await readStreamToText(reader, onProgress, total);
+    reader.releaseLock();
+    return text;
+  }
+
+  if (typeof response.text === "function") {
+    const text = await response.text();
+    onProgress?.(text.length, total);
+    return text;
+  }
+
+  if (typeof response.json === "function") {
+    const json = await response.json();
+    const text = JSON.stringify(json);
+    onProgress?.(text.length, total);
+    return text;
+  }
+
+  throw new Error("Unable to read SBOM response");
+};
+
+const streamFileText = async (
+  file: File,
+  onProgress?: ProgressReporter,
+): Promise<string> => {
+  const reader = file.stream().getReader();
+  const text = await readStreamToText(reader, onProgress, file.size || null);
+  reader.releaseLock();
+  return text;
+};
+
+type LoadingState = {
+  status: "idle" | "loading";
+  message: string;
+  progress: number | null;
+};
 
 export function App() {
-  const [sbom, setSbom] = useState(null);
+  const [sbom, setSbom] = useState<Bom | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [currentFile, setCurrentFile] = useState<string>(
     "sample-simple.cyclonedx.json",
   );
+  const [loadingState, setLoadingState] = useState<LoadingState>({
+    status: "loading",
+    message: "Preparing viewer...",
+    progress: null,
+  });
+  const loadSequence = useRef(0);
 
-  const loadSBOM = (filename: string) => {
-    setSbom(null);
-    setError(null);
+  const [formattedSbom, setFormattedSbom] = useState<any>(null);
+  const [sbomStats, setSbomStats] = useState<any>(null);
 
-    fetch(`/${filename}`)
-      .then((response) => {
+  const updateLoading = useCallback(
+    (message: string, progress: number | null = null) => {
+      setLoadingState({ status: "loading", message, progress });
+    },
+    [],
+  );
+
+  const resetLoading = useCallback(() => {
+    setLoadingState({ status: "idle", message: "", progress: null });
+  }, []);
+
+  const processWithWorker = useCallback((jsonText: string, filename: string, loadId: number) => {
+    return new Promise<void>((resolve, reject) => {
+      const worker = new Worker(new URL("./workers/sbomWorker.ts", import.meta.url), {
+        type: "module",
+      });
+
+      worker.onmessage = (e) => {
+        if (loadSequence.current !== loadId) {
+          worker.terminate();
+          return;
+        }
+
+        const { type, message, progress, result } = e.data;
+        if (type === "progress") {
+          updateLoading(message, progress / 100);
+        } else if (type === "complete") {
+          setSbom(result.bom);
+          setFormattedSbom(result.formatted);
+          setSbomStats(result.stats);
+          resetLoading();
+          worker.terminate();
+          resolve();
+        } else if (type === "error") {
+          setError(message);
+          resetLoading();
+          worker.terminate();
+          reject(new Error(message));
+        }
+      };
+
+      worker.onerror = (e) => {
+        setError("Worker error: " + e.message);
+        resetLoading();
+        worker.terminate();
+        reject(new Error(e.message));
+      };
+
+      worker.postMessage({ jsonText, filename });
+    });
+  }, [updateLoading, resetLoading]);
+
+  const loadSBOM = useCallback(
+    async (filename: string) => {
+      const loadId = ++loadSequence.current;
+      setSbom(null);
+      setFormattedSbom(null);
+      setSbomStats(null);
+      setError(null);
+      updateLoading(`Downloading ${filename}`, null);
+
+      try {
+        const response = await fetch(`/${filename}`);
         if (!response.ok) {
           throw new Error(`Failed to load SBOM: ${filename}`);
         }
-        return response.json();
-      })
-      .then((data) => {
-        // Convert raw JSON to Bom object
-        const bom = convertJsonToBom(data);
-        setSbom(bom);
-      })
-      .catch((err) => {
-        setError(err.message);
+
+        const text = await streamResponseText(response, (loaded, total) => {
+          if (loadSequence.current !== loadId) return;
+          updateLoading(
+            `Downloading ${filename}`,
+            total ? Math.min(loaded / total, 1) : null,
+          );
+        });
+
+        if (loadSequence.current !== loadId) return;
+        await processWithWorker(text, filename, loadId);
+      } catch (err) {
+        if (loadSequence.current !== loadId) return;
+        const message =
+          err instanceof Error ? err.message : "Failed to load SBOM";
+        setError(message);
         console.error("Error loading SBOM:", err);
-      });
-  };
+        resetLoading();
+      }
+    },
+    [processWithWorker, resetLoading, updateLoading],
+  );
 
   useEffect(() => {
+    if (currentFile.endsWith(".json") && !currentFile.startsWith("Local:")) {
+      loadSBOM(currentFile);
+    }
+  }, [currentFile, loadSBOM]);
+
+  const handleImport = useCallback(
+    async (file: File) => {
+      const loadId = ++loadSequence.current;
+      setSbom(null);
+      setFormattedSbom(null);
+      setSbomStats(null);
+      setError(null);
+      setCurrentFile(`Local: ${file.name}`);
+      updateLoading(`Reading ${file.name}`, 0);
+
+      try {
+        const text = await streamFileText(file, (loaded, total) => {
+          if (loadSequence.current !== loadId) return;
+          updateLoading(
+            `Reading ${file.name}`,
+            total ? Math.min(loaded / total, 1) : null,
+          );
+        });
+
+        if (loadSequence.current !== loadId) return;
+        await processWithWorker(text, file.name, loadId);
+      } catch (err) {
+        if (loadSequence.current !== loadId) return;
+        const message =
+          err instanceof Error ? err.message : "Failed to process SBOM import";
+        setError(message);
+        console.error("Error importing SBOM:", err);
+        resetLoading();
+      }
+    },
+    [processWithWorker, resetLoading, updateLoading],
+  );
+
+  const handleRetry = () => {
+    setError(null);
+    if (currentFile.startsWith("Local:")) {
+      resetLoading();
+      return;
+    }
     loadSBOM(currentFile);
-  }, [currentFile]);
+  };
 
-  if (error) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">
-          Error Loading SBOM
-        </h1>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <Button onClick={() => loadSBOM(currentFile)}>Retry</Button>
-      </div>
-    );
-  }
+  const progressWidth =
+    typeof loadingState.progress === "number"
+      ? Math.min(Math.max(loadingState.progress, 0), 1) * 100
+      : 0;
 
-  if (!sbom) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Loading SBOM...</h1>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+  const loadingScreen = (
+    <div className="h-full flex flex-col items-center justify-center bg-background gap-4 px-6 text-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground text-lg font-medium">
+          {loadingState.message || "Loading analysis..."}
+        </p>
       </div>
-    );
-  }
+      {typeof loadingState.progress === "number" && (
+        <div className="w-full max-w-md bg-muted/30 h-2 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary transition-all"
+            style={{ width: `${progressWidth}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+
+  const errorScreen = (
+    <div className="h-full flex flex-col items-center justify-center gap-4 px-6 text-center bg-muted/10">
+      <h1 className="text-2xl font-bold text-red-600">Error Loading SBOM</h1>
+      <p className="text-gray-600">{error}</p>
+      <Button onClick={handleRetry}>Retry</Button>
+    </div>
+  );
+
+  const mainContent = error ? (
+    errorScreen
+  ) : !sbom ? (
+    loadingScreen
+  ) : (
+    <AppContent
+      sbom={sbom}
+      formattedSbom={formattedSbom}
+      sbomStats={sbomStats}
+      currentFile={currentFile}
+      setCurrentFile={setCurrentFile}
+      onImport={handleImport}
+    />
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
-      <header className="border-b sticky top-0 bg-background/90 backdrop-blur z-10">
-        <div className="container mx-auto py-4 px-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-sm" />
-                <h1 className="text-3xl font-bold">SBOM Viewer</h1>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                CycloneDX Software Bill of Materials Viewer
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={
-                  currentFile === "sample-simple.cyclonedx.json"
-                    ? "default"
-                    : "outline"
-                }
-                size="sm"
-                onClick={() => setCurrentFile("sample-simple.cyclonedx.json")}
-              >
-                Simple Sample
-              </Button>
-              <Button
-                variant={
-                  currentFile === "sbom.cyclonedx.json" ? "default" : "outline"
-                }
-                size="sm"
-                onClick={() => setCurrentFile("sbom.cyclonedx.json")}
-              >
-                Full SBOM
-              </Button>
-            </div>
-          </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span>Active file:</span>
-            <span className="rounded-full border px-2 py-0.5">
-              {currentFile}
-            </span>
-          </div>
-        </div>
-      </header>
-      <main className="container mx-auto pb-16">
-        <Renderer SBOM={sbom} />
-      </main>
-    </div>
+    <ViewProvider>
+      <Layout>{mainContent}</Layout>
+    </ViewProvider>
   );
 }
 

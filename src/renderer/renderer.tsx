@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { SBOMComponent } from "./SBOMComponent/SBOMComponent";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { ComponentErrorBoundary } from "./ComponentErrorBoundary";
-import { Formatter } from "./Formatter/Formatter";
 import type { NestedSBOMComponent } from "./Formatter/Formatter";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -18,8 +16,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { buildMermaidDiagram } from "@/lib/mermaid/sbomToMermaid";
 /** @typedef {import('@cyclonedx/cyclonedx-library/Models').Bom} Bom */
+
+// Why: keep large SBOM render paths out of the initial bundle.
+const SBOMComponent = lazy(() =>
+  import("./SBOMComponent/SBOMComponent").then((module) => ({
+    default: module.SBOMComponent,
+  })),
+);
 
 /**
  * MARK: Renderer
@@ -35,6 +39,7 @@ export const Renderer = ({ SBOM }) => {
     message: "Initializing Formatter...",
   });
   const [formattedNestedSBOM, setFormattedNestedSBOM] = useState(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const [query, setQuery] = useState("");
   const [showVulnerableOnly, setShowVulnerableOnly] = useState(false);
   const [maxDepth, setMaxDepth] = useState(3);
@@ -61,12 +66,44 @@ export const Renderer = ({ SBOM }) => {
   const maxPreviewChars = 160000;
 
   useEffect(() => {
+    let cancelled = false;
+
     const formatSBOM = async () => {
-      await setFormattedNestedSBOM(
-        await Formatter({ rawSBOM: SBOM, setProgress: setLoadingStatus }),
-      );
+      // Why: reset state while we lazily load the formatter for large inputs.
+      setFormattedNestedSBOM(null);
+      setLoadingStatus({ progress: 0, message: "Initializing Formatter..." });
+
+       try {
+         const { Formatter } = await import("./Formatter/Formatter");
+         abortControllerRef.current?.abort();
+         abortControllerRef.current = new AbortController();
+         const formatted = await Formatter({
+           rawSBOM: SBOM,
+           setProgress: (status) => {
+             if (!cancelled) setLoadingStatus(status);
+           },
+           abortSignal: abortControllerRef.current.signal,
+         });
+         if (!cancelled) setFormattedNestedSBOM(formatted);
+       } catch (error) {
+         if (!cancelled) {
+           console.error("Formatter load failed:", error);
+           const aborted =
+             (error instanceof Error && /aborted/i.test(error.message)) || false;
+           setLoadingStatus({
+             progress: aborted ? loadingStatus.progress : 100,
+             message: aborted ? "Formatting cancelled" : "Unable to format SBOM.",
+           });
+         }
+       }
     };
+
     formatSBOM();
+
+    return () => {
+      cancelled = true;
+      abortControllerRef.current?.abort();
+    };
   }, [SBOM]);
 
   useEffect(() => {
@@ -174,15 +211,28 @@ export const Renderer = ({ SBOM }) => {
   if (loadingStatus.progress < 100 || !formattedNestedSBOM) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-4">
-          <Spinner />
-          <div>
-            <p className="text-lg font-medium">{loadingStatus.message}</p>
-            <p className="text-sm text-muted-foreground">
-              {loadingStatus.progress}%
-            </p>
-          </div>
-        </div>
+         <div className="text-center space-y-4">
+           <Spinner />
+           <div className="space-y-2">
+             <p className="text-lg font-medium">{loadingStatus.message}</p>
+             <div className="mx-auto h-2 w-64 overflow-hidden rounded bg-muted">
+               <div
+                 className="h-full bg-primary transition-all"
+                 style={{ width: `${Math.max(0, Math.min(100, loadingStatus.progress))}%` }}
+               />
+             </div>
+             <p className="text-sm text-muted-foreground">
+               {loadingStatus.progress}%
+             </p>
+             <Button
+               variant="outline"
+               size="sm"
+               onClick={() => abortControllerRef.current?.abort()}
+             >
+               Cancel
+             </Button>
+           </div>
+         </div>
       </div>
     );
   }
@@ -284,7 +334,8 @@ export const Renderer = ({ SBOM }) => {
 
   const exportRoots = focusedComponent ? [focusedComponent] : sortedComponents;
 
-  const prepareMermaidSource = () => {
+  const prepareMermaidSource = async () => {
+    const { buildMermaidDiagram } = await import("@/lib/mermaid/sbomToMermaid");
     const result = buildMermaidDiagram(exportRoots, {
       maxDepth,
       query,
@@ -347,7 +398,7 @@ export const Renderer = ({ SBOM }) => {
               variant="outline"
               size="sm"
               onClick={() => {
-                prepareMermaidSource();
+                void prepareMermaidSource();
                 setMermaidOpen(true);
               }}
             >
@@ -385,7 +436,7 @@ export const Renderer = ({ SBOM }) => {
           open={mermaidOpen}
           onOpenChange={(open) => {
             setMermaidOpen(open);
-            if (open) prepareMermaidSource();
+            if (open) void prepareMermaidSource();
             if (open) setMermaidScale(1);
           }}
         >
@@ -634,26 +685,34 @@ export const Renderer = ({ SBOM }) => {
           </p>
         </div>
 
-        {(focusedComponent ? [focusedComponent] : sortedComponents).map(
-          (component, index) => (
-            <ComponentErrorBoundary
-              key={component.bomRef?.value || index}
-              name={component.name}
-            >
-              <SBOMComponent
-                component={component}
-                maxDepth={maxDepth}
-                expandMode={expandMode}
-                searchQuery={query}
-                pruneNonMatches={pruneNonMatches}
-                sortMode={sortMode}
-                compactMode={compactMode}
-                parentPathRefs={focusedComponent ? focusedPathRefs || [] : []}
-                onFocus={setFocusedPathRefs}
-              />
-            </ComponentErrorBoundary>
-          ),
-        )}
+        <Suspense
+          fallback={
+            <div className="py-6 text-sm text-muted-foreground">
+              Preparing components...
+            </div>
+          }
+        >
+          {(focusedComponent ? [focusedComponent] : sortedComponents).map(
+            (component, index) => (
+              <ComponentErrorBoundary
+                key={component.bomRef?.value || index}
+                name={component.name}
+              >
+                <SBOMComponent
+                  component={component}
+                  maxDepth={maxDepth}
+                  expandMode={expandMode}
+                  searchQuery={query}
+                  pruneNonMatches={pruneNonMatches}
+                  sortMode={sortMode}
+                  compactMode={compactMode}
+                  parentPathRefs={focusedComponent ? focusedPathRefs || [] : []}
+                  onFocus={setFocusedPathRefs}
+                />
+              </ComponentErrorBoundary>
+            ),
+          )}
+        </Suspense>
       </div>
     </>
   );

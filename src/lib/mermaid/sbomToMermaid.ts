@@ -53,15 +53,16 @@ const hasAnyVulnerability = (component: NestedSBOMComponent) => {
 
 const sanitizeLabelText = (value: string) =>
   value
+    .replace(/\\/g, "\\\\") // Escape backslashes
+    .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "'")
-    .replace(/\n/g, " ");
+    .replace(/"/g, "&quot;") // Escape quotes
+    .replace(/\n/g, "<br/>"); // Use <br/> for newlines in Mermaid
 
 const buildLabel = (component: NestedSBOMComponent, maxLabelLength: number) => {
   const name = sanitizeLabelText(component.name || "Unnamed Component");
   const version = component.version ? sanitizeLabelText(component.version) : "";
-  const group = component.group ? sanitizeLabelText(component.group) : "";
   const { inherent, transitive } = component.vulnerabilities;
   const inherentTotal =
     inherent.Critical.length +
@@ -76,19 +77,18 @@ const buildLabel = (component: NestedSBOMComponent, maxLabelLength: number) => {
   const total = inherentTotal + transitiveTotal;
   const vulnSummaryBase =
     total === 0
-      ? "No known vulnerabilities"
-      : `Vulns: ${total} (direct ${inherentTotal}, inherited ${transitiveTotal})`;
+      ? ""
+      : `${total} vulns (${inherentTotal}nd, ${transitiveTotal}tr)`;
   const vulnSummary =
     vulnSummaryBase.length > maxLabelLength
-      ? `Vulns: ${total} (direct ${inherentTotal})`
+      ? `${total} vulns`
       : vulnSummaryBase;
 
   const parts = [name];
   if (version) parts.push(`v${version}`);
-  if (group) parts.push(group);
-  parts.push(vulnSummary);
+  if (vulnSummary) parts.push(vulnSummary);
 
-  const label = parts.join("\\n");
+  const label = parts.join("<br/>");
   if (label.length <= maxLabelLength) return label;
 
   return `${label.slice(0, maxLabelLength - 3)}...`;
@@ -195,7 +195,7 @@ export const buildMermaidDiagram = (
   if (nodes.length === 0) {
     return {
       diagram: [
-        "flowchart TB",
+        "flowchart LR",
         'empty["No components matched the current filters"]',
       ].join("\n"),
       nodeCount: 0,
@@ -207,7 +207,7 @@ export const buildMermaidDiagram = (
   }
 
   const diagram = [
-    "flowchart TB",
+    "flowchart LR",
     "classDef critical fill:#7f1d1d,stroke:#fecaca,color:#fff;",
     "classDef high fill:#b45309,stroke:#fed7aa,color:#111;",
     "classDef medium fill:#a16207,stroke:#fde68a,color:#111;",

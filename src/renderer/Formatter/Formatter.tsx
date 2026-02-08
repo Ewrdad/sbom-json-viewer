@@ -4,6 +4,7 @@ import type { License, Metadata } from "@cyclonedx/cyclonedx-library/Models";
 import type { Dispatch, SetStateAction } from "react";
 import { uniqueLicenses } from "./Statistics/uniqueLicenses";
 import { uniqueVulnerabilities } from "./Statistics/uniqueVulnerabilities";
+import { batchProcess, tick } from "../../lib/asyncUtils";
 
 type Vulnerability = Models.Vulnerability.Vulnerability;
 
@@ -50,8 +51,7 @@ export interface NestedSBOMComponent extends Component {
  * @description Groups vulnerabilities affecting a specific component by their severity level
  */
 const categorizeVulnerabilities = (
-  vulnerabilities: Iterable<Vulnerability>,
-  componentRef: string,
+  vulnerabilities: Vulnerability[],
 ): {
   Critical: Vulnerability[];
   High: Vulnerability[];
@@ -68,22 +68,6 @@ const categorizeVulnerabilities = (
   };
 
   for (const vuln of vulnerabilities) {
-    // Check if this vulnerability affects the current component
-    let affectsThisComponent = false;
-    for (const affect of vuln.affects) {
-      // Check if the ref matches the component's bom-ref
-      if (
-        typeof affect.ref === "object" &&
-        "value" in affect.ref &&
-        affect.ref.value === componentRef
-      ) {
-        affectsThisComponent = true;
-        break;
-      }
-    }
-
-    if (!affectsThisComponent) continue;
-
     // Extract severity from ratings
     let severity = "informational";
     for (const rating of vuln.ratings) {
@@ -146,14 +130,16 @@ const cloneComponent = (component: Component): Component => {
 export const Formatter = async ({
   rawSBOM,
   setProgress,
+  abortSignal,
 }: {
   rawSBOM: Bom;
   setProgress: Dispatch<SetStateAction<{ progress: number; message: string }>>;
+  abortSignal?: AbortSignal;
 }): Promise<formattedSBOM> => {
-  // Step 1: Initialize progress
   setProgress(() => ({ progress: 0, message: "Initializing formatter..." }));
+  await tick();
+  if (abortSignal?.aborted) throw new Error("Formatting aborted");
 
-  // Setup globals
   const formattedSBOM: formattedSBOM = {
     statistics: {
       licenses: [],
@@ -169,81 +155,99 @@ export const Formatter = async ({
     components: [],
   };
 
-  // Step 2: Extract unique licenses and vulnerabilities
   setProgress(() => ({ progress: 1, message: "Extracting unique licenses" }));
-
   formattedSBOM.statistics.licenses = uniqueLicenses(rawSBOM.components);
+  await tick();
+  if (abortSignal?.aborted) throw new Error("Formatting aborted");
   setProgress(() => ({
     progress: 5,
     message: "Finished extracting unique licenses",
   }));
-
+  await tick();
   setProgress(() => ({
     progress: 6,
     message: "Extracting unique vulnerabilities",
   }));
   formattedSBOM.statistics.vulnerabilities = uniqueVulnerabilities(rawSBOM);
-
+  await tick();
+  if (abortSignal?.aborted) throw new Error("Formatting aborted");
   setProgress(() => ({
     progress: 10,
     message: "Finished extracting unique vulnerabilities",
   }));
+  await tick();
 
-  // Step 3: Build component and dependency maps for efficient lookup
   setProgress(() => ({
     progress: 15,
     message: "Building component and dependency maps",
   }));
+  await tick();
 
   const componentMap = new Map<string, Component>();
   const dependencyMap = new Map<string, string[]>();
 
-  // Build component map - iterate through the ComponentRepository
-  for (const component of rawSBOM.components) {
+  await batchProcess(rawSBOM.components, (component) => {
+    if (abortSignal?.aborted) return;
     const bomRef = component.bomRef.value;
-    if (bomRef) {
-      componentMap.set(bomRef, component);
+    if (!bomRef) return;
 
-      // Extract dependencies from the component itself
-      const deps: string[] = [];
-      for (const depRef of component.dependencies) {
+    componentMap.set(bomRef, component);
+    const deps: string[] = [];
+    component.dependencies.forEach((depRef) => {
+      if (depRef.value) {
         deps.push(depRef.value);
       }
-      if (deps.length > 0) {
-        dependencyMap.set(bomRef, deps);
+    });
+    if (deps.length > 0) {
+      dependencyMap.set(bomRef, deps);
+    }
+  });
+
+  await tick();
+  setProgress(() => ({
+    progress: 20,
+    message: "Finished building maps",
+  }));
+  await tick();
+
+  setProgress(() => ({
+    progress: 25,
+    message: "Indexing vulnerabilities",
+  }));
+  await tick();
+
+  const vulnIndex = new Map<string, Vulnerability[]>();
+  for (const vuln of rawSBOM.vulnerabilities) {
+    for (const affect of vuln.affects) {
+      const ref =
+        typeof affect.ref === "object" && "value" in affect.ref
+          ? affect.ref.value
+          : typeof affect.ref === "string"
+            ? affect.ref
+            : null;
+      if (ref) {
+        const list = vulnIndex.get(ref) || [];
+        list.push(vuln);
+        vulnIndex.set(ref, list);
       }
     }
   }
 
   setProgress(() => ({
-    progress: 20,
-    message: "Finished building maps",
-  }));
-
-  // Step 4: Build nested component structure with vulnerabilities
-  setProgress(() => ({
-    progress: 25,
+    progress: 27,
     message: "Building nested component structure",
   }));
+  await tick();
 
-  /**
-   * Recursive function to build nested component with its dependencies
-   * @param componentRef The bom-ref of the component to process
-   * @param visitedInCurrentPath Set of component refs visited in the current path to detect circular dependencies
-   * @returns NestedSBOMComponent with all dependencies fully replicated
-   */
-  const buildNestedComponent = (
+  let nestedWorkCounter = 0;
+  const buildNestedComponent = async (
     componentRef: string,
     visitedInCurrentPath: Set<string> = new Set(),
-  ): NestedSBOMComponent | null => {
-    // Get the component from the map
+  ): Promise<NestedSBOMComponent | null> => {
     const component = componentMap.get(componentRef);
     if (!component) return null;
 
-    // Initialize the nested component by cloning to preserve private fields (e.g., #bomRef)
     const nestedComponent = cloneComponent(component) as NestedSBOMComponent;
-
-    // Add vulnerability tracking
     nestedComponent.vulnerabilities = {
       inherent: {
         Critical: [],
@@ -260,72 +264,63 @@ export const Formatter = async ({
         Informational: [],
       },
     };
-
-    // Initialize formatted dependencies
     nestedComponent.formattedDependencies = [];
 
-    // Extract inherent vulnerabilities for this component
-    nestedComponent.vulnerabilities.inherent = categorizeVulnerabilities(
-      rawSBOM.vulnerabilities,
-      componentRef,
-    );
+    const componentVulns = vulnIndex.get(componentRef) || [];
+    nestedComponent.vulnerabilities.inherent =
+      categorizeVulnerabilities(componentVulns);
 
-    // Get dependencies for this component
     const dependencies = dependencyMap.get(componentRef) || [];
-
-    // Add current component to visited path to detect circular dependencies
     const newVisitedPath = new Set(visitedInCurrentPath);
     newVisitedPath.add(componentRef);
 
-    // Recursively build dependencies
-    dependencies.forEach((depRef) => {
-      // If we've already visited this component in the current path, skip to avoid infinite recursion
-      if (visitedInCurrentPath.has(depRef)) {
-        return;
-      }
+    for (const depRef of dependencies) {
+      if (visitedInCurrentPath.has(depRef)) continue;
 
-      const nestedDep = buildNestedComponent(depRef, newVisitedPath);
-      if (nestedDep) {
-        // Add the dependency (fully replicated)
-        nestedComponent.formattedDependencies.push(nestedDep);
+      const nestedDep = await buildNestedComponent(depRef, newVisitedPath);
+      if (!nestedDep) continue;
 
-        // Aggregate transitive vulnerabilities from this dependency
-        // Include both inherent and transitive vulnerabilities from the dependency
-        Object.keys(nestedDep.vulnerabilities.inherent).forEach((severity) => {
-          const severityKey =
-            severity as keyof NestedSBOMComponent["vulnerabilities"]["inherent"];
-          nestedComponent.vulnerabilities.transitive[severityKey].push(
-            ...nestedDep.vulnerabilities.inherent[severityKey],
-          );
-        });
+      nestedComponent.formattedDependencies.push(nestedDep);
 
-        Object.keys(nestedDep.vulnerabilities.transitive).forEach(
-          (severity) => {
-            const severityKey =
-              severity as keyof NestedSBOMComponent["vulnerabilities"]["transitive"];
-            nestedComponent.vulnerabilities.transitive[severityKey].push(
-              ...nestedDep.vulnerabilities.transitive[severityKey],
-            );
-          },
+      for (const severity of Object.keys(nestedDep.vulnerabilities.inherent)) {
+        const severityKey =
+          severity as keyof NestedSBOMComponent["vulnerabilities"]["inherent"];
+        nestedComponent.vulnerabilities.transitive[severityKey].push(
+          ...nestedDep.vulnerabilities.inherent[severityKey],
         );
       }
-    });
+
+      for (const severity of Object.keys(
+        nestedDep.vulnerabilities.transitive,
+      )) {
+        const severityKey =
+          severity as keyof NestedSBOMComponent["vulnerabilities"]["transitive"];
+        nestedComponent.vulnerabilities.transitive[severityKey].push(
+          ...nestedDep.vulnerabilities.transitive[severityKey],
+        );
+      }
+
+      nestedWorkCounter += 1;
+       if (nestedWorkCounter % 60 === 0) {
+         await tick();
+         if (abortSignal?.aborted) return null;
+       }
+     }
 
     return nestedComponent;
   };
 
-  // Find top-level components (those that are not dependencies of others)
   setProgress(() => ({
     progress: 30,
     message: "Identifying top-level components",
   }));
+  await tick();
 
   const allDependencies = new Set<string>();
   dependencyMap.forEach((deps) => {
     deps.forEach((dep) => allDependencies.add(dep));
   });
 
-  // Top-level components are those in the dependency map but not as dependencies
   const topLevelRefs: string[] = [];
   dependencyMap.forEach((_, ref) => {
     if (!allDependencies.has(ref)) {
@@ -333,12 +328,10 @@ export const Formatter = async ({
     }
   });
 
-  // If no top-level components found, use metadata component or first few components
   if (topLevelRefs.length === 0) {
     if (rawSBOM.metadata?.component?.bomRef?.value) {
       topLevelRefs.push(rawSBOM.metadata.component.bomRef.value);
     } else {
-      // Use first component as fallback
       const componentsArray = Array.from(rawSBOM.components);
       if (componentsArray.length > 0 && componentsArray[0].bomRef?.value) {
         topLevelRefs.push(componentsArray[0].bomRef.value);
@@ -350,29 +343,32 @@ export const Formatter = async ({
     progress: 35,
     message: `Found ${topLevelRefs.length} top-level component(s)`,
   }));
+  await tick();
 
-  // Build nested structure for top-level components
-  topLevelRefs.forEach((ref, index) => {
-    setProgress(() => ({
-      progress: 35 + (index / topLevelRefs.length) * 55,
-      message: `Processing top-level component ${index + 1}/${topLevelRefs.length}`,
-    }));
+   for (let index = 0; index < topLevelRefs.length; index += 1) {
+     if (abortSignal?.aborted) throw new Error("Formatting aborted");
+     const ref = topLevelRefs[index];
+     setProgress(() => ({
+       progress: 35 + (index / topLevelRefs.length) * 55,
+       message: `Processing top-level component ${index + 1}/${topLevelRefs.length}`,
+     }));
+     await tick();
+     if (abortSignal?.aborted) throw new Error("Formatting aborted");
 
-    const nestedComponent = buildNestedComponent(ref);
-    if (nestedComponent) {
-      formattedSBOM.components.push(nestedComponent);
-    }
-  });
+     const nestedComponent = await buildNestedComponent(ref);
+     if (nestedComponent) {
+       formattedSBOM.components.push(nestedComponent);
+     }
+   }
 
-  // Step 5: Finalize
   setProgress(() => ({
     progress: 95,
     message: "Finalizing formatted SBOM",
   }));
+  await tick();
 
-  // Deduplicate transitive vulnerabilities within each component
-  formattedSBOM.components.forEach((component) => {
-    Object.keys(component.vulnerabilities.transitive).forEach((severity) => {
+  for (const component of formattedSBOM.components) {
+    for (const severity of Object.keys(component.vulnerabilities.transitive)) {
       const severityKey =
         severity as keyof NestedSBOMComponent["vulnerabilities"]["transitive"];
       const uniqueVulns = new Map<string, Vulnerability>();
@@ -384,13 +380,15 @@ export const Formatter = async ({
       component.vulnerabilities.transitive[severityKey] = Array.from(
         uniqueVulns.values(),
       );
-    });
-  });
+    }
+    await tick();
+  }
 
   setProgress(() => ({
     progress: 100,
     message: "Formatting complete",
   }));
+  await tick();
 
   return formattedSBOM;
 };

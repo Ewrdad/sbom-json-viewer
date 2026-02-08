@@ -44,7 +44,7 @@ describe("buildMermaidDiagram", () => {
       showVulnerableOnly: false,
     });
 
-    expect(result.diagram).toContain("flowchart TB");
+    expect(result.diagram).toContain("flowchart LR");
     expect(result.diagram).toContain("root");
     expect(result.diagram).toContain("leaf");
     expect(result.edgeCount).toBe(1);
@@ -135,5 +135,37 @@ describe("buildMermaidDiagram", () => {
 
     expect(result.truncated).toBe(true);
     expect(result.nodeCount).toBeLessThanOrEqual(3);
+  });
+
+  it("sanitizes component names and versions in labels", () => {
+    // Why: Prevents Mermaid syntax errors from special characters.
+    const tricky = createMockNode('Component <with> "quotes" & \\slashes', "pkg:npm/tricky@1.0.0");
+    
+    const result = buildMermaidDiagram([tricky], {
+      maxDepth: 1,
+      pruneNonMatches: false,
+      query: "",
+      showVulnerableOnly: false,
+    });
+
+    expect(result.diagram).toContain("Component &lt;with&gt; &quot;quotes&quot; &amp; \\\\slashes");
+  });
+
+  it("applies the highest severity class to nodes", () => {
+    // Why: Nodes should be visually prioritized by their worst vulnerability.
+    const component = createMockNode("vuln-comp", "pkg:npm/vuln@1.0.0");
+    component.vulnerabilities.inherent.High = [{ id: "CVE-HIGH" } as any];
+    component.vulnerabilities.transitive.Critical = [{ id: "CVE-CRITICAL" } as any];
+
+    const result = buildMermaidDiagram([component], {
+      maxDepth: 1,
+      pruneNonMatches: false,
+      query: "",
+      showVulnerableOnly: false,
+    });
+
+    // Should be critical because it has a transitive critical vuln
+    expect(result.diagram).toContain('node_0["vuln-comp');
+    expect(result.diagram).toContain('node_0["vuln-comp<br/>v1.0.0<br/>2 vulns (1nd, 1tr)"]:::critical');
   });
 });
