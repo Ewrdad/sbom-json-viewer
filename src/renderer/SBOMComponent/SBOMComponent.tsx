@@ -67,7 +67,7 @@ export const SBOMComponent = ({
   const purl =
     typeof component.purl === "string"
       ? component.purl
-      : component.purl?.value || component.purl?.toString?.();
+      : component.purl?.toString?.();
   const displayName = componentGroup
     ? `${componentGroup}/${componentName}`
     : componentName;

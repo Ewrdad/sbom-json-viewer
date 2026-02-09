@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { SBOMComponent } from "./SBOMComponent";
 import type { NestedSBOMComponent } from "../Formatter/Formatter";
-import { BomRef } from "@cyclonedx/cyclonedx-library/Models";
+// No BomRef import needed here
+
 
 // Mock navigator.clipboard
 vi.stubGlobal('navigator', {

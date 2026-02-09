@@ -5,6 +5,7 @@ import { X, Network, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { type DependencyAnalysis } from "../../lib/bomUtils";
+import { getLicenseCategory } from "../../lib/licenseUtils";
 
 interface ComponentDetailPanelProps {
   component: Component;
@@ -102,15 +103,35 @@ export function ComponentDetailPanel({
             </h4>
             <div className="flex flex-wrap gap-2">
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {Array.from(component.licenses || []).map((l: any, i) => (
-                <Badge
-                  key={i}
-                  variant="secondary"
-                  className="font-mono text-[10px]"
-                >
-                  {l.id || l.name || "Unknown"}
-                </Badge>
-              ))}
+              {Array.from(component.licenses || []).map((l: any, i) => {
+                const id = l.id || l.name;
+                const name = id || "Unknown";
+                const category = getLicenseCategory(id);
+                
+                let badgeVariant: "secondary" | "destructive" | "outline" | "default" = "secondary";
+                let customClassName = "font-mono text-[10px]";
+                
+                if (category === "copyleft") {
+                  badgeVariant = "destructive";
+                } else if (category === "weak-copyleft") {
+                  customClassName += " bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800";
+                } else if (category === "permissive") {
+                  customClassName += " bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+                } else if (category === "unknown") {
+                  badgeVariant = "outline";
+                }
+
+                return (
+                  <Badge
+                    key={i}
+                    variant={badgeVariant}
+                    className={customClassName}
+                    title={`${name} (${category})`}
+                  >
+                    {name}
+                  </Badge>
+                );
+              })}
               {(!component.licenses || component.licenses.size === 0) && (
                 <span className="text-sm text-muted-foreground">
                   No license info

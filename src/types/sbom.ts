@@ -9,6 +9,13 @@ export interface SbomStats {
   };
   licenseCounts: Record<string, number>;
   topLicenses: { name: string; count: number }[];
+  licenseDistribution: {
+    permissive: number;
+    copyleft: number;
+    weakCopyleft: number;
+    proprietary: number;
+    unknown: number;
+  };
   vulnerableComponents: {
     name: string;
     version: string;

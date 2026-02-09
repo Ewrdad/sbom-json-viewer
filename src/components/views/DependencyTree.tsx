@@ -212,7 +212,11 @@ export function DependencyTree({
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
 
   useEffect(() => {
-    if (preFormattedData) {
+    setAllowLargeFormat(false);
+  }, [sbom]);
+
+  useEffect(() => {
+    if (preFormattedData && (!isLarge || allowLargeFormat)) {
       setFormattedData(preFormattedData);
       // Automatically expand level 0 components initially
       const topLevelPaths = new Set<string>();
@@ -222,11 +226,10 @@ export function DependencyTree({
       });
       setExpandedPaths(topLevelPaths);
     } else {
-      setAllowLargeFormat(false);
       setFormattedData(null);
       setExpandedPaths(new Set());
     }
-  }, [sbom, preFormattedData]);
+  }, [sbom, preFormattedData, isLarge, allowLargeFormat]);
 
   useEffect(() => {
     let mounted = true;

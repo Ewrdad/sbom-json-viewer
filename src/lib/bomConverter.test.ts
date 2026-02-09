@@ -32,9 +32,12 @@ describe("bomConverter", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const bom = await convertJsonToBom(json as any);
     expect(bom).toBeInstanceOf(Bom);
-    expect(bom.components.size).toBe(1);
+    // Now 2 because we add metadata.component
+    expect(bom.components.size).toBe(2);
 
     const comps = Array.from(bom.components);
-    expect(comps[0].name).toBe("lib1");
+    const names = comps.map(c => c.name);
+    expect(names).toContain("lib1");
+    expect(names).toContain("root");
   });
 });

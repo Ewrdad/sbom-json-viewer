@@ -3,6 +3,7 @@ import { type Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { batchProcess, tick } from "../lib/asyncUtils";
 
 import { type SbomStats } from "../types/sbom";
+import { getLicenseCategory } from "../lib/licenseUtils";
 
 export function useSbomStats(sbom: Bom | null): SbomStats | null {
   const [stats, setStats] = useState<SbomStats | null>(null);
@@ -45,6 +46,13 @@ async function computeStats(sbom: Bom): Promise<SbomStats> {
     },
     licenseCounts: {},
     topLicenses: [],
+    licenseDistribution: {
+      permissive: 0,
+      copyleft: 0,
+      weakCopyleft: 0,
+      proprietary: 0,
+      unknown: 0,
+    },
     vulnerableComponents: [],
   };
 
@@ -135,10 +143,23 @@ async function computeStats(sbom: Bom): Promise<SbomStats> {
     .slice(0, 5);
 
   await batchProcess(componentsArray, (component) => {
-    component.licenses.forEach((license) => {
-      const name = (license as any).id || (license as any).name || "Unknown";
-      stats.licenseCounts[name] = (stats.licenseCounts[name] || 0) + 1;
-    });
+    const licenses = Array.from(component.licenses || []);
+    if (licenses.length === 0) {
+      stats.licenseDistribution.unknown++;
+    } else {
+      licenses.forEach((license) => {
+        const id = (license as any).id || (license as any).name;
+        const name = id || "Unknown";
+        stats.licenseCounts[name] = (stats.licenseCounts[name] || 0) + 1;
+
+        const category = getLicenseCategory(id);
+        if (category === "permissive") stats.licenseDistribution.permissive++;
+        else if (category === "copyleft") stats.licenseDistribution.copyleft++;
+        else if (category === "weak-copyleft") stats.licenseDistribution.weakCopyleft++;
+        else if (category === "proprietary") stats.licenseDistribution.proprietary++;
+        else stats.licenseDistribution.unknown++;
+      });
+    }
   });
 
   stats.topLicenses = Object.entries(stats.licenseCounts)

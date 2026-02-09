@@ -323,7 +323,7 @@ export const Formatter = async ({
   });
 
   const topLevelRefs: string[] = [];
-  dependencyMap.forEach((_, ref) => {
+  componentMap.forEach((_, ref) => {
     if (!allDependencies.has(ref)) {
       topLevelRefs.push(ref);
     }

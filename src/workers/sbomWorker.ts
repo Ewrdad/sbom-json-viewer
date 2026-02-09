@@ -1,6 +1,7 @@
 import { convertJsonToBom } from "../lib/bomConverter";
 import { Formatter } from "../renderer/Formatter/Formatter";
 import { type SbomStats, type WorkerProgressUpdate } from "../types/sbom";
+import { getLicenseCategory } from "../lib/licenseUtils";
 
 /**
  * SBOM Worker
@@ -108,6 +109,13 @@ function computeStatsSync(bom: any): SbomStats {
     vulnerabilityCounts: { critical: 0, high: 0, medium: 0, low: 0, none: 0 },
     licenseCounts: {},
     topLicenses: [],
+    licenseDistribution: {
+      permissive: 0,
+      copyleft: 0,
+      weakCopyleft: 0,
+      proprietary: 0,
+      unknown: 0,
+    },
     vulnerableComponents: [],
   };
 
@@ -147,9 +155,22 @@ function computeStatsSync(bom: any): SbomStats {
 
   // License unique list
   for (const component of bom.components) {
-    for (const license of (component.licenses || [])) {
-      const name = license.id || license.name || "Unknown";
-      stats.licenseCounts[name] = (stats.licenseCounts[name] || 0) + 1;
+    const licenses = Array.from(component.licenses || []);
+    if (licenses.length === 0) {
+      stats.licenseDistribution.unknown++;
+    } else {
+      for (const license of licenses) {
+        const id = (license as any).id || (license as any).name;
+        const name = id || "Unknown";
+        stats.licenseCounts[name] = (stats.licenseCounts[name] || 0) + 1;
+        
+        const category = getLicenseCategory(id);
+        if (category === "permissive") stats.licenseDistribution.permissive++;
+        else if (category === "copyleft") stats.licenseDistribution.copyleft++;
+        else if (category === "weak-copyleft") stats.licenseDistribution.weakCopyleft++;
+        else if (category === "proprietary") stats.licenseDistribution.proprietary++;
+        else stats.licenseDistribution.unknown++;
+      }
     }
   }
 

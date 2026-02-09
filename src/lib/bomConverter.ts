@@ -9,6 +9,23 @@ export const convertJsonToBom = async (
     metadata: rawJson.metadata as any,
   });
 
+  // Adding the root component from metadata if it exists
+  if (rawJson.metadata?.component) {
+    const metaComp = rawJson.metadata.component;
+    const rootComponent = new Component(
+      metaComp.type || "application",
+      metaComp.name || "root",
+      {
+        bomRef: metaComp["bom-ref"],
+        version: metaComp.version,
+        group: metaComp.group,
+        description: metaComp.description,
+        purl: metaComp.purl,
+      },
+    );
+    bom.components.add(rootComponent);
+  }
+
   const componentsArray = Array.isArray(rawJson.components)
     ? rawJson.components
     : [];

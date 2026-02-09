@@ -1,4 +1,4 @@
-import { type Bom, type Component } from "@cyclonedx/cyclonedx-library/Models";
+import { type Component } from "@cyclonedx/cyclonedx-library/Models";
 import { batchProcess } from "./asyncUtils";
 
 export interface DependencyAnalysis {

@@ -83,6 +83,11 @@ describe("useSbomStats", () => {
     expect(s.licenseCounts["Apache-2.0"]).toBe(1);
     expect(s.topLicenses[0].name).toBe("MIT");
 
+    // License distribution
+    expect(s.licenseDistribution.permissive).toBe(3); // MIT(2) + Apache-2.0(1)
+    expect(s.licenseDistribution.copyleft).toBe(0);
+    expect(s.licenseDistribution.unknown).toBe(0);
+
     // Vulnerable components
     expect(s.vulnerableComponents).toHaveLength(2);
     expect(s.vulnerableComponents[0].name).toBe("comp1");

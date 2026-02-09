@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSbomStats } from "../../hooks/useSbomStats";
-import type { SbomStats } from "../../hooks/useSbomStats";
+import type { SbomStats } from "@/types/sbom";
 import {
   Bar,
   BarChart,
@@ -8,6 +8,9 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  Pie,
+  PieChart,
+  Cell,
 } from "recharts";
 import { ShieldAlert, ShieldCheck, FileText, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +36,13 @@ export function DashboardView({
     },
     licenseCounts: {},
     topLicenses: [],
+    licenseDistribution: {
+      permissive: 0,
+      copyleft: 0,
+      weakCopyleft: 0,
+      proprietary: 0,
+      unknown: 0,
+    },
     vulnerableComponents: [],
   };
 
@@ -58,6 +68,16 @@ export function DashboardView({
       fill: "#3b82f6",
     },
   ];
+
+  const licenseDistData = [
+    { name: "Permissive", value: displayStats.licenseDistribution.permissive, color: "#22c55e" },
+    { name: "Copyleft", value: displayStats.licenseDistribution.copyleft, color: "#ef4444" },
+    { name: "Weak Copyleft", value: displayStats.licenseDistribution.weakCopyleft, color: "#f97316" },
+    { name: "Proprietary", value: displayStats.licenseDistribution.proprietary, color: "#a855f7" },
+    { name: "Unknown", value: displayStats.licenseDistribution.unknown, color: "#94a3b8" },
+  ].filter(d => d.value > 0);
+
+  const totalLicenseCount = Object.values(displayStats.licenseDistribution).reduce((a, b) => a + b, 0);
 
   return (
     <ScrollArea className="h-full">
@@ -181,11 +201,56 @@ export function DashboardView({
           </Card>
 
           <Card className="col-span-3 shadow-sm border-muted-foreground/10">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xl">License Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={licenseDistData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {licenseDistData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        borderColor: "hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                {licenseDistData.map((entry) => (
+                  <div key={entry.name} className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                    <span className="text-xs font-medium">{entry.name}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {Math.round((entry.value / (totalLicenseCount || 1)) * 100)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="col-span-3 shadow-sm border-muted-foreground/10">
             <CardHeader>
               <CardTitle className="text-xl">Top Licenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {displayStats.topLicenses.map((license) => (
                   <div key={license.name} className="flex items-center">
                     <div className="flex-1 space-y-1">
