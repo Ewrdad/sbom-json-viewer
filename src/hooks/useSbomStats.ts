@@ -2,27 +2,7 @@ import { useEffect, useState } from "react";
 import { type Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { batchProcess, tick } from "../lib/asyncUtils";
 
-export interface SbomStats {
-  totalComponents: number;
-  vulnerabilityCounts: {
-    critical: number;
-    high: number;
-    medium: number;
-    low: number;
-    none: number;
-  };
-  licenseCounts: Record<string, number>;
-  topLicenses: { name: string; count: number }[];
-  vulnerableComponents: {
-    name: string;
-    version: string;
-    critical: number;
-    high: number;
-    medium: number;
-    low: number;
-    total: number;
-  }[];
-}
+import { type SbomStats } from "../types/sbom";
 
 export function useSbomStats(sbom: Bom | null): SbomStats | null {
   const [stats, setStats] = useState<SbomStats | null>(null);

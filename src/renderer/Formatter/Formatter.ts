@@ -1,7 +1,8 @@
 import { Bom, Component } from "@cyclonedx/cyclonedx-library/Models";
 import type * as Models from "@cyclonedx/cyclonedx-library/Models";
 import type { License, Metadata } from "@cyclonedx/cyclonedx-library/Models";
-import type { Dispatch, SetStateAction } from "react";
+// import type { Dispatch, SetStateAction } from "react";
+type SetProgress = (update: { progress: number; message: string } | ((prev: { progress: number; message: string }) => { progress: number; message: string })) => void;
 import { uniqueLicenses } from "./Statistics/uniqueLicenses";
 import { uniqueVulnerabilities } from "./Statistics/uniqueVulnerabilities";
 import { batchProcess, tick } from "../../lib/asyncUtils";
@@ -133,7 +134,7 @@ export const Formatter = async ({
   abortSignal,
 }: {
   rawSBOM: Bom;
-  setProgress: Dispatch<SetStateAction<{ progress: number; message: string }>>;
+  setProgress: SetProgress;
   abortSignal?: AbortSignal;
 }): Promise<formattedSBOM> => {
   setProgress(() => ({ progress: 0, message: "Initializing formatter..." }));

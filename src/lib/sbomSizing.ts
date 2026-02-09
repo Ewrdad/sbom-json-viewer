@@ -12,7 +12,8 @@ export type SbomSizeProfile = {
  * Why: Large SBOMs can make deep formatting and graph rendering memory-heavy.
  */
 export const getSbomSizeProfile = (sbom: Bom): SbomSizeProfile => {
-  const componentCount = sbom.components.size;
+  const componentCount =
+    (sbom.components as any).size ?? (sbom.components as any).length ?? 0;
   return {
     componentCount,
     isLarge: componentCount >= LARGE_SBOM_COMPONENT_THRESHOLD,

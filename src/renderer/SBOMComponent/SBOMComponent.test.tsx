@@ -1,16 +1,23 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { SBOMComponent } from "./SBOMComponent";
 import type { NestedSBOMComponent } from "../Formatter/Formatter";
 import { BomRef } from "@cyclonedx/cyclonedx-library/Models";
 
+// Mock navigator.clipboard
+vi.stubGlobal('navigator', {
+  clipboard: {
+    writeText: vi.fn().mockImplementation(() => Promise.resolve()),
+  },
+});
+
 describe("SBOMComponent", () => {
   let mockComponent: NestedSBOMComponent;
 
   beforeEach(() => {
-    // Create a basic mock component
+    // Create a basic mock component with plain-object structure
     mockComponent = {
-      bomRef: new BomRef("pkg:npm/test@1.0.0"),
+      bomRef: "pkg:npm/test@1.0.0",
       type: "library",
       name: "test-component",
       version: "1.0.0",
@@ -136,8 +143,8 @@ describe("SBOMComponent", () => {
       const componentWithDeps = {
         ...mockComponent,
         formattedDependencies: [
-          { ...mockComponent, bomRef: new BomRef("pkg:npm/dep1@1.0.0") },
-          { ...mockComponent, bomRef: new BomRef("pkg:npm/dep2@1.0.0") },
+          { ...mockComponent, bomRef: "pkg:npm/dep1@1.0.0" },
+          { ...mockComponent, bomRef: "pkg:npm/dep2@1.0.0" },
         ] as any[],
       } as NestedSBOMComponent;
 
@@ -152,7 +159,7 @@ describe("SBOMComponent", () => {
       const componentWithDeps = {
         ...mockComponent,
         formattedDependencies: [
-          { ...mockComponent, bomRef: new BomRef("pkg:npm/dep1@1.0.0") },
+          { ...mockComponent, bomRef: "pkg:npm/dep1@1.0.0" },
         ] as any[],
       } as NestedSBOMComponent;
 
@@ -169,12 +176,7 @@ describe("SBOMComponent", () => {
     it("should display license information", () => {
       const componentWithLicense = {
         ...mockComponent,
-        licenses: {
-          add: () => {},
-          [Symbol.iterator]: function* () {
-            yield { id: "MIT" } as any;
-          },
-        } as any,
+        licenses: [{ id: "MIT" }] as any,
       } as NestedSBOMComponent;
 
       render(<SBOMComponent component={componentWithLicense} />);
@@ -185,13 +187,7 @@ describe("SBOMComponent", () => {
     it("should display multiple licenses", () => {
       const componentWithLicenses = {
         ...mockComponent,
-        licenses: {
-          add: () => {},
-          [Symbol.iterator]: function* () {
-            yield { id: "MIT" } as any;
-            yield { id: "Apache-2.0" } as any;
-          },
-        } as any,
+        licenses: [{ id: "MIT" }, { id: "Apache-2.0" }] as any,
       } as NestedSBOMComponent;
 
       render(<SBOMComponent component={componentWithLicenses} />);

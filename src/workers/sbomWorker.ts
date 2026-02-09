@@ -1,11 +1,6 @@
 import { convertJsonToBom } from "../lib/bomConverter";
 import { Formatter } from "../renderer/Formatter/Formatter";
-import { type SbomStats } from "../hooks/useSbomStats";
-
-interface WorkerProgressUpdate {
-  progress: number;
-  message: string;
-}
+import { type SbomStats, type WorkerProgressUpdate } from "../types/sbom";
 
 /**
  * SBOM Worker
@@ -44,11 +39,12 @@ self.onmessage = async (e: MessageEvent) => {
 
     // 5. Send result back
     try {
-      const result = JSON.parse(JSON.stringify({ 
+      // Deeply convert to plain objects to handle Sets/Maps/Classes correctly
+      const result = deepToPlain({ 
         bom, 
         formatted,
         stats
-      }));
+      });
       console.log(`[Worker] Sending result`);
       self.postMessage({ type: "complete", result });
     } catch (serializeError) {
@@ -63,6 +59,48 @@ self.onmessage = async (e: MessageEvent) => {
     });
   }
 };
+
+/**
+ * Deeply converts a value to a plain object/array.
+ * Handles Sets, Maps, and common class patterns.
+ */
+function deepToPlain(obj: any): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  // Handle Sets
+  if (obj instanceof Set) {
+    return Array.from(obj).map(deepToPlain);
+  }
+
+  // Handle Maps
+  if (obj instanceof Map) {
+    return Object.fromEntries(Array.from(obj.entries()).map(([k, v]) => [k, deepToPlain(v)]));
+  }
+
+  // Handle Arrays
+  if (Array.isArray(obj)) {
+    return obj.map(deepToPlain);
+  }
+
+  // Handle objects and class instances
+  const plain: any = {};
+  
+  // Special handling for BomRef and similar classes with a 'value' property
+  if (obj.value !== undefined && Object.keys(obj).length <= 2) {
+    return obj.value;
+  }
+
+  for (const key in obj) {
+    // Basic check for own properties (or simple class props)
+    if (Object.prototype.hasOwnProperty.call(obj, key) || typeof obj[key] !== 'function') {
+      plain[key] = deepToPlain(obj[key]);
+    }
+  }
+
+  return plain;
+}
 
 function computeStatsSync(bom: any): SbomStats {
   const stats: SbomStats = {

@@ -5,6 +5,7 @@ import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 
 export function Sidebar() {
+  console.log("Sidebar component rendering...");
   const { activeView, setActiveView } = useView();
 
   const navItems: { id: ViewType; label: string; icon: React.ReactNode }[] = [

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { Layout } from "./components/layout/Layout";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
 const DashboardView = lazy(() =>
   import("./components/views/DashboardView").then((module) => ({
     default: module.DashboardView,
@@ -426,9 +427,11 @@ export function App() {
   );
 
   return (
-    <ViewProvider>
-      <Layout>{mainContent}</Layout>
-    </ViewProvider>
+    <ErrorBoundary>
+      <ViewProvider>
+        <Layout>{mainContent}</Layout>
+      </ViewProvider>
+    </ErrorBoundary>
   );
 }
 

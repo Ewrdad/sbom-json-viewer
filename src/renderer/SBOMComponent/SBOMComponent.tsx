@@ -62,12 +62,12 @@ export const SBOMComponent = ({
   const componentName = component.name || "Unnamed Component";
   const componentVersion = component.version || "";
   const componentGroup = component.group || "";
-  const bomRef = component.bomRef?.value || "No reference";
+  const bomRef = typeof component.bomRef === 'string' ? component.bomRef : component.bomRef?.value || "No reference";
   const componentType = component.type || "library";
   const purl =
     typeof component.purl === "string"
       ? component.purl
-      : component.purl?.toString?.();
+      : component.purl?.value || component.purl?.toString?.();
   const displayName = componentGroup
     ? `${componentGroup}/${componentName}`
     : componentName;
@@ -79,13 +79,23 @@ export const SBOMComponent = ({
 
   const licenses: string[] = [];
   if (component.licenses) {
-    for (const license of component.licenses) {
-      if ("id" in license && license.id) {
-        licenses.push(license.id);
-      } else if ("name" in license && license.name) {
-        licenses.push(license.name);
-      } else if ("expression" in license && license.expression) {
-        licenses.push(license.expression);
+    const licensesToProcess = Array.isArray(component.licenses) 
+      ? component.licenses 
+      : typeof (component.licenses as any)[Symbol.iterator] === 'function'
+        ? Array.from(component.licenses)
+        : [];
+        
+    for (const license of licensesToProcess) {
+      if (typeof license === 'string') {
+        licenses.push(license);
+      } else if (license && typeof license === 'object') {
+        if ("id" in license && license.id) {
+          licenses.push(license.id);
+        } else if ("name" in license && license.name) {
+          licenses.push(license.name);
+        } else if ("expression" in license && license.expression) {
+          licenses.push(license.expression);
+        }
       }
     }
   }
@@ -317,7 +327,7 @@ export const SBOMComponent = ({
 
       <CardContent>
         <ResizablePanelGroup
-          orientation="horizontal"
+          direction="horizontal"
           className={`rounded-lg bg-muted/20 ${compactMode ? "min-h-40" : "min-h-50"}`}
         >
           <ResizablePanel defaultSize={canShowMoreDeps ? 60 : 100} minSize={30}>
