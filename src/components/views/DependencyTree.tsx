@@ -23,11 +23,11 @@ interface FlatNode {
 
 interface TreeItemRowProps {
   item: FlatNode;
-  showDetailed: boolean;
+  detailMode: "summary" | "severity" | "license";
   onToggle: (path: string) => void;
 }
 
-function TreeItemRow({ item, showDetailed, onToggle }: TreeItemRowProps) {
+function TreeItemRow({ item, detailMode, onToggle }: TreeItemRowProps) {
   const { node, level, hasChildren, isExpanded } = item;
   const children = node.formattedDependencies || [];
 
@@ -65,6 +65,28 @@ function TreeItemRow({ item, showDetailed, onToggle }: TreeItemRowProps) {
       </Badge>
     );
   };
+  const renderLicenseBadge = (
+    category: "permissive" | "copyleft" | "weak-copyleft" | "proprietary" | "unknown",
+    label: string,
+    colorClass: string,
+  ) => {
+    const count = node.licenseDistribution[category === "weak-copyleft" ? "weakCopyleft" : category];
+    if (count === 0) return null;
+
+    return (
+      <Badge
+        variant="outline"
+        className={cn(
+          "h-4 px-1 text-[9px] font-mono border flex gap-1",
+          colorClass,
+        )}
+        title={`${label}: ${count}`}
+      >
+        <span>{label}</span>
+        <span className="opacity-60">{count}</span>
+      </Badge>
+    );
+  };
 
   return (
     <div className="select-none text-card-foreground">
@@ -99,7 +121,7 @@ function TreeItemRow({ item, showDetailed, onToggle }: TreeItemRowProps) {
         </span>
 
         <div className="ml-auto flex items-center gap-1.5 flex-none overflow-hidden">
-          {showDetailed ? (
+          {detailMode === "severity" && (
             <div className="flex items-center gap-1">
               {renderSeverityBadge(
                 "Critical",
@@ -118,7 +140,39 @@ function TreeItemRow({ item, showDetailed, onToggle }: TreeItemRowProps) {
                 "border-blue-500/50 text-blue-500 bg-blue-500/5",
               )}
             </div>
-          ) : (
+          )}
+
+          {detailMode === "license" && (
+            <div className="flex items-center gap-1">
+              {renderLicenseBadge(
+                "copyleft",
+                "Copy",
+                "border-red-500/50 text-red-500 bg-red-500/5",
+              )}
+              {renderLicenseBadge(
+                "weak-copyleft",
+                "Weak",
+                "border-orange-500/50 text-orange-500 bg-orange-500/5",
+              )}
+              {renderLicenseBadge(
+                "proprietary",
+                "Prop",
+                "border-purple-500/50 text-purple-500 bg-purple-500/5",
+              )}
+              {renderLicenseBadge(
+                "permissive",
+                "Perm",
+                "border-green-500/50 text-green-500 bg-green-500/5",
+              )}
+              {renderLicenseBadge(
+                "unknown",
+                "Unk",
+                "border-gray-500/50 text-gray-500 bg-gray-500/5",
+              )}
+            </div>
+          )}
+
+          {detailMode === "summary" && (
             <>
               {inherentCount > 0 && (
                 <Badge
@@ -202,7 +256,7 @@ export function DependencyTree({
     preFormattedData || null,
   );
   const [loading, setLoading] = useState(false);
-  const [showDetailed, setShowDetailed] = useState(false);
+  const [detailMode, setDetailMode] = useState<"summary" | "severity" | "license">("summary");
   const [allowLargeFormat, setAllowLargeFormat] = useState(false);
   const [progress, setProgress] = useState({
     progress: 0,
@@ -333,20 +387,28 @@ export function DependencyTree({
           </span>
           <div className="flex items-center bg-muted p-1 rounded-md border">
             <Button
-              variant={!showDetailed ? "secondary" : "ghost"}
+              variant={detailMode === "summary" ? "secondary" : "ghost"}
               size="sm"
               className="h-7 text-[10px] px-2 py-0"
-              onClick={() => setShowDetailed(false)}
+              onClick={() => setDetailMode("summary")}
             >
               Summary
             </Button>
             <Button
-              variant={showDetailed ? "secondary" : "ghost"}
+              variant={detailMode === "severity" ? "secondary" : "ghost"}
               size="sm"
               className="h-7 text-[10px] px-2 py-0"
-              onClick={() => setShowDetailed(true)}
+              onClick={() => setDetailMode("severity")}
             >
               Severity
+            </Button>
+            <Button
+              variant={detailMode === "license" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 text-[10px] px-2 py-0"
+              onClick={() => setDetailMode("license")}
+            >
+              License
             </Button>
           </div>
         </div>
@@ -361,7 +423,7 @@ export function DependencyTree({
             <TreeItemRow
               key={item.path}
               item={item}
-              showDetailed={showDetailed}
+              detailMode={detailMode}
               onToggle={toggleNode}
             />
           )}

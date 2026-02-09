@@ -6,6 +6,7 @@ type SetProgress = (update: { progress: number; message: string } | ((prev: { pr
 import { uniqueLicenses } from "./Statistics/uniqueLicenses";
 import { uniqueVulnerabilities } from "./Statistics/uniqueVulnerabilities";
 import { batchProcess, tick } from "../../lib/asyncUtils";
+import { getLicenseCategory } from "../../lib/licenseUtils";
 
 type Vulnerability = Models.Vulnerability.Vulnerability;
 
@@ -43,6 +44,13 @@ export interface NestedSBOMComponent extends Component {
       Low: Vulnerability[];
       Informational: Vulnerability[];
     };
+  };
+  licenseDistribution: {
+    permissive: number;
+    copyleft: number;
+    weakCopyleft: number;
+    proprietary: number;
+    unknown: number;
   };
   formattedDependencies: NestedSBOMComponent[];
 }
@@ -265,7 +273,30 @@ export const Formatter = async ({
         Informational: [],
       },
     };
+    nestedComponent.licenseDistribution = {
+      permissive: 0,
+      copyleft: 0,
+      weakCopyleft: 0,
+      proprietary: 0,
+      unknown: 0,
+    };
     nestedComponent.formattedDependencies = [];
+
+    // Calculate inherent licenses for this component
+    const licenses = Array.from(component.licenses || []);
+    if (licenses.length === 0) {
+      nestedComponent.licenseDistribution.unknown++;
+    } else {
+      licenses.forEach((l: any) => {
+        const id = l.id || l.name;
+        const category = getLicenseCategory(id);
+        if (category === "permissive") nestedComponent.licenseDistribution.permissive++;
+        else if (category === "copyleft") nestedComponent.licenseDistribution.copyleft++;
+        else if (category === "weak-copyleft") nestedComponent.licenseDistribution.weakCopyleft++;
+        else if (category === "proprietary") nestedComponent.licenseDistribution.proprietary++;
+        else nestedComponent.licenseDistribution.unknown++;
+      });
+    }
 
     const componentVulns = vulnIndex.get(componentRef) || [];
     nestedComponent.vulnerabilities.inherent =
@@ -300,6 +331,13 @@ export const Formatter = async ({
           ...nestedDep.vulnerabilities.transitive[severityKey],
         );
       }
+
+      // Aggregate license distribution
+      nestedComponent.licenseDistribution.permissive += nestedDep.licenseDistribution.permissive;
+      nestedComponent.licenseDistribution.copyleft += nestedDep.licenseDistribution.copyleft;
+      nestedComponent.licenseDistribution.weakCopyleft += nestedDep.licenseDistribution.weakCopyleft;
+      nestedComponent.licenseDistribution.proprietary += nestedDep.licenseDistribution.proprietary;
+      nestedComponent.licenseDistribution.unknown += nestedDep.licenseDistribution.unknown;
 
       nestedWorkCounter += 1;
        if (nestedWorkCounter % 60 === 0) {
