@@ -12,6 +12,13 @@ import { cn } from "../../lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import { Virtuoso } from "react-virtuoso";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { ComponentDetailPanel } from "./ComponentDetailPanel";
+import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 
 interface FlatNode {
   node: NestedSBOMComponent;
@@ -24,10 +31,12 @@ interface FlatNode {
 interface TreeItemRowProps {
   item: FlatNode;
   detailMode: "summary" | "severity" | "license";
+  isSelected: boolean;
+  onSelect: (node: NestedSBOMComponent) => void;
   onToggle: (path: string) => void;
 }
 
-function TreeItemRow({ item, detailMode, onToggle }: TreeItemRowProps) {
+function TreeItemRow({ item, detailMode, isSelected, onSelect, onToggle }: TreeItemRowProps) {
   const { node, level, hasChildren, isExpanded } = item;
   const children = node.formattedDependencies || [];
 
@@ -95,11 +104,21 @@ function TreeItemRow({ item, detailMode, onToggle }: TreeItemRowProps) {
           "flex items-center py-1.5 px-2 hover:bg-muted/50 cursor-pointer rounded-sm group transition-colors",
           level === 0 &&
             "font-semibold border-b border-muted/50 mb-1 bg-muted/10",
+          isSelected && "bg-primary/15 hover:bg-primary/20 ring-1 ring-primary/30 ring-inset"
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
-        onClick={() => hasChildren && onToggle(item.path)}
+        onClick={(e) => {
+          // If clicking the chevron container, just toggle. 
+          // Otherwise, select the component.
+          const target = e.target as HTMLElement;
+          if (target.closest('.chevron-toggle')) {
+            hasChildren && onToggle(item.path);
+          } else {
+            onSelect(node);
+          }
+        }}
       >
-        <div className="w-5 flex items-center justify-center shrink-0">
+        <div className="w-5 flex items-center justify-center shrink-0 chevron-toggle">
           {hasChildren ? (
             isExpanded ? (
               <ChevronDown className="h-3.5 w-3.5" />
@@ -263,6 +282,9 @@ export function DependencyTree({
     message: "Preparing tree...",
   });
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+  const [selectedComponent, setSelectedComponent] = useState<NestedSBOMComponent | null>(null);
+  
+  const { analysis } = useDependencyAnalysis(sbom);
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
 
   useEffect(() => {
@@ -414,21 +436,53 @@ export function DependencyTree({
         </div>
       </div>
 
-      <Card className="flex-1 overflow-hidden bg-card/30 border border-muted/50 flex flex-col shadow-sm relative">
-        <Virtuoso
-          style={{ height: "100%" }}
-          totalCount={flatNodes.length}
-          data={flatNodes}
-          itemContent={(index, item) => (
-            <TreeItemRow
-              key={item.path}
-              item={item}
-              detailMode={detailMode}
-              onToggle={toggleNode}
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="flex-1 overflow-hidden"
+        key={selectedComponent ? "split" : "single"}
+      >
+        <ResizablePanel 
+          defaultSize={selectedComponent ? 60 : 100} 
+          minSize={20}
+          className="flex flex-col"
+        >
+          <Card className="flex-1 overflow-hidden bg-card/30 border border-muted/50 flex flex-col shadow-sm relative">
+            <Virtuoso
+              style={{ height: "100%" }}
+              totalCount={flatNodes.length}
+              data={flatNodes}
+              itemContent={(index, item) => (
+                <TreeItemRow
+                  key={item.path}
+                  item={item}
+                  detailMode={detailMode}
+                  isSelected={selectedComponent?.bomRef?.value === item.node.bomRef?.value}
+                  onSelect={setSelectedComponent}
+                  onToggle={toggleNode}
+                />
+              )}
             />
-          )}
-        />
-      </Card>
+          </Card>
+        </ResizablePanel>
+
+        {selectedComponent && (
+          <>
+            <ResizableHandle
+              withHandle
+              className="w-2 bg-border hover:bg-primary/50 transition-colors mx-1"
+            />
+            <ResizablePanel defaultSize={40} minSize={20}>
+              <div className="h-full pl-2">
+                <ComponentDetailPanel
+                  component={selectedComponent}
+                  analysis={analysis}
+                  onClose={() => setSelectedComponent(null)}
+                />
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
     </div>
   );
 }
