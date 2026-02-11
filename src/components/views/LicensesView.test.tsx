@@ -39,6 +39,9 @@ const mockStats: SbomStats = {
         { name: 'react', version: '18.2.0', ref: 'ref-react', licenses: [{ id: 'MIT', name: 'MIT', category: 'permissive' }] },
         { name: 'express', version: '4.17.1', ref: 'ref-express', licenses: [{ id: 'MIT', name: 'MIT', category: 'permissive' }] },
     ],
+    uniqueVulnerabilityCount: 0,
+    exposureRate: 0,
+    avgVulnerabilitiesPerComponent: 0,
 };
 
 

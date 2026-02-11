@@ -59,6 +59,9 @@ export interface SbomStats {
     ref: string;
     licenses: { id: string; name: string; category: string }[];
   }[];
+  uniqueVulnerabilityCount: number;
+  exposureRate: number;
+  avgVulnerabilitiesPerComponent: number;
 }
 
 export interface WorkerProgressUpdate {

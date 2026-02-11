@@ -72,11 +72,13 @@ describe("useSbomStats", () => {
     const s = result.current!;
     expect(s.totalComponents).toBe(3);
 
-    // Vulnerability counts
-    expect(s.vulnerabilityCounts.critical).toBe(2);
-    expect(s.vulnerabilityCounts.high).toBe(1);
-    expect(s.vulnerabilityCounts.medium).toBe(1);
+    // Vulnerability counts (Findings based, max severity per finding)
+    expect(s.vulnerabilityCounts.critical).toBe(2); // vuln1 on ref1, vuln2 on ref1
+    expect(s.vulnerabilityCounts.high).toBe(0); // vuln1's high rating is shadowed by its critical rating
+    expect(s.vulnerabilityCounts.medium).toBe(1); // vuln3 on ref2
     expect(s.vulnerabilityCounts.low).toBe(0);
+    expect(s.totalVulnerabilities).toBe(3);
+    expect(s.uniqueVulnerabilityCount).toBe(3);
 
     // License counts
     expect(s.licenseCounts["MIT"]).toBe(2);

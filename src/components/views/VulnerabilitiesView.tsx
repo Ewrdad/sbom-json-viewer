@@ -19,7 +19,6 @@ import {
 } from "recharts";
 import {
   ShieldAlert,
-  ShieldX,
   ShieldCheck,
   AlertTriangle,
   Search,
@@ -56,7 +55,9 @@ const SEVERITY_COLORS = {
 export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; preComputedStats?: SbomStats }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
-  const displayStats: SbomStats = {
+  
+  // High-defensive initialization
+  const fallbackStats: SbomStats = {
     totalComponents: 0,
     vulnerabilityCounts: { critical: 0, high: 0, medium: 0, low: 0, none: 0 },
     licenseCounts: {},
@@ -66,8 +67,27 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     allVulnerableComponents: [],
     totalVulnerabilities: 0,
     allVulnerabilities: [],
+    allLicenses: [],
+    allLicenseComponents: [],
+    uniqueVulnerabilityCount: 0,
+    exposureRate: 0,
+    avgVulnerabilitiesPerComponent: 0,
+  };
+
+  const displayStats: SbomStats = {
+    ...fallbackStats,
     ...(preComputedStats ?? stats ?? {}),
   } as SbomStats;
+
+  // Final safety check to ensure vulnerabilityCounts is never undefined
+  if (!displayStats.vulnerabilityCounts) {
+    displayStats.vulnerabilityCounts = fallbackStats.vulnerabilityCounts;
+  }
+  
+  // Debug log (only in dev)
+  if (import.meta.env.DEV && !isLoadingStats) {
+    console.log('[VulnerabilitiesView] displayStats:', displayStats);
+  }
 
   const [viewMode, setViewMode] = useState<ViewMode>("components");
 
@@ -227,21 +247,40 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card className="border-l-4 border-l-destructive/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Vulnerabilities</CardTitle>
+              <CardTitle className="text-sm font-medium">Vulnerability Findings</CardTitle>
               <ShieldAlert className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{totalVulns}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                across {displayStats.allVulnerableComponents.length} components
-              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
+                  {displayStats.uniqueVulnerabilityCount} Unique CVEs
+                </p>
+                <div 
+                   className="h-3 w-3 rounded-full bg-muted flex items-center justify-center text-[8px] cursor-help border"
+                   title="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions."
+                >
+                  ?
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-orange-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Exposure Rate</CardTitle>
+              <ShieldAlert className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-orange-600">{displayStats.exposureRate}%</div>
+              <p className="text-xs text-muted-foreground mt-1">{displayStats.allVulnerableComponents.length} packages affected</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4" style={{ borderLeftColor: SEVERITY_COLORS.Critical }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Critical</CardTitle>
-              <ShieldX className="h-4 w-4 text-red-600" />
+              <AlertTriangle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-red-600">{critical}</div>

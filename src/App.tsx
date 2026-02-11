@@ -304,18 +304,31 @@ export function App() {
         if (type === "progress") {
           updateLoading(message, progress / 100);
         } else if (type === "complete") {
+          if (!result) {
+            setError("Worker error: complete message missing result");
+            resetLoading();
+            worker.terminate();
+            reject(new Error("complete message missing result"));
+            return;
+          }
+
           // Revive Maps from plain objects sent by worker
           const formatted = result.formatted;
           if (formatted) {
-            if (formatted.componentMap) {
-              formatted.componentMap = new Map(Object.entries(formatted.componentMap));
-            } else {
-              formatted.componentMap = new Map();
-            }
-            if (formatted.dependencyGraph) {
-              formatted.dependencyGraph = new Map(Object.entries(formatted.dependencyGraph));
-            } else {
-              formatted.dependencyGraph = new Map();
+            try {
+              if (formatted.componentMap) {
+                formatted.componentMap = new Map(Object.entries(formatted.componentMap));
+              } else {
+                formatted.componentMap = new Map();
+              }
+              if (formatted.dependencyGraph) {
+                formatted.dependencyGraph = new Map(Object.entries(formatted.dependencyGraph));
+              } else {
+                formatted.dependencyGraph = new Map();
+              }
+            } catch (err) {
+              console.error("Map revival failed", err);
+              // Continue anyway, UI will handle partial data
             }
           }
           

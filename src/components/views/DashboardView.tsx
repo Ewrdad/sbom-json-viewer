@@ -12,7 +12,7 @@ import {
   PieChart,
   Cell,
 } from "recharts";
-import { ShieldAlert, ShieldCheck, FileText, Package } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -49,6 +49,9 @@ export function DashboardView({
     allVulnerabilities: [],
     allLicenses: [],
     allLicenseComponents: [],
+    uniqueVulnerabilityCount: 0,
+    exposureRate: 0,
+    avgVulnerabilitiesPerComponent: 0,
   };
 
   const vulnData = [
@@ -115,32 +118,41 @@ export function DashboardView({
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Vulnerabilities
+                Vulnerability Findings
               </CardTitle>
               <ShieldAlert className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-destructive">
-                {displayStats.vulnerabilityCounts.critical +
-                  displayStats.vulnerabilityCounts.high}
+                {displayStats.totalVulnerabilities}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Critical & High risk
-              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
+                  {displayStats.uniqueVulnerabilityCount} Unique CVEs
+                </p>
+                <div 
+                   className="h-3 w-3 rounded-full bg-muted flex items-center justify-center text-[8px] cursor-help border"
+                   title="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions."
+                >
+                  ?
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Unique Licenses
+                Exposure Rate
               </CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <ShieldCheck className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {Object.keys(displayStats.licenseCounts).length}
+                {displayStats.exposureRate}%
               </div>
-              <p className="text-xs text-muted-foreground">Detected types</p>
+              <p className="text-xs text-muted-foreground">
+                {displayStats.allVulnerableComponents.length} of {displayStats.totalComponents} impacted
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -148,18 +160,11 @@ export function DashboardView({
               <CardTitle className="text-sm font-medium">
                 Secure Components
               </CardTitle>
-              <ShieldCheck className="h-4 w-4 text-green-600" />
+              <ShieldCheck className="h-4 w-4 text-sky-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {Math.max(
-                  0,
-                  displayStats.totalComponents -
-                    (displayStats.vulnerabilityCounts.critical +
-                      displayStats.vulnerabilityCounts.high +
-                      displayStats.vulnerabilityCounts.medium +
-                      displayStats.vulnerabilityCounts.low),
-                )}
+                {Math.max(0, displayStats.totalComponents - displayStats.allVulnerableComponents.length)}
               </div>
               <p className="text-xs text-muted-foreground">No known issues</p>
             </CardContent>

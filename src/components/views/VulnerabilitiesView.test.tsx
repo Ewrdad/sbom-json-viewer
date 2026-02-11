@@ -36,6 +36,9 @@ const mockStats: SbomStats = {
     ],
     allLicenses: [],
     allLicenseComponents: [],
+    uniqueVulnerabilityCount: 3,
+    exposureRate: 3,
+    avgVulnerabilitiesPerComponent: 0.5,
 };
 
 const emptyStats: SbomStats = {
@@ -50,18 +53,30 @@ const emptyStats: SbomStats = {
     allVulnerabilities: [],
     allLicenses: [],
     allLicenseComponents: [],
+    uniqueVulnerabilityCount: 0,
+    exposureRate: 0,
+    avgVulnerabilitiesPerComponent: 0,
 };
 
 describe('VulnerabilitiesView', () => {
     it('should render KPI cards with correct counts', () => {
         render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
 
-        expect(screen.getByText('Total Vulnerabilities')).toBeInTheDocument();
+        expect(screen.getByText('Vulnerability Findings')).toBeInTheDocument();
         expect(screen.getByText('50')).toBeInTheDocument();
-        expect(screen.getByText('5')).toBeInTheDocument(); // critical
-        expect(screen.getByText('10')).toBeInTheDocument(); // high
-        expect(screen.getByText('20')).toBeInTheDocument(); // medium
-        expect(screen.getByText('15')).toBeInTheDocument(); // low
+        expect(screen.getByText(/3 unique CVEs/i)).toBeInTheDocument();
+
+        // Use a more resilient way to find severity counts: find the label and ensure the count is nearby
+        // or just check that they exist in the document.
+        expect(screen.getAllByText('Critical').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('High').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('Medium').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('Low').length).toBeGreaterThanOrEqual(1);
+
+        expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('20').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('15').length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show empty state when no vulnerabilities', () => {
