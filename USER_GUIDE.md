@@ -8,12 +8,13 @@ This SBOM Viewer provides an interactive, hierarchical view of CycloneDX Softwar
 
 ### ✨ Core Features
 
-- **Nested Dependency Tree**: View components and their dependencies up to 3 levels deep (configurable)
+- **Nested Dependency Tree**: View components and their dependencies with infinite scrolling
 - **Vulnerability Tracking**: Separate display of direct vs. inherited vulnerabilities
 - **Severity-Based Coloring**: Color-coded badges for Critical, High, Medium, and Low vulnerabilities
+- **Interactive CVE Links**: Click vulnerability badges to view official NVD details
 - **License Display**: View licenses for each component
 - **Interactive Expansion**: Expand/collapse dependencies on demand
-- **Sample SBOM**: Includes a simple sample SBOM for quick testing
+- **Large SBOM Support**: Capable of rendering 20,000+ components smoothly
 
 ### 🎯 Vulnerability Display
 
@@ -23,7 +24,7 @@ This SBOM Viewer provides an interactive, hierarchical view of CycloneDX Softwar
 - **Low** (Outline badge): Low severity vulnerabilities
 - Shows **direct vulnerabilities** (inherent to the component)
 - Shows **inherited vulnerabilities** (from dependencies)
-- Click badges to expand and see CVE details
+- **Clickable Badges**: Click any severity badge to open the corresponding CVE page on nvd.nist.gov
 
 ### 📦 Component Information
 
@@ -53,17 +54,24 @@ The viewer can load SBOMs in two ways:
 
 ### Navigation
 
+#### Toolbar & Navigation
+
+- **Search**: Filter by component name, group, version, or CVE ID.
+- **Depth Switcher**: Quickly jump to specific levels:
+  - **Roots**: Collapse all to top-level.
+  - **L1 / L2**: Expand to 1st or 2nd level of depth.
+  - **Full**: Expand all components (use with caution on huge SBOMs).
+- **Reveal Threats**: specialized "Focus Mode" that filters the tree to show _only_ components with vulnerabilities (direct or transitive).
+
 #### Expanding/Collapsing
 
-- **Dependencies**: Click "Show/Hide Dependencies" button to toggle
-- **Vulnerabilities**: Click severity badges to view CVE details
-- **Auto-Expansion**: First 2 levels expand by default for better UX
+- **Toggle**: Click the chevron or row to expand/collapse.
+- **Auto-Expansion**: Smart expansion based on search results.
 
-#### Depth Limiting
+#### Large SBOM Handling
 
-- Default maximum depth: **3 levels**
-- Prevents performance issues with large dependency trees
-- Components beyond max depth show a message: "X more dependencies (max depth reached)"
+- **Virtualization**: The tree uses "windowing" to only render visible rows, allowing smooth scrolling even with 20k+ components.
+- **Web Workers**: Parsing and formatting happen in a background thread to keep the UI responsive.
 
 ### Component Cards
 
@@ -108,10 +116,10 @@ App.tsx
 
 ### Performance Optimizations
 
-- **Depth Limiting**: Prevents rendering thousands of nested components
-- **Lazy Expansion**: Dependencies only visible when expanded
-- **Efficient Formatting**: Single-pass dependency resolution
-- **Memoized Components**: React optimization for re-renders
+- **Web Workers**: Heavy parsing logic runs in a background thread.
+- **UI Virtualization**: `react-virtuoso` renders only the visible portion of the dependency tree.
+- **Lazy Expansion**: Dependencies are computed on-the-fly or in background batches.
+- **Memoized Components**: React optimization for re-renders.
 
 ## Sample SBOM Structure
 

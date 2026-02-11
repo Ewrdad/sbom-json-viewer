@@ -10,25 +10,28 @@ import { getLicenseCategory } from "../lib/licenseUtils";
 
 self.onmessage = async (e: MessageEvent) => {
   const { jsonText, filename } = e.data;
-  console.log(`[Worker] Started processing ${filename}`);
+  if (import.meta.env.DEV) {
+    console.log(`[Worker] Started processing ${filename}`);
+  }
 
   try {
     // 1. Parse JSON
     self.postMessage({ type: "progress", message: `Parsing ${filename}...`, progress: 0 });
     const json = JSON.parse(jsonText);
-    console.log(`[Worker] JSON parsed`);
+    if (import.meta.env.DEV) console.log(`[Worker] JSON parsed`);
 
     // 2. Convert to Bom
     self.postMessage({ type: "progress", message: "Converting to CycloneDX model...", progress: 5 });
     const bom = await convertJsonToBom(json);
-    console.log(`[Worker] Bom converted`);
+    if (import.meta.env.DEV) console.log(`[Worker] Bom converted`);
 
     // 3. Compute Stats
     self.postMessage({ type: "progress", message: "Computing statistics...", progress: 10 });
     const stats = computeStatsSync(bom);
-    console.log(`[Worker] Stats computed`);
+    if (import.meta.env.DEV) console.log(`[Worker] Stats computed`);
 
-    const formatted = await Formatter({
+    // 4. Format
+    const result_formatted = await Formatter({
       rawSBOM: bom,
       setProgress: (update: WorkerProgressUpdate | ((prev: WorkerProgressUpdate) => WorkerProgressUpdate)) => {
         const value = typeof update === 'function' ? update({ progress: 0, message: '' }) : update;
@@ -36,17 +39,17 @@ self.onmessage = async (e: MessageEvent) => {
         self.postMessage({ type: "progress", message: value.message, progress: scaledProgress });
       }
     });
-    console.log(`[Worker] Formatted`);
+    if (import.meta.env.DEV) console.log(`[Worker] Formatted`);
 
     // 5. Send result back
     try {
       // Deeply convert to plain objects to handle Sets/Maps/Classes correctly
       const result = deepToPlain({ 
         bom, 
-        formatted,
+        formatted: result_formatted,
         stats
       });
-      console.log(`[Worker] Sending result`);
+      if (import.meta.env.DEV) console.log(`[Worker] Sending result`);
       self.postMessage({ type: "complete", result });
     } catch (serializeError) {
       console.error("[Worker] Serialization failed:", serializeError);
@@ -77,7 +80,12 @@ function deepToPlain(obj: any): any {
 
   // Handle Maps
   if (obj instanceof Map) {
-    return Object.fromEntries(Array.from(obj.entries()).map(([k, v]) => [k, deepToPlain(v)]));
+    // Return as plain object for serialization
+    const plainMap: any = {};
+    for (const [key, value] of obj) {
+      plainMap[key] = deepToPlain(value);
+    }
+    return plainMap;
   }
 
   // Handle Arrays
@@ -90,7 +98,7 @@ function deepToPlain(obj: any): any {
   
   // Special handling for BomRef and similar classes with a 'value' property
   if (obj.value !== undefined && Object.keys(obj).length <= 2) {
-    return obj.value;
+    return { value: obj.value };
   }
 
   for (const key in obj) {
@@ -117,6 +125,8 @@ function computeStatsSync(bom: any): SbomStats {
       unknown: 0,
     },
     vulnerableComponents: [],
+    allVulnerableComponents: [],
+    totalVulnerabilities: 0,
   };
 
   const severityOrder = ["critical", "high", "medium", "low"];
@@ -179,10 +189,9 @@ function computeStatsSync(bom: any): SbomStats {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  // Most vulnerable
-  stats.vulnerableComponents = Array.from(compVulnMap.entries())
+  // All vulnerable components (full list with refs)
+  const allVulnComps = Array.from(compVulnMap.entries())
     .map(([ref, vulns]) => {
-      // Find component name/version from ref if possible
       let name = "Unknown";
       let version = "";
       for (const c of bom.components) {
@@ -192,14 +201,20 @@ function computeStatsSync(bom: any): SbomStats {
           break;
         }
       }
-      return { name, version, ...vulns };
+      return { name, version, ref, ...vulns };
     })
     .sort((a, b) => {
       if (b.critical !== a.critical) return b.critical - a.critical;
       if (b.high !== a.high) return b.high - a.high;
       return b.total - a.total;
-    })
-    .slice(0, 5);
+    });
+
+  stats.allVulnerableComponents = allVulnComps;
+  stats.vulnerableComponents = allVulnComps.slice(0, 5);
+  stats.totalVulnerabilities = stats.vulnerabilityCounts.critical +
+    stats.vulnerabilityCounts.high +
+    stats.vulnerabilityCounts.medium +
+    stats.vulnerabilityCounts.low;
 
   return stats;
 }

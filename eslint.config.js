@@ -22,6 +22,8 @@ export default defineConfig([
     rules: {
       "react-hooks/set-state-in-effect": "off", // This is a pattern supported by the react team you dumbasses
       "@typescript-eslint/no-unused-vars": "off", // Just isnt functional
+      "@typescript-eslint/no-explicit-any": "warn",
+      "react-refresh/only-export-components": "warn",
     },
   },
 ]);

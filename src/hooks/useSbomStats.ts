@@ -54,6 +54,8 @@ async function computeStats(sbom: Bom): Promise<SbomStats> {
       unknown: 0,
     },
     vulnerableComponents: [],
+    allVulnerableComponents: [],
+    totalVulnerabilities: 0,
   };
 
   const compVulnMap = new Map<
@@ -127,11 +129,12 @@ async function computeStats(sbom: Bom): Promise<SbomStats> {
     }
   });
 
-  stats.vulnerableComponents = Array.from(compVulnMap.entries())
+  const allVulnComps = Array.from(compVulnMap.entries())
     .map(([ref, vulns]) => {
       const info = componentMap.get(ref) || { name: "Unknown", version: "" };
       return {
         ...info,
+        ref,
         ...vulns,
       };
     })
@@ -139,8 +142,14 @@ async function computeStats(sbom: Bom): Promise<SbomStats> {
       if (b.critical !== a.critical) return b.critical - a.critical;
       if (b.high !== a.high) return b.high - a.high;
       return b.total - a.total;
-    })
-    .slice(0, 5);
+    });
+
+  stats.allVulnerableComponents = allVulnComps;
+  stats.vulnerableComponents = allVulnComps.slice(0, 5);
+  stats.totalVulnerabilities = stats.vulnerabilityCounts.critical +
+    stats.vulnerabilityCounts.high +
+    stats.vulnerabilityCounts.medium +
+    stats.vulnerabilityCounts.low;
 
   await batchProcess(componentsArray, (component) => {
     const licenses = Array.from(component.licenses || []);

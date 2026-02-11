@@ -1,0 +1,1324 @@
+
+> sbom-json-viewer@0.0.0 test:unit
+> vitest --run --reporter=verbose
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer[39m
+
+[90mstdout[2m | src/ImportIsolation.test.ts[2m > [22m[2mImport Isolation[2m > [22m[2mshould import Layout
+[22m[39mImporting Layout...
+
+[90mstdout[2m | src/ImportIsolation.test.ts[2m > [22m[2mImport Isolation[2m > [22m[2mshould import Layout
+[22m[39mLayout imported successfully
+
+ [32m✓[39m src/ImportIsolation.test.ts[2m > [22mImport Isolation[2m > [22mshould import Layout[33m 841[2mms[22m[39m
+[90mstdout[2m | src/ImportIsolation.test.ts[2m > [22m[2mImport Isolation[2m > [22m[2mshould import Sidebar
+[22m[39mImporting Sidebar...
+
+[90mstdout[2m | src/ImportIsolation.test.ts[2m > [22m[2mImport Isolation[2m > [22m[2mshould import Sidebar
+[22m[39mSidebar imported successfully
+
+[90mstdout[2m | src/ImportIsolation.test.ts[2m > [22m[2mImport Isolation[2m > [22m[2mshould import App
+[22m[39mImporting App...
+
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mBasic Functionality[2m > [22mshould format an empty SBOM without errors[32m 77[2mms[22m[39m
+[31m   → expected undefined to deeply equal [][39m
+ [32m✓[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mBasic Functionality[2m > [22mshould extract metadata from SBOM[32m 15[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mBasic Functionality[2m > [22mshould report progress throughout formatting[32m 19[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mBasic Functionality[2m > [22mshould extract unique licenses into statistics[32m 16[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mBasic Functionality[2m > [22mshould extract unique vulnerabilities into statistics[32m 13[2mms[22m[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mLinear Dependency Structure[2m > [22mshould build nested component structure for linear dependencies[32m 11[2mms[22m[39m
+[31m   → Target cannot be null or undefined.[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mLinear Dependency Structure[2m > [22mshould aggregate transitive vulnerabilities in linear chain[32m 8[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mLinear Dependency Structure[2m > [22mshould track inherent vulnerabilities at the correct level[32m 15[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mDiamond Dependency Structure[2m > [22mshould replicate shared dependencies[32m 13[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mDiamond Dependency Structure[2m > [22mshould aggregate transitive vulnerabilities from multiple paths[32m 14[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mDiamond Dependency Structure[2m > [22mshould deduplicate transitive vulnerabilities[32m 41[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mCircular Dependency Handling[2m > [22mshould handle circular dependencies without infinite recursion[32m 16[2mms[22m[39m
+[31m   → Target cannot be null or undefined.[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mCircular Dependency Handling[2m > [22mshould still build partial structure with circular dependencies[32m 13[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [32m✓[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mVulnerability Categorization[2m > [22mshould categorize vulnerabilities by severity[32m 22[2mms[22m[39m
+[90mstdout[2m | src/ImportIsolation.test.ts[2m > [22m[2mImport Isolation[2m > [22m[2mshould import App
+[22m[39mApp imported successfully
+
+ [32m✓[39m src/ImportIsolation.test.ts[2m > [22mImport Isolation[2m > [22mshould import Sidebar[32m 6[2mms[22m[39m
+ [32m✓[39m src/ImportIsolation.test.ts[2m > [22mImport Isolation[2m > [22mshould import App[32m 296[2mms[22m[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mVulnerability Categorization[2m > [22mshould separate inherent from transitive vulnerabilities[32m 12[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mEdge Cases[2m > [22mshould handle component with no dependencies[32m 12[2mms[22m[39m
+[31m   → Target cannot be null or undefined.[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mEdge Cases[2m > [22mshould handle component with missing dependency reference[32m 14[2mms[22m[39m
+[31m   → Target cannot be null or undefined.[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mEdge Cases[2m > [22mshould handle SBOM with only vulnerabilities, no components[32m 13[2mms[22m[39m
+[31m   → Target cannot be null or undefined.[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mComponent Structure Integrity[2m > [22mshould preserve component properties in nested structure[32m 10[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading '0')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mComponent Structure Integrity[2m > [22mshould add vulnerability tracking to each component[32m 14[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading 'forEach')[39m
+ [31m×[39m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mComponent Structure Integrity[2m > [22mshould add formattedDependencies array to each component[32m 12[2mms[22m[39m
+[31m   → Cannot read properties of undefined (reading 'forEach')[39m
+ [32m✓[39m src/App.test.tsx[2m > [22mApp Integration[2m > [22msanity check[32m 119[2mms[22m[39m
+ [31m×[39m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders basic component information[32m 55[2mms[22m[39m
+[31m   → Copy is not defined[39m
+ [31m×[39m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders vulnerability breakdown[32m 6[2mms[22m[39m
+[31m   → Copy is not defined[39m
+ [31m×[39m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders license and shows description on click[32m 4[2mms[22m[39m
+[31m   → Copy is not defined[39m
+ [31m×[39m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mcopies JSON to clipboard[32m 3[2mms[22m[39m
+[31m   → Copy is not defined[39m
+ [31m×[39m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders additional details (properties)[32m 6[2mms[22m[39m
+[31m   → Copy is not defined[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mBasic Rendering[2m > [22mshould render component name and version[33m 742[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mBasic Rendering[2m > [22mshould render component group[32m 76[2mms[22m[39m
+ [32m✓[39m src/App.test.tsx[2m > [22mApp Integration[2m > [22mshould load SBOM and display Dashboard by default[33m 1543[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mBasic Rendering[2m > [22mshould render component type badge[32m 245[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mBasic Rendering[2m > [22mshould render bom-ref[32m 94[2mms[22m[39m
+ [32m✓[39m src/App.test.tsx[2m > [22mApp Integration[2m > [22mshould switch views when sidebar buttons are clicked[33m 858[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mVulnerabilities Display[2m > [22mshould show no vulnerabilities message when component is clean[32m 278[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mVulnerabilities Display[2m > [22mshould display critical vulnerabilities count[33m 383[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mVulnerabilities Display[2m > [22mshould show inherited vulnerabilities separately[32m 64[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mDependencies[2m > [22mshould not show dependencies section when there are none[32m 26[2mms[22m[39m
+ [31m×[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mDependencies[2m > [22mshould show dependencies count when present[32m 28[2mms[22m[39m
+[31m   → Unable to find an element with the text: /Dependencies \(2\)/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-lg py-4 text-xs/relaxed ring-1 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg group/card flex flex-col border-muted/60 shadow-sm mb-4"[31m
+      [33mdata-size[31m=[32m"default"[31m
+      [33mdata-slot[31m=[32m"card"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"gap-1 rounded-t-lg px-4 group-data-[size=sm]/card:px-3 [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3 group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"[31m
+        [33mdata-slot[31m=[32m"card-header"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"text-sm font-medium flex items-start gap-2"[31m
+          [33mdata-slot[31m=[32m"card-title"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"flex flex-col"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"flex items-center gap-2"[31m
+            [36m>[31m
+              [0mtest-group/[0m
+              [0mtest-component[0m
+              [36m<span[31m
+                [33mclass[31m=[32m"ml-2 text-sm font-normal text-muted-foreground"[31m
+              [36m>[31m
+                [0mv[0m
+                [0m1.0.0[0m
+              [36m</span>[31m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"text-xs text-muted-foreground"[31m
+            [36m>[31m
+              [0mpkg:npm/test@1.0.0[0m
+            [36m</span>[31m
+          [36m</span>[31m
+          [36m<div[31m
+            [33mclass[31m=[32m"ml-auto flex flex-wrap items-center gap-2"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"h-5 gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground bg-input/20 dark:bg-input/30"[31m
+              [33mdata-slot[31m=[32m"badge"[31m
+              [33mdata-variant[31m=[32m"outline"[31m
+            [36m>[31m
+              [0mlibrary[0m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"h-5 gap-1 rounded-full border border-transparent px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"[31m
+              [33mdata-slot[31m=[32m"badge"[31m
+              [33mdata-variant[31m=[32m"secondary"[31m
+            [36m>[31m
+              [0mRoot[0m
+            [36m</span>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"text-muted-foreground text-xs"[31m
+          [33mdata-slot[31m=[32m"card-description"[31m
+        [36m/>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"px-4 group-data-[size=sm]/card:px-3"[31m
+        [33mdata-slot[31m=[32m"card-content"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex h-full w-full aria-[orientation=vertical]:flex-col rounded-lg bg-muted/20 min-h-50"[31m
+          [33mdata-group[31m=[32m"true"[31m
+          [33mdata-slot[31m=[32m"resizable-panel-group"[31m
+          [33mdata-testid[31m=[32m"_r_q_"[31m
+          [33mid[31m=[32m"_r_q_"[31m
+          [33mstyle[31m=[32m"height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: row; flex-wrap: nowrap;"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mdata-panel[31m=[32m"true"[31m
+            [33mdata-slot[31m=[32m"resizable-panel"[31m
+            [33mdata-testid[31m=[32m"_r_r_"[31m
+            [33mid[31m=[32m"_r_r_"[31m
+            [33mstyle[31m=[32m"min-height: 0; max-height: 100%; height: auto; min-width: 0; max-width: 100%; width: auto; border: 0px none none; padding: 0px; margin: 0px; display: flex; flex-basis: 0px; flex-shrink: 1; overflow: hidden; flex-grow: 100;"[31m
+          [36m>[31m
+            [36m<div[31m
+              [33mstyle[31m=[32m"max-height: 100%; max-width: 100%; flex-grow: 1;"[31m
+            [36m>[31m
+              [36m<div[31m
+                [33mclass[31m=[32m"space-y-3 p-2 "[31m
+              [36m>[31m
+                [36m<div[31m
+                  [33mclass[31m=[32m"text-sm text-muted-foreground"[31m
+                [36m>[31m
+                  [0m✓ No known vulnerabilities[0m
+                [36m</div>[31m
+                [36m<div>[31m
+                  [36m<h4[31m
+                    [33mclass[31m=[32m"text-sm font-semibold mb-2"[31m
+                  [36m>[31m
+                    [0mDetails[0m
+                  [36m</h4>[31m
+                  [36m<div[31m
+                    [33mclass[31m=[32m"relative h-40 w-full rounded-md border p-3"[31m
+                    [33mdata-has-overflow-x[31m=[32m""[31m
+                    [33mdata-has-overflow-y[31m=[32m""[31m
+                    [33mdata-slot[31m=[32m"scroll-area"[31m
+                    [33mrole[31m=[32m"presentation"[31m
+                    [33mstyle[31m=[32m"position: relative; --scroll-area-corner-height: 0px; --scroll-area-corner-width: 0px;"[31m
+                  [36m>[31m
+                    [36m<div[31m
+                      [33mclass[31m=[32m"focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 base-ui-disable-scrollbar"[31m
+                      [33mdata-has-overflow-x[31m=[32m""[31m
+                      [33mdata-has-overflow-y[31m=[32m""[31m
+                      [33mdata-id[31m=[32m"base-ui-_r_s_-viewport"[31m
+                      [33mdata-slot[31m=[32m"scroll-area-viewport"[31m
+                      [33mrole[31m=[32m"presentation"[31m
+                      [33mstyle[31m=[32m"overflow: scroll;"[31m
+                      [33mtabindex[31m=[32m"0"[31m
+                    [36m>[31m
+                      [36m<div[31m
+                        [33mclass[31m=[32m"space-y-2 text-xs"[31m
+                      [36m>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mName:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mtest-component[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mVersion:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0m1.0.0[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mGroup:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mtest-group[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mType:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mlibrary[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mPath:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mtest-group/test-component[0m
+                        [36m</div>[31m
+                      [36m</div>[31m
+                    [36m</div>[31m
+                    [36m<div[31m
+                      [33mclass[31m=[32m"data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none"[31m
+                      [33mdata-has-overflow-x[31m=[32m""[31m
+                      [33mdata-has-overflow-y[31m=[32m""[31m
+                      [33mdata-id[31m=[32m"base-ui-_r_s_-scrollbar"[31m
+                      [33mdata-orientation[31m=[32m"vertical"[31m
+                      [33mdata-slot[31m=[32m"scroll-area-scrollbar"[31m
+                      [33mstyle[31m=[32m"position: absolute; touch-action: none; user-select: none; top: 0px; bottom: var(--scroll-area-corner-height); inset-inline-end: 0; --scroll-area-thumb-height: 0px;"[31m
+                    [36m>[31m
+                      [36m<div[31m
+                        [33mclass[31m=[32m"rounded-full bg-border/80 hover:bg-muted-foreground/50 transition-colors relative flex-1"[31m
+                        [33mdata-orientation[31m=[32m"vertical"[31m
+                        [33mdata-slot[31m=[32m"scroll-area-thumb"[31m
+                        [33mstyle[31m=[32m"height: var(--scroll-area-thumb-height);"[31m
+                      [36m/>[31m
+                    [36m</div>[31m
+                    [36m<div[31m
+                      [33mstyle[31m=[32m"position: absolute; bottom: 0px; inset-inline-end: 0; width: 0px; height: 0px;"[31m
+                    [36m/>[31m
+                  [36m</div>[31m
+                [36m</div>[31m
+              [36m</div>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"rounded-b-lg px-4 group-data-[size=sm]/card:px-3 [.border-t]:pt-4 group-data-[size=sm]/card:[.border-t]:pt-3 flex flex-wrap items-center gap-2"[31m
+        [33mdata-slot[31m=[32m"card-footer"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex flex-wrap items-center gap-2"[31m
+        [36m/>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"ml-auto flex flex-wrap items-center gap-2"[31m
+        [36m>[31m
+          [36m<button[31m
+            [33mclass[31m=[32m"focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding font-medium focus-visible:ring-[2px] aria-invalid:ring-[2px] inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[31m
+            [33mdata-slot[31m=[32m"button"[31m
+            [33mtabindex[31m=[32m"0"[31m
+            [33mtype[31m=[32m"button"[31m
+          [36m>[31m
+            [0mCopy ref[0m
+          [36m</button>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+ [31m×[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mDependencies[2m > [22mshould respect maxDepth limit[32m 28[2mms[22m[39m
+[31m   → Unable to find an element with the text: /more dependencies.*max depth reached/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-lg py-4 text-xs/relaxed ring-1 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg group/card flex flex-col border-muted/60 shadow-sm mb-4"[31m
+      [33mdata-size[31m=[32m"default"[31m
+      [33mdata-slot[31m=[32m"card"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"gap-1 rounded-t-lg px-4 group-data-[size=sm]/card:px-3 [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3 group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"[31m
+        [33mdata-slot[31m=[32m"card-header"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"text-sm font-medium flex items-start gap-2"[31m
+          [33mdata-slot[31m=[32m"card-title"[31m
+        [36m>[31m
+          [36m<span[31m
+            [33mclass[31m=[32m"flex flex-col"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"flex items-center gap-2"[31m
+            [36m>[31m
+              [0mtest-group/[0m
+              [0mtest-component[0m
+              [36m<span[31m
+                [33mclass[31m=[32m"ml-2 text-sm font-normal text-muted-foreground"[31m
+              [36m>[31m
+                [0mv[0m
+                [0m1.0.0[0m
+              [36m</span>[31m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"text-xs text-muted-foreground"[31m
+            [36m>[31m
+              [0mpkg:npm/test@1.0.0[0m
+            [36m</span>[31m
+          [36m</span>[31m
+          [36m<div[31m
+            [33mclass[31m=[32m"ml-auto flex flex-wrap items-center gap-2"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"h-5 gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground bg-input/20 dark:bg-input/30"[31m
+              [33mdata-slot[31m=[32m"badge"[31m
+              [33mdata-variant[31m=[32m"outline"[31m
+            [36m>[31m
+              [0mlibrary[0m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mclass[31m=[32m"h-5 gap-1 rounded-full border border-transparent px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"[31m
+              [33mdata-slot[31m=[32m"badge"[31m
+              [33mdata-variant[31m=[32m"secondary"[31m
+            [36m>[31m
+              [0mRoot[0m
+            [36m</span>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"text-muted-foreground text-xs"[31m
+          [33mdata-slot[31m=[32m"card-description"[31m
+        [36m/>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"px-4 group-data-[size=sm]/card:px-3"[31m
+        [33mdata-slot[31m=[32m"card-content"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex h-full w-full aria-[orientation=vertical]:flex-col rounded-lg bg-muted/20 min-h-50"[31m
+          [33mdata-group[31m=[32m"true"[31m
+          [33mdata-slot[31m=[32m"resizable-panel-group"[31m
+          [33mdata-testid[31m=[32m"_r_t_"[31m
+          [33mid[31m=[32m"_r_t_"[31m
+          [33mstyle[31m=[32m"height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: row; flex-wrap: nowrap;"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mdata-panel[31m=[32m"true"[31m
+            [33mdata-slot[31m=[32m"resizable-panel"[31m
+            [33mdata-testid[31m=[32m"_r_u_"[31m
+            [33mid[31m=[32m"_r_u_"[31m
+            [33mstyle[31m=[32m"min-height: 0; max-height: 100%; height: auto; min-width: 0; max-width: 100%; width: auto; border: 0px none none; padding: 0px; margin: 0px; display: flex; flex-basis: 0px; flex-shrink: 1; overflow: hidden; flex-grow: 100;"[31m
+          [36m>[31m
+            [36m<div[31m
+              [33mstyle[31m=[32m"max-height: 100%; max-width: 100%; flex-grow: 1;"[31m
+            [36m>[31m
+              [36m<div[31m
+                [33mclass[31m=[32m"space-y-3 p-2 "[31m
+              [36m>[31m
+                [36m<div[31m
+                  [33mclass[31m=[32m"text-sm text-muted-foreground"[31m
+                [36m>[31m
+                  [0m✓ No known vulnerabilities[0m
+                [36m</div>[31m
+                [36m<div>[31m
+                  [36m<h4[31m
+                    [33mclass[31m=[32m"text-sm font-semibold mb-2"[31m
+                  [36m>[31m
+                    [0mDetails[0m
+                  [36m</h4>[31m
+                  [36m<div[31m
+                    [33mclass[31m=[32m"relative h-40 w-full rounded-md border p-3"[31m
+                    [33mdata-has-overflow-x[31m=[32m""[31m
+                    [33mdata-has-overflow-y[31m=[32m""[31m
+                    [33mdata-slot[31m=[32m"scroll-area"[31m
+                    [33mrole[31m=[32m"presentation"[31m
+                    [33mstyle[31m=[32m"position: relative; --scroll-area-corner-height: 0px; --scroll-area-corner-width: 0px;"[31m
+                  [36m>[31m
+                    [36m<div[31m
+                      [33mclass[31m=[32m"focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 base-ui-disable-scrollbar"[31m
+                      [33mdata-has-overflow-x[31m=[32m""[31m
+                      [33mdata-has-overflow-y[31m=[32m""[31m
+                      [33mdata-id[31m=[32m"base-ui-_r_v_-viewport"[31m
+                      [33mdata-slot[31m=[32m"scroll-area-viewport"[31m
+                      [33mrole[31m=[32m"presentation"[31m
+                      [33mstyle[31m=[32m"overflow: scroll;"[31m
+                      [33mtabindex[31m=[32m"0"[31m
+                    [36m>[31m
+                      [36m<div[31m
+                        [33mclass[31m=[32m"space-y-2 text-xs"[31m
+                      [36m>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mName:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mtest-component[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mVersion:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0m1.0.0[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mGroup:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mtest-group[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mType:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mlibrary[0m
+                        [36m</div>[31m
+                        [36m<div>[31m
+                          [36m<strong>[31m
+                            [0mPath:[0m
+                          [36m</strong>[31m
+                          [0m [0m
+                          [0mtest-group/test-component[0m
+                        [36m</div>[31m
+                      [36m</div>[31m
+                    [36m</div>[31m
+                    [36m<div[31m
+                      [33mclass[31m=[32m"data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none"[31m
+                      [33mdata-has-overflow-x[31m=[32m""[31m
+                      [33mdata-has-overflow-y[31m=[32m""[31m
+                      [33mdata-id[31m=[32m"base-ui-_r_v_-scrollbar"[31m
+                      [33mdata-orientation[31m=[32m"vertical"[31m
+                      [33mdata-slot[31m=[32m"scroll-area-scrollbar"[31m
+                      [33mstyle[31m=[32m"position: absolute; touch-action: none; user-select: none; top: 0px; bottom: var(--scroll-area-corner-height); inset-inline-end: 0; --scroll-area-thumb-height: 0px;"[31m
+                    [36m>[31m
+                      [36m<div[31m
+                        [33mclass[31m=[32m"rounded-full bg-border/80 hover:bg-muted-foreground/50 transition-colors relative flex-1"[31m
+                        [33mdata-orientation[31m=[32m"vertical"[31m
+                        [33mdata-slot[31m=[32m"scroll-area-thumb"[31m
+                        [33mstyle[31m=[32m"height: var(--scroll-area-thumb-height);"[31m
+                      [36m/>[31m
+                    [36m</div>[31m
+                    [36m<div[31m
+                      [33mstyle[31m=[32m"position: absolute; bottom: 0px; inset-inline-end: 0; width: 0px; height: 0px;"[31m
+                    [36m/>[31m
+                  [36m</div>[31m
+                [36m</div>[31m
+              [36m</div>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"rounded-b-lg px-4 group-data-[size=sm]/card:px-3 [.border-t]:pt-4 group-data-[size=sm]/card:[.border-t]:pt-3 flex flex-wrap items-center gap-2"[31m
+        [33mdata-slot[31m=[32m"card-footer"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex flex-wrap items-center gap-2"[31m
+        [36m/>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"ml-auto flex flex-wrap items-center gap-2"[31m
+        [36m>[31m
+          [36m<button[31m
+            [33mclass[31m=[32m"focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding font-medium focus-visible:ring-[2px] aria-invalid:ring-[2px] inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[31m
+            [33mdata-slot[31m=[32m"button"[31m
+            [33mtabindex[31m=[32m"0"[31m
+            [33mtype[31m=[32m"button"[31m
+          [36m>[31m
+            [0mCopy ref[0m
+          [36m</button>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+ [32m✓[39m src/test/CachingViews.test.tsx[2m > [22mView Caching Integration[2m > [22mshould preserve Component Explorer search state when switching views[33m 2550[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mLicenses[2m > [22mshould display license information[32m 54[2mms[22m[39m
+ [32m✓[39m src/test/CachingViews.test.tsx[2m > [22mView Caching Integration[2m > [22mshould preserve Dependency Tree expansion state when switching views[32m 223[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mLicenses[2m > [22mshould display multiple licenses[32m 98[2mms[22m[39m
+ [32m✓[39m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mComponent Details[2m > [22mshould display all component details in details section[32m 83[2mms[22m[39m
+ [32m✓[39m src/hooks/useSbomStats.test.ts[2m > [22museSbomStats[2m > [22mshould return null if sbom is null[32m 21[2mms[22m[39m
+ [32m✓[39m src/hooks/useSbomStats.test.ts[2m > [22museSbomStats[2m > [22mshould calculate stats correctly for a comprehensive SBOM[32m 68[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyTree.test.tsx[2m > [22mDependencyTree[2m > [22mshows large SBOM guard and skips formatting[32m 157[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyTreeSearch.test.tsx[2m > [22mDependencyTree Search[2m > [22mrenders the tree and allows searching for a package name[32m 161[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyTreeSearch.test.tsx[2m > [22mDependencyTree Search[2m > [22mfilters by CVE ID[32m 38[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyTreeSearch.test.tsx[2m > [22mDependencyTree Search[2m > [22mshows 'No components found' when there are no matches[32m 30[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyTreeSearch.test.tsx[2m > [22mDependencyTree Search[2m > [22mfinds deeply nested dependencies and shows full path[32m 62[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyTreeSearch.test.tsx[2m > [22mDependencyTree Search[2m > [22mfinds the root component from metadata[32m 64[2mms[22m[39m
+ [32m✓[39m tests/TransitiveVulns.test.ts[2m > [22mFormatter Transitive Vulnerabilities[2m > [22mshould propagate vulnerabilities from dependencies to parents[32m 27[2mms[22m[39m
+ [32m✓[39m tests/TransitiveVulns.test.ts[2m > [22mFormatter Transitive Vulnerabilities[2m > [22mshould deduplicate transitive vulnerabilities from multiple paths[32m 13[2mms[22m[39m
+ [32m✓[39m tests/TransitiveVulns.test.ts[2m > [22mFormatter Transitive Vulnerabilities[2m > [22mshould handle circular dependencies without stack overflow[32m 13[2mms[22m[39m
+ [32m✓[39m tests/FormatterFlat.test.ts[2m > [22mFormatter (Flat Structure)[2m > [22mshould format a simple SBOM into a flat component map and dependency graph[32m 27[2mms[22m[39m
+ [32m✓[39m tests/FormatterFlat.test.ts[2m > [22mFormatter (Flat Structure)[2m > [22mshould handle shared dependencies without duplication[32m 15[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould return empty categories when no vulnerabilities exist[32m 5[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould categorize vulnerabilities by severity[32m 3[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould extract vulnerability IDs correctly[32m 1[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould deduplicate vulnerabilities with same ID[32m 1[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould handle multiple critical vulnerabilities[32m 4[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould handle vulnerability without severity rating[32m 1[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould handle mixed severity levels[32m 4[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould handle case-insensitive severity matching[32m 1[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueVulnerabilities.test.tsx[2m > [22muniqueVulnerabilities[2m > [22mshould maintain vulnerability object integrity[32m 2[2mms[22m[39m
+[90mstderr[2m | src/renderer/renderer.test.tsx[2m > [22m[2mRenderer[2m > [22m[2mrenders statistics and components after formatting
+[22m[39mTypeError: Cannot read properties of undefined (reading 'map')
+    at Renderer [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39msrc/renderer/renderer.tsx:287:6[90m)[39m
+    at Object.react_stack_bottom_frame [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:25904:20[90m)[39m
+    at renderWithHooks [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:7662:22[90m)[39m
+    at updateFunctionComponent [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:10166:19[90m)[39m
+    at beginWork [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:11778:18[90m)[39m
+    at runWithFiberInDEV [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:874:13[90m)[39m
+    at performUnitOfWork [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:17641:22[90m)[39m
+    at workLoopSync [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:17469:41[90m)[39m
+    at renderRootSync [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:17450:11[90m)[39m
+    at performWorkOnRoot [90m(/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom-client.development.js:16583:35[90m)[39m
+An error occurred in the <Renderer> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+ [32m✓[39m src/renderer/renderer.test.tsx[2m > [22mRenderer[2m > [22mrenders loading state before formatting completes[33m 9667[2mms[22m[39m
+ [32m✓[39m src/components/views/DashboardView.test.tsx[2m > [22mDashboardView[2m > [22mshould render KPI cards correctly[32m 299[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22mcreates nodes and edges for a dependency tree[32m 10[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22mrespects max depth when rendering[32m 7[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22mfilters to vulnerable components when enabled[32m 1[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22mprunes non-matching branches when query is set[32m 1[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22mtruncates when exceeding node limits[32m 5[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22msanitizes component names and versions in labels[32m 4[2mms[22m[39m
+ [32m✓[39m src/lib/mermaid/sbomToMermaid.test.ts[2m > [22mbuildMermaidDiagram[2m > [22mapplies the highest severity class to nodes[32m 1[2mms[22m[39m
+[90mstderr[2m | src/renderer/renderer.test.tsx[2m > [22m[2mRenderer[2m > [22m[2misolates component failures with error boundary
+[22m[39mAn error occurred in the <Renderer> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+ [31m×[39m src/renderer/renderer.test.tsx[2m > [22mRenderer[2m > [22mrenders statistics and components after formatting[33m 1057[2mms[22m[39m
+[31m   → Unable to find an element with the text: SBOM Statistics. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould return empty array when no components have licenses[32m 5[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould extract unique licenses from components[32m 4[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould deduplicate identical licenses[32m 1[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould handle components with multiple licenses[32m 2[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould handle mix of duplicate and unique licenses[32m 1[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould handle empty ComponentRepository[32m 0[2mms[22m[39m
+ [32m✓[39m src/renderer/Formatter/Statistics/uniqueLicenses.test.tsx[2m > [22muniqueLicenses[2m > [22mshould preserve License objects, not just strings[32m 0[2mms[22m[39m
+ [32m✓[39m src/lib/bomConverter.test.ts[2m > [22mbomConverter[2m > [22mshould convert invalid json to null or throw or handle gracefully[32m 1[2mms[22m[39m
+ [32m✓[39m src/lib/bomConverter.test.ts[2m > [22mbomConverter[2m > [22mshould convert a simple valid cycloneDX JSON to Bom object[32m 6[2mms[22m[39m
+ [32m✓[39m src/lib/licenseUtils.test.ts[2m > [22mlicenseUtils[2m > [22mshould categorize permissive licenses correctly[32m 2[2mms[22m[39m
+ [32m✓[39m src/lib/licenseUtils.test.ts[2m > [22mlicenseUtils[2m > [22mshould categorize copyleft licenses correctly[32m 0[2mms[22m[39m
+ [32m✓[39m src/lib/licenseUtils.test.ts[2m > [22mlicenseUtils[2m > [22mshould categorize weak-copyleft licenses correctly[32m 0[2mms[22m[39m
+ [32m✓[39m src/lib/licenseUtils.test.ts[2m > [22mlicenseUtils[2m > [22mshould handle unknown or null licenses[32m 0[2mms[22m[39m
+ [32m✓[39m src/lib/licenseUtils.test.ts[2m > [22mlicenseUtils[2m > [22mshould handle prefix matching[32m 0[2mms[22m[39m
+ [31m×[39m src/renderer/renderer.test.tsx[2m > [22mRenderer[2m > [22misolates component failures with error boundary[33m 1046[2mms[22m[39m
+[31m   → Unable to find an element with the text: Component render failed. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m[39m
+ [32m✓[39m src/components/views/ComponentSearch.test.tsx[2m > [22mComponent Search Logic[2m > [22mfilters by name in basic search[32m 167[2mms[22m[39m
+ [32m✓[39m src/components/views/ComponentSearch.test.tsx[2m > [22mComponent Search Logic[2m > [22mtoggles advanced search and filters by criteria[32m 116[2mms[22m[39m
+ [32m✓[39m src/components/views/DependencyGraph.test.tsx[2m > [22mDependencyGraph[2m > [22mshows large SBOM guard and skips formatting[32m 115[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 25 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/renderer/renderer.test.tsx[2m > [22mRenderer[2m > [22mrenders statistics and components after formatting
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: SBOM Statistics. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m src/renderer/renderer.test.tsx:[2m96:25[22m[39m
+    [90m 94| [39m    [34mrender[39m([33m<[39m[33mRenderer[39m [33mSBOM[39m[33m=[39m[33m{[39m{}[33m}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 95| [39m
+    [90m 96| [39m    expect(await screen.findByText("SBOM Statistics")).toBeInTheDocume…
+    [90m   | [39m                        [31m^[39m
+    [90m 97| [39m    [35mconst[39m totals [33m=[39m screen[33m.[39m[34mgetAllByText[39m([36m/Total Components:/[39m)[33m;[39m
+    [90m 98| [39m    [34mexpect[39m(totals[33m.[39mlength)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/renderer.test.tsx[2m > [22mRenderer[2m > [22misolates component failures with error boundary
+[31m[1mTestingLibraryElementError[22m: Unable to find an element with the text: Component render failed. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m src/renderer/renderer.test.tsx:[2m127:20[22m[39m
+    [90m125| [39m
+    [90m126| [39m    [34mexpect[39m(
+    [90m127| [39m      [35mawait[39m screen[33m.[39m[34mfindByText[39m([32m"Component render failed"[39m)[33m,[39m
+    [90m   | [39m                   [31m^[39m
+    [90m128| [39m    )[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m129| [39m    [34mexpect[39m(screen[33m.[39m[34mgetAllByText[39m([36m/Boom/[39m)[[34m0[39m])[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders basic component information
+[41m[1m FAIL [22m[49m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders vulnerability breakdown
+[41m[1m FAIL [22m[49m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders license and shows description on click
+[41m[1m FAIL [22m[49m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mcopies JSON to clipboard
+[41m[1m FAIL [22m[49m src/components/views/ComponentDetailPanel.test.tsx[2m > [22mComponentDetailPanel[2m > [22mrenders additional details (properties)
+[31m[1mReferenceError[22m: Copy is not defined[39m
+[36m [2m❯[22m ComponentDetailPanel src/components/views/ComponentDetailPanel.tsx:[2m80:16[22m[39m
+    [90m 78| [39m              [33m<[39m[33mCheck[39m [33mclassName[39m[33m=[39m[32m"h-3 w-3 mr-1 text-green-500"[39m [33m/[39m[33m>[39m
+    [90m 79| [39m            ) [33m:[39m (
+    [90m 80| [39m              [33m<[39m[33mCopy[39m [33mclassName[39m[33m=[39m[32m"h-3 w-3 mr-1"[39m [33m/[39m[33m>[39m
+    [90m   | [39m               [31m^[39m
+    [90m 81| [39m            )[33m}[39m
+    [90m 82| [39m            Copy JSON
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+[90m [2m❯[22m performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:[2m16583:35[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mBasic Functionality[2m > [22mshould format an empty SBOM without errors
+[31m[1mAssertionError[22m: expected undefined to deeply equal [][39m
+
+[32m- Expected:[39m 
+[]
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m47:33[22m[39m
+    [90m 45| [39m
+    [90m 46| [39m      [34mexpect[39m(result)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m 47| [39m      [34mexpect[39m(result[33m.[39mcomponents)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m 48| [39m      [34mexpect[39m(result[33m.[39mstatistics[33m.[39mlicenses)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m 49| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mLinear Dependency Structure[2m > [22mshould build nested component structure for linear dependencies
+[31m[1mAssertionError[22m: Target cannot be null or undefined.[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m107:33[22m[39m
+    [90m105| [39m
+    [90m106| [39m      [90m// Should have one top-level component (A)[39m
+    [90m107| [39m      [34mexpect[39m(result[33m.[39mcomponents)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m108| [39m      [34mexpect[39m(result[33m.[39mcomponents[[34m0[39m][33m.[39mname)[33m.[39m[34mtoBe[39m([32m"a"[39m)[33m;[39m
+    [90m109| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mLinear Dependency Structure[2m > [22mshould aggregate transitive vulnerabilities in linear chain
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m131:33[22m[39m
+    [90m129| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m130| [39m
+    [90m131| [39m      [35mconst[39m componentA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m132| [39m
+    [90m133| [39m      [90m// A should have no inherent vulnerabilities[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mLinear Dependency Structure[2m > [22mshould track inherent vulnerabilities at the correct level
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m150:16[22m[39m
+    [90m148| [39m
+    [90m149| [39m      [35mconst[39m componentC [33m=[39m
+    [90m150| [39m        result.components[0].formattedDependencies[0].formattedDepende…
+    [90m   | [39m               [31m^[39m
+    [90m151| [39m
+    [90m152| [39m      [90m// C should have inherent vulnerability[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mDiamond Dependency Structure[2m > [22mshould replicate shared dependencies
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m168:33[22m[39m
+    [90m166| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m167| [39m
+    [90m168| [39m      [35mconst[39m componentA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m169| [39m      expect(componentA.formattedDependencies).toHaveLength(2); // B a…
+    [90m170| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mDiamond Dependency Structure[2m > [22mshould aggregate transitive vulnerabilities from multiple paths
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m199:33[22m[39m
+    [90m197| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m198| [39m
+    [90m199| [39m      [35mconst[39m componentA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m200| [39m
+    [90m201| [39m      [90m// A should have transitive critical vulnerability from D[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mDiamond Dependency Structure[2m > [22mshould deduplicate transitive vulnerabilities
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m215:33[22m[39m
+    [90m213| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m214| [39m
+    [90m215| [39m      [35mconst[39m componentA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m216| [39m
+    [90m217| [39m      [90m// Should have exactly 1 critical vulnerability (deduplicated)[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mCircular Dependency Handling[2m > [22mshould handle circular dependencies without infinite recursion
+[31m[1mAssertionError[22m: Target cannot be null or undefined.[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m235:33[22m[39m
+    [90m233| [39m
+    [90m234| [39m      [34mexpect[39m(result)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m235| [39m      [34mexpect[39m(result[33m.[39mcomponents)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m [90m// A is top-level[39m
+    [90m   | [39m                                [31m^[39m
+    [90m236| [39m    })[33m;[39m
+    [90m237| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mCircular Dependency Handling[2m > [22mshould still build partial structure with circular dependencies
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m245:33[22m[39m
+    [90m243| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m244| [39m
+    [90m245| [39m      [35mconst[39m componentA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m246| [39m      [34mexpect[39m(componentA[33m.[39mname)[33m.[39m[34mtoBe[39m([32m"a"[39m)[33m;[39m
+    [90m247| [39m      [34mexpect[39m(componentA[33m.[39mformattedDependencies)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m [90m// B[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mVulnerability Categorization[2m > [22mshould separate inherent from transitive vulnerabilities
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m296:33[22m[39m
+    [90m294| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m295| [39m
+    [90m296| [39m      [35mconst[39m formattedA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m297| [39m
+    [90m298| [39m      [90m// A should have its own vulnerability as inherent[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mEdge Cases[2m > [22mshould handle component with no dependencies
+[31m[1mAssertionError[22m: Target cannot be null or undefined.[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m321:33[22m[39m
+    [90m319| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m320| [39m
+    [90m321| [39m      [34mexpect[39m(result[33m.[39mcomponents)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m322| [39m      expect(result.components[0].formattedDependencies).toHaveLength(…
+    [90m323| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mEdge Cases[2m > [22mshould handle component with missing dependency reference
+[31m[1mAssertionError[22m: Target cannot be null or undefined.[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m335:33[22m[39m
+    [90m333| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m334| [39m
+    [90m335| [39m      [34mexpect[39m(result[33m.[39mcomponents)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m336| [39m      // Should have no formatted dependencies since the reference is …
+    [90m337| [39m      expect(result.components[0].formattedDependencies).toHaveLength(…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mEdge Cases[2m > [22mshould handle SBOM with only vulnerabilities, no components
+[31m[1mAssertionError[22m: Target cannot be null or undefined.[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m353:33[22m[39m
+    [90m351| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m352| [39m
+    [90m353| [39m      [34mexpect[39m(result[33m.[39mcomponents)[33m.[39m[34mtoHaveLength[39m([34m0[39m)[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m354| [39m      [34mexpect[39m(result[33m.[39mstatistics[33m.[39mvulnerabilities[33m.[39m[33mHigh[39m)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m
+    [90m355| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mComponent Structure Integrity[2m > [22mshould preserve component properties in nested structure
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading '0')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m366:33[22m[39m
+    [90m364| [39m      [35mconst[39m result [33m=[39m [35mawait[39m [33mFormatter[39m({ rawSBOM[33m:[39m bom[33m,[39m setProgress })[33m;[39m
+    [90m365| [39m
+    [90m366| [39m      [35mconst[39m componentA [33m=[39m result[33m.[39mcomponents[[34m0[39m][33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m367| [39m      [34mexpect[39m(componentA[33m.[39mname)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m368| [39m      [34mexpect[39m(componentA[33m.[39mname)[33m.[39m[34mtoBe[39m([32m"a"[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mComponent Structure Integrity[2m > [22mshould add vulnerability tracking to each component
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'forEach')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m395:25[22m[39m
+    [90m393| [39m      }[33m;[39m
+    [90m394| [39m
+    [90m395| [39m      result[33m.[39mcomponents[33m.[39m[34mforEach[39m(checkVulnerabilityStructure)[33m;[39m
+    [90m   | [39m                        [31m^[39m
+    [90m396| [39m    })[33m;[39m
+    [90m397| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/Formatter/Formatter.test.tsx[2m > [22mFormatter[2m > [22mComponent Structure Integrity[2m > [22mshould add formattedDependencies array to each component
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'forEach')[39m
+[36m [2m❯[22m src/renderer/Formatter/Formatter.test.tsx:[2m411:25[22m[39m
+    [90m409| [39m      }[33m;[39m
+    [90m410| [39m
+    [90m411| [39m      result[33m.[39mcomponents[33m.[39m[34mforEach[39m(checkFormattedDeps)[33m;[39m
+    [90m   | [39m                        [31m^[39m
+    [90m412| [39m    })[33m;[39m
+    [90m413| [39m  })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mDependencies[2m > [22mshould show dependencies count when present
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /Dependencies \(2\)/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-lg py-4 text-xs/relaxed ring-1 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg group/card flex flex-col border-muted/60 shadow-sm mb-4"[39m
+      [33mdata-size[39m=[32m"default"[39m
+      [33mdata-slot[39m=[32m"card"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"gap-1 rounded-t-lg px-4 group-data-[size=sm]/card:px-3 [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3 group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"[39m
+        [33mdata-slot[39m=[32m"card-header"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-sm font-medium flex items-start gap-2"[39m
+          [33mdata-slot[39m=[32m"card-title"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"flex items-center gap-2"[39m
+            [36m>[39m
+              [0mtest-group/[0m
+              [0mtest-component[0m
+              [36m<span[39m
+                [33mclass[39m=[32m"ml-2 text-sm font-normal text-muted-foreground"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m1.0.0[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0mpkg:npm/test@1.0.0[0m
+            [36m</span>[39m
+          [36m</span>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ml-auto flex flex-wrap items-center gap-2"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"h-5 gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground bg-input/20 dark:bg-input/30"[39m
+              [33mdata-slot[39m=[32m"badge"[39m
+              [33mdata-variant[39m=[32m"outline"[39m
+            [36m>[39m
+              [0mlibrary[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"h-5 gap-1 rounded-full border border-transparent px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"[39m
+              [33mdata-slot[39m=[32m"badge"[39m
+              [33mdata-variant[39m=[32m"secondary"[39m
+            [36m>[39m
+              [0mRoot[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-muted-foreground text-xs"[39m
+          [33mdata-slot[39m=[32m"card-description"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"px-4 group-data-[size=sm]/card:px-3"[39m
+        [33mdata-slot[39m=[32m"card-content"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex h-full w-full aria-[orientation=vertical]:flex-col rounded-lg bg-muted/20 min-h-50"[39m
+          [33mdata-group[39m=[32m"true"[39m
+          [33mdata-slot[39m=[32m"resizable-panel-group"[39m
+          [33mdata-testid[39m=[32m"_r_q_"[39m
+          [33mid[39m=[32m"_r_q_"[39m
+          [33mstyle[39m=[32m"height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: row; flex-wrap: nowrap;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-panel[39m=[32m"true"[39m
+            [33mdata-slot[39m=[32m"resizable-panel"[39m
+            [33mdata-testid[39m=[32m"_r_r_"[39m
+            [33mid[39m=[32m"_r_r_"[39m
+            [33mstyle[39m=[32m"min-height: 0; max-height: 100%; height: auto; min-width: 0; max-width: 100%; width: auto; border: 0px none none; padding: 0px; margin: 0px; display: flex; flex-basis: 0px; flex-shrink: 1; overflow: hidden; flex-grow: 100;"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"max-height: 100%; max-width: 100%; flex-grow: 1;"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-3 p-2 "[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+                [36m>[39m
+                  [0m✓ No known vulnerabilities[0m
+                [36m</div>[39m
+                [36m<div>[39m
+                  [36m<h4[39m
+                    [33mclass[39m=[32m"text-sm font-semibold mb-2"[39m
+                  [36m>[39m
+                    [0mDetails[0m
+                  [36m</h4>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"relative h-40 w-full rounded-md border p-3"[39m
+                    [33mdata-has-overflow-x[39m=[32m""[39m
+                    [33mdata-has-overflow-y[39m=[32m""[39m
+                    [33mdata-slot[39m=[32m"scroll-area"[39m
+                    [33mrole[39m=[32m"presentation"[39m
+                    [33mstyle[39m=[32m"position: relative; --scroll-area-corner-height: 0px; --scroll-area-corner-width: 0px;"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 base-ui-disable-scrollbar"[39m
+                      [33mdata-has-overflow-x[39m=[32m""[39m
+                      [33mdata-has-overflow-y[39m=[32m""[39m
+                      [33mdata-id[39m=[32m"base-ui-_r_s_-viewport"[39m
+                      [33mdata-slot[39m=[32m"scroll-area-viewport"[39m
+                      [33mrole[39m=[32m"presentation"[39m
+                      [33mstyle[39m=[32m"overflow: scroll;"[39m
+                      [33mtabindex[39m=[32m"0"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"space-y-2 text-xs"[39m
+                      [36m>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mName:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mtest-component[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mVersion:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0m1.0.0[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mGroup:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mtest-group[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mType:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mlibrary[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mPath:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mtest-group/test-component[0m
+                        [36m</div>[39m
+                      [36m</div>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none"[39m
+                      [33mdata-has-overflow-x[39m=[32m""[39m
+                      [33mdata-has-overflow-y[39m=[32m""[39m
+                      [33mdata-id[39m=[32m"base-ui-_r_s_-scrollbar"[39m
+                      [33mdata-orientation[39m=[32m"vertical"[39m
+                      [33mdata-slot[39m=[32m"scroll-area-scrollbar"[39m
+                      [33mstyle[39m=[32m"position: absolute; touch-action: none; user-select: none; top: 0px; bottom: var(--scroll-area-corner-height); inset-inline-end: 0; --scroll-area-thumb-height: 0px;"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"rounded-full bg-border/80 hover:bg-muted-foreground/50 transition-colors relative flex-1"[39m
+                        [33mdata-orientation[39m=[32m"vertical"[39m
+                        [33mdata-slot[39m=[32m"scroll-area-thumb"[39m
+                        [33mstyle[39m=[32m"height: var(--scroll-area-thumb-height);"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mstyle[39m=[32m"position: absolute; bottom: 0px; inset-inline-end: 0; width: 0px; height: 0px;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"rounded-b-lg px-4 group-data-[size=sm]/card:px-3 [.border-t]:pt-4 group-data-[size=sm]/card:[.border-t]:pt-3 flex flex-wrap items-center gap-2"[39m
+        [33mdata-slot[39m=[32m"card-footer"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"ml-auto flex flex-wrap items-center gap-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding font-medium focus-visible:ring-[2px] aria-invalid:ring-[2px] inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCopy ref[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m109:15[22m[39m
+[36m [2m❯[22m src/renderer/SBOMComponent/SBOMComponent.test.tsx:[2m159:21[22m[39m
+    [90m157| [39m      [34mrender[39m([33m<[39m[33mSBOMComponent[39m [33mcomponent[39m[33m=[39m[33m{[39mcomponentWithDeps[33m}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m158| [39m
+    [90m159| [39m      expect(screen.getAllByText(/Dependencies \(2\)/).length).toBeGre…
+    [90m   | [39m                    [31m^[39m
+    [90m160| [39m        [34m0[39m[33m,[39m
+    [90m161| [39m      )[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/25]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/renderer/SBOMComponent/SBOMComponent.test.tsx[2m > [22mSBOMComponent[2m > [22mDependencies[2m > [22mshould respect maxDepth limit
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: /more dependencies.*max depth reached/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-lg py-4 text-xs/relaxed ring-1 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg group/card flex flex-col border-muted/60 shadow-sm mb-4"[39m
+      [33mdata-size[39m=[32m"default"[39m
+      [33mdata-slot[39m=[32m"card"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"gap-1 rounded-t-lg px-4 group-data-[size=sm]/card:px-3 [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3 group/card-header @container/card-header grid auto-rows-min items-start has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]"[39m
+        [33mdata-slot[39m=[32m"card-header"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-sm font-medium flex items-start gap-2"[39m
+          [33mdata-slot[39m=[32m"card-title"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"flex items-center gap-2"[39m
+            [36m>[39m
+              [0mtest-group/[0m
+              [0mtest-component[0m
+              [36m<span[39m
+                [33mclass[39m=[32m"ml-2 text-sm font-normal text-muted-foreground"[39m
+              [36m>[39m
+                [0mv[0m
+                [0m1.0.0[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0mpkg:npm/test@1.0.0[0m
+            [36m</span>[39m
+          [36m</span>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ml-auto flex flex-wrap items-center gap-2"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"h-5 gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground bg-input/20 dark:bg-input/30"[39m
+              [33mdata-slot[39m=[32m"badge"[39m
+              [33mdata-variant[39m=[32m"outline"[39m
+            [36m>[39m
+              [0mlibrary[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"h-5 gap-1 rounded-full border border-transparent px-2 py-0.5 text-[0.625rem] font-medium transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&>svg]:size-2.5! inline-flex items-center justify-center w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive overflow-hidden group/badge bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"[39m
+              [33mdata-slot[39m=[32m"badge"[39m
+              [33mdata-variant[39m=[32m"secondary"[39m
+            [36m>[39m
+              [0mRoot[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-muted-foreground text-xs"[39m
+          [33mdata-slot[39m=[32m"card-description"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"px-4 group-data-[size=sm]/card:px-3"[39m
+        [33mdata-slot[39m=[32m"card-content"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex h-full w-full aria-[orientation=vertical]:flex-col rounded-lg bg-muted/20 min-h-50"[39m
+          [33mdata-group[39m=[32m"true"[39m
+          [33mdata-slot[39m=[32m"resizable-panel-group"[39m
+          [33mdata-testid[39m=[32m"_r_t_"[39m
+          [33mid[39m=[32m"_r_t_"[39m
+          [33mstyle[39m=[32m"height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: row; flex-wrap: nowrap;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-panel[39m=[32m"true"[39m
+            [33mdata-slot[39m=[32m"resizable-panel"[39m
+            [33mdata-testid[39m=[32m"_r_u_"[39m
+            [33mid[39m=[32m"_r_u_"[39m
+            [33mstyle[39m=[32m"min-height: 0; max-height: 100%; height: auto; min-width: 0; max-width: 100%; width: auto; border: 0px none none; padding: 0px; margin: 0px; display: flex; flex-basis: 0px; flex-shrink: 1; overflow: hidden; flex-grow: 100;"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"max-height: 100%; max-width: 100%; flex-grow: 1;"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"space-y-3 p-2 "[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+                [36m>[39m
+                  [0m✓ No known vulnerabilities[0m
+                [36m</div>[39m
+                [36m<div>[39m
+                  [36m<h4[39m
+                    [33mclass[39m=[32m"text-sm font-semibold mb-2"[39m
+                  [36m>[39m
+                    [0mDetails[0m
+                  [36m</h4>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"relative h-40 w-full rounded-md border p-3"[39m
+                    [33mdata-has-overflow-x[39m=[32m""[39m
+                    [33mdata-has-overflow-y[39m=[32m""[39m
+                    [33mdata-slot[39m=[32m"scroll-area"[39m
+                    [33mrole[39m=[32m"presentation"[39m
+                    [33mstyle[39m=[32m"position: relative; --scroll-area-corner-height: 0px; --scroll-area-corner-width: 0px;"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 base-ui-disable-scrollbar"[39m
+                      [33mdata-has-overflow-x[39m=[32m""[39m
+                      [33mdata-has-overflow-y[39m=[32m""[39m
+                      [33mdata-id[39m=[32m"base-ui-_r_v_-viewport"[39m
+                      [33mdata-slot[39m=[32m"scroll-area-viewport"[39m
+                      [33mrole[39m=[32m"presentation"[39m
+                      [33mstyle[39m=[32m"overflow: scroll;"[39m
+                      [33mtabindex[39m=[32m"0"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"space-y-2 text-xs"[39m
+                      [36m>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mName:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mtest-component[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mVersion:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0m1.0.0[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mGroup:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mtest-group[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mType:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mlibrary[0m
+                        [36m</div>[39m
+                        [36m<div>[39m
+                          [36m<strong>[39m
+                            [0mPath:[0m
+                          [36m</strong>[39m
+                          [0m [0m
+                          [0mtest-group/test-component[0m
+                        [36m</div>[39m
+                      [36m</div>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none"[39m
+                      [33mdata-has-overflow-x[39m=[32m""[39m
+                      [33mdata-has-overflow-y[39m=[32m""[39m
+                      [33mdata-id[39m=[32m"base-ui-_r_v_-scrollbar"[39m
+                      [33mdata-orientation[39m=[32m"vertical"[39m
+                      [33mdata-slot[39m=[32m"scroll-area-scrollbar"[39m
+                      [33mstyle[39m=[32m"position: absolute; touch-action: none; user-select: none; top: 0px; bottom: var(--scroll-area-corner-height); inset-inline-end: 0; --scroll-area-thumb-height: 0px;"[39m
+                    [36m>[39m
+                      [36m<div[39m
+                        [33mclass[39m=[32m"rounded-full bg-border/80 hover:bg-muted-foreground/50 transition-colors relative flex-1"[39m
+                        [33mdata-orientation[39m=[32m"vertical"[39m
+                        [33mdata-slot[39m=[32m"scroll-area-thumb"[39m
+                        [33mstyle[39m=[32m"height: var(--scroll-area-thumb-height);"[39m
+                      [36m/>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mstyle[39m=[32m"position: absolute; bottom: 0px; inset-inline-end: 0; width: 0px; height: 0px;"[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"rounded-b-lg px-4 group-data-[size=sm]/card:px-3 [.border-t]:pt-4 group-data-[size=sm]/card:[.border-t]:pt-3 flex flex-wrap items-center gap-2"[39m
+        [33mdata-slot[39m=[32m"card-footer"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"ml-auto flex flex-wrap items-center gap-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding font-medium focus-visible:ring-[2px] aria-invalid:ring-[2px] inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCopy ref[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/renderer/SBOMComponent/SBOMComponent.test.tsx:[2m176:16[22m[39m
+    [90m174| [39m      [90m// Should show message about max depth reached[39m
+    [90m175| [39m      [34mexpect[39m(
+    [90m176| [39m        screen[33m.[39m[34mgetByText[39m([36m/more dependencies.*max depth reached/[39m)[33m,[39m
+    [90m   | [39m               [31m^[39m
+    [90m177| [39m      )[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m178| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/25]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m16 passed[39m[22m[90m (20)[39m
+[2m      Tests [22m [1m[31m25 failed[39m[22m[2m | [22m[1m[32m72 passed[39m[22m[90m (97)[39m
+[2m   Start at [22m 11:37:33
+[2m   Duration [22m 14.39s[2m (transform 6.06s, setup 3.89s, import 29.63s, tests 22.48s, environment 26.63s)[22m
+

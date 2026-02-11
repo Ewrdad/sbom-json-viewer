@@ -57,6 +57,9 @@ vi.mock("./components/views/DependencyGraph", () => ({
 vi.mock("./components/views/DependencyTree", () => ({
   DependencyTree: () => <div data-testid="tree-view">Dependency Tree</div>,
 }));
+vi.mock("./components/views/VulnerabilitiesView", () => ({
+  VulnerabilitiesView: () => <div data-testid="vulnerabilities-view">Vulnerabilities View</div>,
+}));
 
 // Mock Lucide icons
 vi.mock("lucide-react", () => ({
@@ -68,6 +71,10 @@ vi.mock("lucide-react", () => ({
   ChevronRight: () => <div />,
   ArrowUpDown: () => <div />,
   Search: () => <div />,
+  ShieldAlert: () => <div />,
+  ShieldX: () => <div />,
+  ShieldCheck: () => <div />,
+  AlertTriangle: () => <div />,
 }));
 
 // Polyfill Worker
@@ -94,7 +101,9 @@ class MockWorker {
             vulnerabilityCounts: { critical: 0, high: 0, medium: 0, low: 0, none: 0 },
             licenseCounts: {},
             topLicenses: [],
-            vulnerableComponents: []
+            vulnerableComponents: [],
+            allVulnerableComponents: [],
+            totalVulnerabilities: 0
           }
         };
         this.onmessage({ data: { type: "complete", result: mockResult } });

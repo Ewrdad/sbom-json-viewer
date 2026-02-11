@@ -8,6 +8,46 @@ export interface DependencyAnalysis {
 }
 
 /**
+ * Helper to recursively extract all components from an SBOM,
+ * including metadata and nested components.
+ */
+export const getAllComponents = (sbom: any): any[] => {
+  const all: any[] = [];
+  const seen = new Set<string>();
+
+  const walk = (comp: any) => {
+    if (!comp) return;
+    const ref = typeof comp.bomRef === "string" ? comp.bomRef : comp.bomRef?.value;
+    
+    // Add to list if not seen before (or if it doesn't have a ref, use name)
+    const id = ref || comp.name;
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      all.push(comp);
+    }
+
+    // Recurse into nested components
+    const nested = Array.isArray(comp.components) 
+      ? comp.components 
+      : Array.from(comp.components || []);
+    nested.forEach(walk);
+  };
+
+  // 1. Process metadata component
+  if (sbom.metadata?.component) {
+    walk(sbom.metadata.component);
+  }
+
+  // 2. Process main components list
+  const components = Array.isArray(sbom.components) 
+    ? sbom.components 
+    : Array.from(sbom.components || []);
+  components.forEach(walk);
+
+  return all;
+};
+
+/**
  * Builds dependency maps for efficient traversal
  */
 export const analyzeDependencies = (sbom: any): DependencyAnalysis => {
@@ -15,7 +55,7 @@ export const analyzeDependencies = (sbom: any): DependencyAnalysis => {
   const inverseDependencyMap = new Map<string, string[]>();
   const componentMap = new Map<string, any>();
 
-  const components = Array.isArray(sbom.components) ? sbom.components : Array.from(sbom.components || []);
+  const components = getAllComponents(sbom);
 
   // Initial pass to build component map and collect all refs
   components.forEach((comp) => {
@@ -62,7 +102,7 @@ export const analyzeDependenciesAsync = async (
   const inverseDependencyMap = new Map<string, string[]>();
   const componentMap = new Map<string, any>();
 
-  const components: any[] = Array.isArray(sbom.components) ? sbom.components : Array.from(sbom.components || []);
+  const components = getAllComponents(sbom);
   
   await batchProcess(components, (comp: any) => {
     const ref = typeof comp.bomRef === 'string' ? comp.bomRef : comp.bomRef?.value;

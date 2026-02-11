@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { NestedSBOMComponent } from "../Formatter/Formatter";
+import { type EnhancedComponent } from "../../types/sbom";
 
 interface SBOMComponentProps {
-  component: NestedSBOMComponent;
+  component: EnhancedComponent;
   currentDepth?: number;
   maxDepth?: number;
   expandMode?: "auto" | "expand" | "collapse";
@@ -33,6 +33,8 @@ interface SBOMComponentProps {
   compactMode?: boolean;
   parentPath?: string;
   parentPathRefs?: string[];
+  componentMap?: Map<string, EnhancedComponent>;
+  dependencyGraph?: Map<string, string[]>;
   onFocus?: (pathRefs: string[]) => void;
 }
 
@@ -53,6 +55,8 @@ export const SBOMComponent = ({
   compactMode = false,
   parentPath,
   parentPathRefs = [],
+  componentMap = new Map(),
+  dependencyGraph = new Map(),
   onFocus,
 }: SBOMComponentProps) => {
   const [showDeps, setShowDeps] = useState(currentDepth < 2);
@@ -123,13 +127,12 @@ export const SBOMComponent = ({
   const totalVulnCount =
     criticalCount.total + highCount.total + mediumCount.total + lowCount.total;
 
-  const hasDependencies =
-    component.formattedDependencies &&
-    component.formattedDependencies.length > 0;
+  const deps = dependencyGraph.get(bomRef) || [];
+  const hasDependencies = deps.length > 0;
   const canShowMoreDeps = currentDepth < maxDepth && hasDependencies;
 
   const normalize = (value: string) => value.toLowerCase();
-  const matchesComponent = (node: NestedSBOMComponent) => {
+  const matchesComponent = (node: EnhancedComponent) => {
     if (!searchQuery.trim()) return true;
     const haystack = [
       node.name,
@@ -142,9 +145,12 @@ export const SBOMComponent = ({
     return normalize(haystack).includes(normalize(searchQuery));
   };
 
-  const matchesTree = (node: NestedSBOMComponent): boolean => {
+  const matchesTree = (nodeRef: string): boolean => {
+    const node = componentMap.get(nodeRef);
+    if (!node) return false;
     if (matchesComponent(node)) return true;
-    return node.formattedDependencies?.some(matchesTree) ?? false;
+    const nodeDeps = dependencyGraph.get(nodeRef) || [];
+    return nodeDeps.some(matchesTree);
   };
 
   const isMatch = searchQuery.trim() ? matchesComponent(component) : false;
@@ -166,19 +172,25 @@ export const SBOMComponent = ({
   }, [currentDepth]);
 
   const sortedDependencies = useMemo(() => {
-    const deps = [...(component.formattedDependencies || [])];
-    if (!deps.length) return deps;
+    const depRefs = dependencyGraph.get(bomRef) || [];
+    if (!depRefs.length) return [];
+    
+    // Map refs to components
+    const deps = depRefs.map(ref => componentMap.get(ref)).filter(Boolean) as EnhancedComponent[];
+
     if (sortMode === "name") {
       return deps.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     }
     if (sortMode === "deps") {
       return deps.sort(
-        (a, b) =>
-          (b.formattedDependencies?.length || 0) -
-          (a.formattedDependencies?.length || 0),
+        (a, b) => {
+          const bRef = typeof b.bomRef === 'string' ? b.bomRef : b.bomRef?.value || "";
+          const aRef = typeof a.bomRef === 'string' ? a.bomRef : a.bomRef?.value || "";
+          return (dependencyGraph.get(bRef)?.length || 0) - (dependencyGraph.get(aRef)?.length || 0);
+        }
       );
     }
-    const vulnScore = (node: NestedSBOMComponent) => {
+    const vulnScore = (node: EnhancedComponent) => {
       const { inherent, transitive } = node.vulnerabilities;
       return (
         inherent.Critical.length +
@@ -192,10 +204,13 @@ export const SBOMComponent = ({
       );
     };
     return deps.sort((a, b) => vulnScore(b) - vulnScore(a));
-  }, [component.formattedDependencies, sortMode]);
+  }, [bomRef, componentMap, dependencyGraph, sortMode]);
 
   const visibleDependencies = pruneNonMatches
-    ? sortedDependencies.filter(matchesTree)
+    ? sortedDependencies.filter(dep => {
+        const ref = typeof dep.bomRef === 'string' ? dep.bomRef : dep.bomRef?.value || "";
+        return matchesTree(ref);
+      })
     : sortedDependencies;
 
   const handleCopyRef = async () => {
@@ -249,7 +264,18 @@ export const SBOMComponent = ({
                   severity as keyof typeof component.vulnerabilities.inherent
                 ]?.map((vuln, idx) => (
                   <li key={idx} className="text-xs">
-                    {vuln.id || `Vuln-${idx + 1}`}
+                    {vuln.id && vuln.id.startsWith("CVE-") ? (
+                      <a 
+                        href={`https://nvd.nist.gov/vuln/detail/${vuln.id}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline font-medium"
+                      >
+                        {vuln.id}
+                      </a>
+                    ) : (
+                      vuln.id || `Vuln-${idx + 1}`
+                    )}
                     {vuln.description && (
                       <span className="text-muted-foreground">
                         {" "}
@@ -300,7 +326,7 @@ export const SBOMComponent = ({
             <Badge variant="secondary">{depthBadge}</Badge>
             {hasDependencies && (
               <Badge variant="outline">
-                {component.formattedDependencies.length} deps
+                {deps.length} deps
               </Badge>
             )}
             {licenses.length > 0 && (
@@ -379,8 +405,8 @@ export const SBOMComponent = ({
                       <div>
                         <strong>Dependencies:</strong>{" "}
                         {pruneNonMatches && searchQuery.trim()
-                          ? `${visibleDependencies.length}/${component.formattedDependencies.length}`
-                          : component.formattedDependencies.length}
+                          ? `${visibleDependencies.length}/${deps.length}`
+                          : deps.length}
                       </div>
                     )}
                     <div>
@@ -406,13 +432,13 @@ export const SBOMComponent = ({
                     <h4 className="text-sm font-semibold sticky top-0 bg-background pb-2">
                       Dependencies (
                       {pruneNonMatches && searchQuery.trim()
-                        ? `${visibleDependencies.length}/${component.formattedDependencies.length}`
-                        : component.formattedDependencies.length}
+                        ? `${visibleDependencies.length}/${deps.length}`
+                        : deps.length}
                       )
                     </h4>
                     {visibleDependencies.map((dep, idx) => (
                       <SBOMComponent
-                        key={dep.bomRef?.value || idx}
+                        key={dep.bomRef?.value || (typeof dep.bomRef === 'string' ? dep.bomRef : null) || idx}
                         component={dep}
                         currentDepth={currentDepth + 1}
                         maxDepth={maxDepth}
@@ -423,6 +449,8 @@ export const SBOMComponent = ({
                         compactMode={compactMode}
                         parentPath={fullPath}
                         parentPathRefs={currentPathRefs}
+                        componentMap={componentMap}
+                        dependencyGraph={dependencyGraph}
                         onFocus={onFocus}
                       />
                     ))}
@@ -443,12 +471,12 @@ export const SBOMComponent = ({
               onClick={() => setShowDeps(!showDeps)}
             >
               {showDeps ? "Hide" : "Show"} Dependencies (
-              {component.formattedDependencies.length})
+              {deps.length})
             </Button>
           )}
           {!canShowMoreDeps && hasDependencies && currentDepth >= maxDepth && (
             <span className="text-xs text-muted-foreground">
-              {component.formattedDependencies.length} more dependencies (max
+              {deps.length} more dependencies (max
               depth reached)
             </span>
           )}
@@ -466,7 +494,7 @@ export const SBOMComponent = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => window.open(purl, "_blank")}
+              onClick={() => window.open(purl, "_blank", "noopener,noreferrer")}
             >
               Open purl
             </Button>

@@ -30,8 +30,15 @@ import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { cn } from "../../lib/utils";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
+import { type formattedSBOM } from "../../types/sbom";
 
-export function ComponentExplorer({ sbom }: { sbom: any }) {
+export function ComponentExplorer({ 
+  sbom,
+  formattedSbom 
+}: { 
+  sbom: any;
+  formattedSbom?: formattedSBOM | null;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [selectedComponent, setSelectedComponent] = useState<any | null>(

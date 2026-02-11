@@ -1,0 +1,4 @@
+
+> sbom-json-viewer@0.0.0 test
+> node ./scripts/run-tests.mjs
+

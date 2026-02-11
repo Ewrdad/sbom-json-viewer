@@ -1,4 +1,4 @@
-import type { NestedSBOMComponent } from "@/renderer/Formatter/Formatter";
+import type { EnhancedComponent, formattedSBOM } from "../../types/sbom";
 
 export type MermaidBuildOptions = {
   maxDepth: number;
@@ -8,6 +8,7 @@ export type MermaidBuildOptions = {
   maxNodes?: number;
   maxEdges?: number;
   maxLabelLength?: number;
+  rootRefs?: string[];
 };
 
 type MermaidBuildResult = {
@@ -21,7 +22,7 @@ type MermaidBuildResult = {
 
 const normalize = (value: string) => value.toLowerCase();
 
-const matchesQuery = (component: NestedSBOMComponent, query: string) => {
+const matchesQuery = (component: EnhancedComponent, query: string) => {
   if (!query.trim()) return true;
   const haystack = [
     component.name,
@@ -37,7 +38,7 @@ const matchesQuery = (component: NestedSBOMComponent, query: string) => {
   return normalize(haystack).includes(normalize(query));
 };
 
-const hasAnyVulnerability = (component: NestedSBOMComponent) => {
+const hasAnyVulnerability = (component: EnhancedComponent) => {
   const { inherent, transitive } = component.vulnerabilities;
   const count =
     inherent.Critical.length +
@@ -60,7 +61,7 @@ const sanitizeLabelText = (value: string) =>
     .replace(/"/g, "&quot;") // Escape quotes
     .replace(/\n/g, "<br/>"); // Use <br/> for newlines in Mermaid
 
-const buildLabel = (component: NestedSBOMComponent, maxLabelLength: number) => {
+const buildLabel = (component: EnhancedComponent, maxLabelLength: number) => {
   const name = sanitizeLabelText(component.name || "Unnamed Component");
   const version = component.version ? sanitizeLabelText(component.version) : "";
   const { inherent, transitive } = component.vulnerabilities;
@@ -94,7 +95,7 @@ const buildLabel = (component: NestedSBOMComponent, maxLabelLength: number) => {
   return `${label.slice(0, maxLabelLength - 3)}...`;
 };
 
-const severityClass = (component: NestedSBOMComponent) => {
+const severityClass = (component: EnhancedComponent) => {
   const { inherent, transitive } = component.vulnerabilities;
   const severityOrder: Array<keyof typeof component.vulnerabilities.inherent> =
     ["Critical", "High", "Medium", "Low"];
@@ -109,11 +110,10 @@ const severityClass = (component: NestedSBOMComponent) => {
 };
 
 /**
- * Build a Mermaid flowchart for the SBOM dependency tree.
- * Why: Enables exportable diagrams that mirror the viewer's filtering controls.
+ * Build a Mermaid flowchart for the SBOM dependency tree using flat structure.
  */
 export const buildMermaidDiagram = (
-  roots: NestedSBOMComponent[],
+  formattedSbom: formattedSBOM,
   options: MermaidBuildOptions,
 ): MermaidBuildResult => {
   const maxNodes = options.maxNodes ?? 320;
@@ -123,74 +123,105 @@ export const buildMermaidDiagram = (
   let idCounter = 0;
   const nodes: string[] = [];
   const edges: string[] = [];
-  const visited = new Set<string>();
+  const visitedNodes = new Set<string>();
+  const visitedEdges = new Set<string>();
   let truncated = false;
 
-  const getNodeId = (component: NestedSBOMComponent) => {
-    const ref = component.bomRef?.value || component.name || "unknown";
+  const { componentMap, dependencyGraph, topLevelRefs } = formattedSbom;
+
+  const getNodeId = (ref: string) => {
     if (idMap.has(ref)) return idMap.get(ref)!;
     const id = `node_${idCounter++}`;
     idMap.set(ref, id);
     return id;
   };
 
-  const matchesTree = (component: NestedSBOMComponent): boolean => {
-    if (matchesQuery(component, options.query)) return true;
-    return component.formattedDependencies?.some(matchesTree) ?? false;
+  // Helper to check if a component or its children match the query
+  const memoMatchesTree = new Map<string, boolean>();
+  const matchesTree = (ref: string): boolean => {
+    if (memoMatchesTree.has(ref)) return memoMatchesTree.get(ref)!;
+    
+    const component = componentMap.get(ref);
+    if (!component) return false;
+
+    if (matchesQuery(component, options.query)) {
+      memoMatchesTree.set(ref, true);
+      return true;
+    }
+
+    const deps = dependencyGraph.get(ref) || [];
+    const childMatch = deps.some(matchesTree);
+    memoMatchesTree.set(ref, childMatch);
+    return childMatch;
   };
 
-  const shouldIncludeNode = (component: NestedSBOMComponent) => {
+  const shouldIncludeNode = (ref: string) => {
     if (options.pruneNonMatches && options.query.trim()) {
-      return matchesTree(component);
+      return matchesTree(ref);
     }
     return true;
   };
 
   const walk = (
-    component: NestedSBOMComponent,
+    ref: string,
     depth: number,
-    parent?: NestedSBOMComponent,
+    parentId?: string,
   ) => {
-    if (!shouldIncludeNode(component)) return;
+    if (!shouldIncludeNode(ref)) return;
     if (nodes.length >= maxNodes || edges.length >= maxEdges) {
       truncated = true;
       return;
     }
 
-    const nodeId = getNodeId(component);
-    if (!visited.has(nodeId)) {
+    const component = componentMap.get(ref);
+    if (!component) return;
+
+    const nodeId = getNodeId(ref);
+    if (!visitedNodes.has(nodeId)) {
       const label = buildLabel(component, maxLabelLength);
       const klass = severityClass(component);
       nodes.push(`${nodeId}["${label}"]:::${klass}`);
-      visited.add(nodeId);
+      visitedNodes.add(nodeId);
     }
 
-    if (parent) {
-      const parentId = getNodeId(parent);
-      if (edges.length < maxEdges) {
-        edges.push(`${parentId} --> ${nodeId}`);
-      } else {
-        truncated = true;
-        return;
+    if (parentId) {
+      const pId = getNodeId(parentId);
+      const edgeId = `${pId}->${nodeId}`;
+      if (!visitedEdges.has(edgeId)) {
+        if (edges.length < maxEdges) {
+          edges.push(`${pId} --> ${nodeId}`);
+          visitedEdges.add(edgeId);
+        } else {
+          truncated = true;
+          return;
+        }
       }
     }
 
     if (depth >= options.maxDepth) return;
 
-    component.formattedDependencies?.forEach((child) => {
+    const deps = dependencyGraph.get(ref) || [];
+    deps.forEach((childRef) => {
       if (nodes.length >= maxNodes || edges.length >= maxEdges) {
         truncated = true;
         return;
       }
-      walk(child, depth + 1, component);
+      walk(childRef, depth + 1, ref);
     });
   };
 
-  const filteredRoots = options.showVulnerableOnly
-    ? roots.filter(hasAnyVulnerability)
-    : roots;
+  const initialRoots = options.rootRefs && options.rootRefs.length > 0 
+    ? options.rootRefs 
+    : topLevelRefs;
 
-  filteredRoots.forEach((root) => walk(root, 0));
+  const filteredRoots = options.showVulnerableOnly
+    ? initialRoots.filter(ref => {
+        const comp = componentMap.get(ref);
+        return comp ? hasAnyVulnerability(comp) : false;
+      })
+    : initialRoots;
+
+  filteredRoots.forEach((rootRef) => walk(rootRef, 0));
 
   if (nodes.length === 0) {
     return {

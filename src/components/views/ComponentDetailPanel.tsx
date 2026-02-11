@@ -1,23 +1,34 @@
 import { type Component } from "@cyclonedx/cyclonedx-library/Models";
+import { type EnhancedComponent } from "../../types/sbom";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Network, Package } from "lucide-react";
+import { X, Network, Package, Copy, Check, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { type DependencyAnalysis } from "../../lib/bomUtils";
 import { getLicenseCategory } from "../../lib/licenseUtils";
+import { useState } from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronRight } from "lucide-react";
 
 interface ComponentDetailPanelProps {
-  component: Component;
+  component: Component | EnhancedComponent;
   analysis: DependencyAnalysis | null;
   onClose: () => void;
 }
 
 export function ComponentDetailPanel({
-  component,
+  component: rawComponent,
   analysis,
   onClose,
 }: ComponentDetailPanelProps) {
+  // Cast to EnhancedComponent to access extra props safely
+  const component = rawComponent as EnhancedComponent;
+
   const ref = component.bomRef?.value;
   const upstreamRefs =
     ref && analysis ? analysis.inverseDependencyMap.get(ref) || [] : [];
@@ -26,6 +37,27 @@ export function ComponentDetailPanel({
         .map((r) => analysis.componentMap.get(r))
         .filter(Boolean) as Component[])
     : [];
+  
+  const [copied, setCopied] = useState(false);
+  const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(component, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const propertiesCount = component.properties?.size || (Array.isArray(component.properties) ? component.properties.length : 0);
+
+  // Helper to count vulns
+  const getVulnCount = (vulns: any) => {
+    if (!vulns) return 0;
+    return (vulns.Critical?.length || 0) + (vulns.High?.length || 0) + (vulns.Medium?.length || 0) + (vulns.Low?.length || 0);
+  };
+
+  const inherentCount = getVulnCount(component.vulnerabilities?.inherent);
+  const transitiveCount = getVulnCount(component.vulnerabilities?.transitive);
+  const hasVulns = inherentCount > 0 || transitiveCount > 0;
 
   return (
     <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
@@ -142,6 +174,69 @@ export function ComponentDetailPanel({
 
           <Separator />
 
+          {/* Vulnerabilities */}
+          {hasVulns && (
+            <>
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <ShieldAlert className="h-4 w-4 text-destructive" />
+                  <h4 className="text-sm font-semibold">Vulnerabilities</h4>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Inherent */}
+                   {inherentCount > 0 && (
+                     <div className="space-y-2">
+                       {['Critical', 'High', 'Medium', 'Low'].map(severity => {
+                          const vulns = component.vulnerabilities?.inherent[severity as keyof typeof component.vulnerabilities.inherent] || [];
+                          if (vulns.length === 0) return null;
+                          return (
+                             <div key={severity} className="bg-destructive/10 rounded-md p-2">
+                                 <h5 className="text-xs font-bold text-destructive mb-1">{severity} ({vulns.length})</h5>
+                                 <div className="space-y-1">
+                                    {vulns.map((v: any) => (
+                                       <div key={v.id} className="flex items-center gap-2">
+                                           <a href={`https://nvd.nist.gov/vuln/detail/${v.id}`} target="_blank" rel="noopener noreferrer" className="text-xs font-mono hover:underline text-destructive/80">
+                                             {v.id}
+                                           </a>
+                                       </div>
+                                    ))}
+                                 </div>
+                             </div>
+                          )
+                      })}
+                     </div>
+                   )}
+
+                   {/* Transitive */}
+                   {transitiveCount > 0 && (
+                     <div>
+                       <h5 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                          <Network className="h-3 w-3" /> Transitive
+                       </h5>
+                       <div className="space-y-2 pl-2 border-l-2 border-muted">
+                          {['Critical', 'High', 'Medium', 'Low'].map(severity => {
+                              const vulns = component.vulnerabilities?.transitive[severity as keyof typeof component.vulnerabilities.transitive] || [];
+                              if (vulns.length === 0) return null;
+                              return (
+                                <div key={severity}>
+                                    <div className="flex justify-between items-center text-xs mb-1">
+                                        <span className={severity === 'Critical' || severity === 'High' ? 'font-semibold text-destructive' : 'font-medium'}>
+                                            {severity} ({vulns.length})
+                                        </span>
+                                    </div>
+                                </div>
+                              )
+                          })}
+                       </div>
+                     </div>
+                   )}
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+
           {/* Impact Analysis / Reverse Dependencies */}
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -195,6 +290,36 @@ export function ComponentDetailPanel({
             )}
           </div>
 
+          {propertiesCount > 0 && (
+            <>
+              <Separator />
+              <Collapsible
+                open={isPropertiesOpen}
+                onOpenChange={setIsPropertiesOpen}
+                className="space-y-2"
+              >
+                <div className="flex items-center justify-between space-x-4 px-4">
+                  <CollapsibleTrigger className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors w-full bg-transparent border-none p-0"> 
+                      <ChevronRight className={`h-4 w-4 transition-transform ${isPropertiesOpen ? 'transform rotate-90' : ''}`} />
+                      <h4 className="text-sm font-semibold">
+                        Properties ({propertiesCount})
+                      </h4>
+                  </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent className="space-y-2">
+                  <div className="rounded-md border p-2 text-xs font-mono bg-muted/50 overflow-auto max-h-[200px]">
+                    {Array.from(component.properties || []).map((prop: any, i) => (
+                      <div key={i} className="grid grid-cols-3 gap-2 py-1 border-b last:border-0 border-border/50">
+                        <span className="font-semibold text-muted-foreground truncate" title={prop.name}>{prop.name}</span>
+                        <span className="col-span-2 truncate select-all" title={prop.value}>{prop.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </>
+          )}
+
           {component.purl && (
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-1">
@@ -216,6 +341,27 @@ export function ComponentDetailPanel({
               </code>
             </div>
           )}
+
+          <Separator />
+          
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={handleCopy}
+            disabled={copied}
+          >
+            {copied ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Copied JSON
+              </>
+            ) : (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                Copy JSON
+              </>
+            )}
+          </Button>
         </div>
       </ScrollArea>
     </div>

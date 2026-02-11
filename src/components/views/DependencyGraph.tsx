@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { type Bom } from "@cyclonedx/cyclonedx-library/Models";
 import {
   Formatter,
-  type formattedSBOM,
 } from "../../renderer/Formatter/Formatter";
+import { type formattedSBOM } from "../../types/sbom";
 import { buildMermaidDiagram } from "../../lib/mermaid/sbomToMermaid";
 import { Mermaid } from "@/components/ui/mermaid";
 import { Card } from "@/components/ui/card";
@@ -20,13 +20,13 @@ import {
 
 export function DependencyGraph({
   sbom,
-  formattedData: preFormattedData,
+  formattedSbom: preFormattedSbom,
 }: {
   sbom: Bom;
-  formattedData?: formattedSBOM | null;
+  formattedSbom?: formattedSBOM | null;
 }) {
   const [formattedData, setFormattedData] = useState<formattedSBOM | null>(
-    preFormattedData || null,
+    preFormattedSbom || null,
   );
   const [formatting, setFormatting] = useState(false);
   const [maxDepth, setMaxDepth] = useState<number>(3);
@@ -38,13 +38,13 @@ export function DependencyGraph({
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
 
   useEffect(() => {
-    if (preFormattedData) {
-      setFormattedData(preFormattedData);
+    if (preFormattedSbom) {
+      setFormattedData(preFormattedSbom);
     } else {
       setAllowLargeFormat(false);
       setFormattedData(null);
     }
-  }, [sbom, preFormattedData]);
+  }, [sbom, preFormattedSbom]);
 
   // Format the SBOM when it changes
   useEffect(() => {
@@ -59,7 +59,7 @@ export function DependencyGraph({
     }
 
     const runFormatter = async () => {
-      if (!sbom || preFormattedData) return;
+      if (!sbom || preFormattedSbom) return;
       setFormatting(true);
       setProgress({ progress: 0, message: "Initializing formatter..." });
       try {
@@ -78,7 +78,7 @@ export function DependencyGraph({
     return () => {
       mounted = false;
     };
-  }, [sbom, allowLargeFormat, isLarge, preFormattedData]);
+  }, [sbom, allowLargeFormat, isLarge, preFormattedSbom]);
 
   const mermaidChart = useMemo(() => {
     if (!formattedData) return "";
@@ -90,7 +90,7 @@ export function DependencyGraph({
       showVulnerableOnly: false,
     };
 
-    const result = buildMermaidDiagram(formattedData.components, options);
+    const result = buildMermaidDiagram(formattedData, options);
     return result.diagram;
   }, [formattedData, maxDepth]);
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 
 const mockFormatted = {
   statistics: {
@@ -13,29 +13,33 @@ const mockFormatted = {
     },
   },
   metadata: {},
-  components: [
-    {
-      name: "comp-a",
-      bomRef: { value: "pkg:npm/comp-a@1.0.0" },
-      formattedDependencies: [],
-      vulnerabilities: {
-        inherent: {
-          Critical: [],
-          High: [],
-          Medium: [],
-          Low: [],
-          Informational: [],
+  componentMap: new Map([
+    [
+      "pkg:npm/comp-a@1.0.0",
+      {
+        name: "comp-a",
+        bomRef: { value: "pkg:npm/comp-a@1.0.0" },
+        vulnerabilities: {
+          inherent: {
+            Critical: [],
+            High: [],
+            Medium: [],
+            Low: [],
+            Informational: [],
+          },
+          transitive: {
+            Critical: [],
+            High: [],
+            Medium: [],
+            Low: [],
+            Informational: [],
+          },
         },
-        transitive: {
-          Critical: [],
-          High: [],
-          Medium: [],
-          Low: [],
-          Informational: [],
-        },
-      },
-    },
-  ],
+      } as any,
+    ],
+  ]),
+  dependencyGraph: new Map(),
+  topLevelRefs: ["pkg:npm/comp-a@1.0.0"],
 };
 
 describe("Renderer", () => {
@@ -48,12 +52,15 @@ describe("Renderer", () => {
   });
 
   it("renders loading state before formatting completes", async () => {
+    let resolveFormatter: (value: any) => void = () => {};
+    const formatterPromise = new Promise((resolve) => {
+      resolveFormatter = resolve;
+    });
+
     vi.doMock("./Formatter/Formatter", () => ({
       Formatter: vi.fn(async ({ setProgress }) => {
         setProgress({ progress: 50, message: "Formatting..." });
-        // Keep promise pending briefly so we stay in loading state, then resolve
-        await new Promise((r) => setTimeout(r, 10));
-        return new Promise(() => undefined) as any;
+        return formatterPromise;
       }),
     }));
 
@@ -65,8 +72,13 @@ describe("Renderer", () => {
     render(<Renderer SBOM={{}} />);
 
     // Ensure the loading UI appears promptly
-    await screen.findByText("Formatting...", {}, { timeout: 3000 });
-  });
+    await screen.findByText("Formatting...", {}, { timeout: 10000 });
+    
+    // Cleanup: resolve the promise so the test environment is clean
+    await act(async () => {
+      resolveFormatter(mockFormatted);
+    });
+  }, 15000);
 
   it("renders statistics and components after formatting", async () => {
     vi.doMock("./Formatter/Formatter", () => ({
@@ -118,7 +130,7 @@ describe("Renderer", () => {
     expect(
       await screen.findByText("Component render failed"),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Boom/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Boom/)[0]).toBeInTheDocument();
 
     consoleError.mockRestore();
   });

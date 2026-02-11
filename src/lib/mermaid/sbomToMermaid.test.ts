@@ -1,12 +1,11 @@
 import { describe, it, expect } from "vitest";
-import type { NestedSBOMComponent } from "@/renderer/Formatter/Formatter";
 import { buildMermaidDiagram } from "./sbomToMermaid";
+import type { EnhancedComponent, formattedSBOM } from "../../types/sbom";
 
 const createMockNode = (
   name: string,
   bomRef: string,
-  deps: NestedSBOMComponent[] = [],
-): NestedSBOMComponent =>
+): EnhancedComponent =>
   ({
     name,
     version: "1.0.0",
@@ -28,16 +27,41 @@ const createMockNode = (
         Informational: [],
       },
     },
-    formattedDependencies: deps,
   }) as any;
+
+const createMockSbom = (
+  nodes: EnhancedComponent[],
+  graph: Record<string, string[]>,
+  topLevelRefs: string[],
+): formattedSBOM => ({
+  statistics: {
+    licenses: [],
+    vulnerabilities: {
+      Critical: [],
+      High: [],
+      Medium: [],
+      Low: [],
+      Informational: [],
+    },
+  },
+  metadata: {} as any,
+  componentMap: new Map(nodes.map((n) => [typeof n.bomRef === 'string' ? n.bomRef : n.bomRef?.value || "", n])),
+  dependencyGraph: new Map(Object.entries(graph)),
+  topLevelRefs,
+});
 
 describe("buildMermaidDiagram", () => {
   it("creates nodes and edges for a dependency tree", () => {
-    // Why: Ensures the diagram captures hierarchy for export.
-    const leaf = createMockNode("leaf", "pkg:npm/leaf@1.0.0");
-    const root = createMockNode("root", "pkg:npm/root@1.0.0", [leaf]);
+    const leaf = createMockNode("leaf", "leaf-ref");
+    const root = createMockNode("root", "root-ref");
+    
+    const sbom = createMockSbom(
+      [root, leaf],
+      { "root-ref": ["leaf-ref"] },
+      ["root-ref"]
+    );
 
-    const result = buildMermaidDiagram([root], {
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 3,
       pruneNonMatches: true,
       query: "",
@@ -51,12 +75,20 @@ describe("buildMermaidDiagram", () => {
   });
 
   it("respects max depth when rendering", () => {
-    // Why: Keeps diagrams compact and aligned with UI depth limits.
-    const deepLeaf = createMockNode("deep", "pkg:npm/deep@1.0.0");
-    const mid = createMockNode("mid", "pkg:npm/mid@1.0.0", [deepLeaf]);
-    const root = createMockNode("root", "pkg:npm/root@1.0.0", [mid]);
+    const deepLeaf = createMockNode("deep", "deep-ref");
+    const mid = createMockNode("mid", "mid-ref");
+    const root = createMockNode("root", "root-ref");
 
-    const result = buildMermaidDiagram([root], {
+    const sbom = createMockSbom(
+      [root, mid, deepLeaf],
+      { 
+        "root-ref": ["mid-ref"],
+        "mid-ref": ["deep-ref"]
+      },
+      ["root-ref"]
+    );
+
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 1,
       pruneNonMatches: false,
       query: "",
@@ -69,29 +101,17 @@ describe("buildMermaidDiagram", () => {
   });
 
   it("filters to vulnerable components when enabled", () => {
-    // Why: Export should mirror vulnerable-only filter.
-    const clean = createMockNode("clean", "pkg:npm/clean@1.0.0");
-    const vulnerable = {
-      ...createMockNode("vuln", "pkg:npm/vuln@1.0.0"),
-      vulnerabilities: {
-        inherent: {
-          Critical: [{ id: "CVE-1" } as any],
-          High: [],
-          Medium: [],
-          Low: [],
-          Informational: [],
-        },
-        transitive: {
-          Critical: [],
-          High: [],
-          Medium: [],
-          Low: [],
-          Informational: [],
-        },
-      },
-    } as NestedSBOMComponent;
+    const clean = createMockNode("clean", "clean-ref");
+    const vulnerable = createMockNode("vuln", "vuln-ref");
+    vulnerable.vulnerabilities.inherent.Critical = [{ id: "CVE-1" } as any];
 
-    const result = buildMermaidDiagram([clean, vulnerable], {
+    const sbom = createMockSbom(
+      [clean, vulnerable],
+      {},
+      ["clean-ref", "vuln-ref"]
+    );
+
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 2,
       pruneNonMatches: false,
       query: "",
@@ -103,11 +123,16 @@ describe("buildMermaidDiagram", () => {
   });
 
   it("prunes non-matching branches when query is set", () => {
-    // Why: Export should mirror pruning behavior.
-    const match = createMockNode("match", "pkg:npm/match@1.0.0");
-    const other = createMockNode("other", "pkg:npm/other@1.0.0");
+    const match = createMockNode("match", "match-ref");
+    const other = createMockNode("other", "other-ref");
 
-    const result = buildMermaidDiagram([match, other], {
+    const sbom = createMockSbom(
+      [match, other],
+      {},
+      ["match-ref", "other-ref"]
+    );
+
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 2,
       pruneNonMatches: true,
       query: "match",
@@ -119,12 +144,17 @@ describe("buildMermaidDiagram", () => {
   });
 
   it("truncates when exceeding node limits", () => {
-    // Why: Protects UI from excessively large diagrams.
     const nodes = Array.from({ length: 10 }, (_, index) =>
-      createMockNode(`node-${index}`, `pkg:npm/node-${index}@1.0.0`),
+      createMockNode(`node-${index}`, `ref-${index}`),
     );
 
-    const result = buildMermaidDiagram(nodes, {
+    const sbom = createMockSbom(
+      nodes,
+      {},
+      nodes.map(n => n.bomRef?.value as string)
+    );
+
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 1,
       pruneNonMatches: false,
       query: "",
@@ -138,10 +168,11 @@ describe("buildMermaidDiagram", () => {
   });
 
   it("sanitizes component names and versions in labels", () => {
-    // Why: Prevents Mermaid syntax errors from special characters.
-    const tricky = createMockNode('Component <with> "quotes" & \\slashes', "pkg:npm/tricky@1.0.0");
+    const tricky = createMockNode('Component <with> "quotes" & \\slashes', "tricky-ref");
     
-    const result = buildMermaidDiagram([tricky], {
+    const sbom = createMockSbom([tricky], {}, ["tricky-ref"]);
+
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 1,
       pruneNonMatches: false,
       query: "",
@@ -152,19 +183,19 @@ describe("buildMermaidDiagram", () => {
   });
 
   it("applies the highest severity class to nodes", () => {
-    // Why: Nodes should be visually prioritized by their worst vulnerability.
-    const component = createMockNode("vuln-comp", "pkg:npm/vuln@1.0.0");
+    const component = createMockNode("vuln-comp", "vuln-ref");
     component.vulnerabilities.inherent.High = [{ id: "CVE-HIGH" } as any];
     component.vulnerabilities.transitive.Critical = [{ id: "CVE-CRITICAL" } as any];
 
-    const result = buildMermaidDiagram([component], {
+    const sbom = createMockSbom([component], {}, ["vuln-ref"]);
+
+    const result = buildMermaidDiagram(sbom, {
       maxDepth: 1,
       pruneNonMatches: false,
       query: "",
       showVulnerableOnly: false,
     });
 
-    // Should be critical because it has a transitive critical vuln
     expect(result.diagram).toContain('node_0["vuln-comp');
     expect(result.diagram).toContain('node_0["vuln-comp<br/>v1.0.0<br/>2 vulns (1nd, 1tr)"]:::critical');
   });

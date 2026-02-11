@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { ComponentErrorBoundary } from "./ComponentErrorBoundary";
-import type { NestedSBOMComponent } from "./Formatter/Formatter";
+import { type formattedSBOM, type EnhancedComponent } from "../types/sbom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +38,7 @@ export const Renderer = ({ SBOM }) => {
     progress: 0,
     message: "Initializing Formatter...",
   });
-  const [formattedNestedSBOM, setFormattedNestedSBOM] = useState(null);
+  const [formattedNestedSBOM, setFormattedNestedSBOM] = useState<formattedSBOM | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [query, setQuery] = useState("");
   const [showVulnerableOnly, setShowVulnerableOnly] = useState(false);
@@ -99,7 +99,7 @@ export const Renderer = ({ SBOM }) => {
     };
 
     formatSBOM();
-
+    
     return () => {
       cancelled = true;
       abortControllerRef.current?.abort();
@@ -238,15 +238,15 @@ export const Renderer = ({ SBOM }) => {
   }
 
   const normalize = (value: string) => value.toLowerCase();
-  const matchesQuery = (component) => {
+  const matchesQuery = (node: EnhancedComponent) => {
     if (!query.trim()) return true;
     const haystack = [
-      component.name,
-      component.group,
-      component.bomRef?.value,
-      typeof component.purl === "string"
-        ? component.purl
-        : component.purl?.toString?.(),
+      node.name,
+      node.group,
+      node.bomRef?.value,
+      typeof node.purl === "string"
+        ? node.purl
+        : node.purl?.toString?.(),
     ]
       .filter(Boolean)
       .join(" ");
@@ -254,21 +254,14 @@ export const Renderer = ({ SBOM }) => {
     return normalize(haystack).includes(normalize(query));
   };
 
-  const hasAnyVuln = (component) => {
-    const { inherent, transitive } = component.vulnerabilities;
-    const count =
-      inherent.Critical.length +
-      inherent.High.length +
-      inherent.Medium.length +
-      inherent.Low.length +
-      transitive.Critical.length +
-      transitive.High.length +
-      transitive.Medium.length +
-      transitive.Low.length;
-    return count > 0;
+  const hasAnyVuln = (component: EnhancedComponent) => {
+    return component.vulnerabilities && (
+      Object.values(component.vulnerabilities.inherent).some(v => v.length > 0) ||
+      Object.values(component.vulnerabilities.transitive).some(v => v.length > 0)
+    );
   };
 
-  const vulnCount = (component) => {
+  const vulnCount = (component: EnhancedComponent) => {
     const { inherent, transitive } = component.vulnerabilities;
     return (
       inherent.Critical.length +
@@ -282,15 +275,23 @@ export const Renderer = ({ SBOM }) => {
     );
   };
 
-  const matchesTree = (component) => {
+  const matchesTree = (ref: string) => {
+    const component = formattedNestedSBOM.componentMap.get(ref);
+    if (!component) return false;
     if (matchesQuery(component)) return true;
-    return component.formattedDependencies?.some(matchesTree) ?? false;
+    const deps = formattedNestedSBOM.dependencyGraph.get(ref) || [];
+    return deps.some(matchesTree);
   };
 
-  const filteredComponents = formattedNestedSBOM.components.filter(
+  const rootComponents = formattedNestedSBOM.topLevelRefs
+    .map(ref => formattedNestedSBOM.componentMap.get(ref))
+    .filter(Boolean) as EnhancedComponent[];
+
+  const filteredComponents = rootComponents.filter(
     (component) => {
       if (showVulnerableOnly && !hasAnyVuln(component)) return false;
-      return matchesTree(component);
+      const ref = typeof component.bomRef === 'string' ? component.bomRef : component.bomRef?.value || "";
+      return matchesTree(ref);
     },
   );
 
@@ -299,50 +300,46 @@ export const Renderer = ({ SBOM }) => {
       return (a.name || "").localeCompare(b.name || "");
     }
     if (sortMode === "deps") {
+      const aRef = typeof a.bomRef === 'string' ? a.bomRef : a.bomRef?.value || "";
+      const bRef = typeof b.bomRef === 'string' ? b.bomRef : b.bomRef?.value || "";
       return (
-        (b.formattedDependencies?.length || 0) -
-        (a.formattedDependencies?.length || 0)
+        (formattedNestedSBOM.dependencyGraph.get(bRef)?.length || 0) -
+        (formattedNestedSBOM.dependencyGraph.get(aRef)?.length || 0)
       );
     }
     return vulnCount(b) - vulnCount(a);
   });
 
   const visibleCount = filteredComponents.length;
-  const totalCount = formattedNestedSBOM.components.length;
+  const totalCount = formattedNestedSBOM.componentMap.size;
 
   const findFocusedComponent = (
-    roots,
     pathRefs: string[] | null,
-  ): NestedSBOMComponent | null => {
+  ): EnhancedComponent | null => {
     if (!pathRefs || pathRefs.length === 0) return null;
-    const findByRef = (list, ref) =>
-      list.find((item) => item.bomRef?.value === ref) || null;
-
-    let current = findByRef(roots, pathRefs[0]);
-    if (!current) return null;
-    for (let i = 1; i < pathRefs.length; i += 1) {
-      current = findByRef(current.formattedDependencies || [], pathRefs[i]);
-      if (!current) return null;
-    }
-    return current;
+    const ref = pathRefs[pathRefs.length - 1];
+    return formattedNestedSBOM.componentMap.get(ref) || null;
   };
 
   const focusedComponent = findFocusedComponent(
-    formattedNestedSBOM.components,
     focusedPathRefs,
   );
 
-  const exportRoots = focusedComponent ? [focusedComponent] : sortedComponents;
+  const mermaidRoots = focusedComponent ? [focusedComponent] : sortedComponents;
+
+  // This variable was unused, removed to avoid linting warnings.
+  // const exportRoots = mermaidRoots;
 
   const prepareMermaidSource = async () => {
     const { buildMermaidDiagram } = await import("@/lib/mermaid/sbomToMermaid");
-    const result = buildMermaidDiagram(exportRoots, {
+    const result = buildMermaidDiagram(formattedNestedSBOM, {
       maxDepth,
       query,
       pruneNonMatches,
       showVulnerableOnly,
+      rootRefs: mermaidRoots.map(r => typeof r.bomRef === 'string' ? r.bomRef : r.bomRef?.value || ""),
     });
-    const previewResult = buildMermaidDiagram(exportRoots, {
+    const previewResult = buildMermaidDiagram(formattedNestedSBOM, {
       maxDepth,
       query,
       pruneNonMatches,
@@ -350,6 +347,7 @@ export const Renderer = ({ SBOM }) => {
       maxNodes: 140,
       maxEdges: 280,
       maxLabelLength: 120,
+      rootRefs: mermaidRoots.map(r => typeof r.bomRef === 'string' ? r.bomRef : r.bomRef?.value || ""),
     });
     setMermaidSource(result.diagram);
     setMermaidPreviewSource(previewResult.diagram);
@@ -707,6 +705,8 @@ export const Renderer = ({ SBOM }) => {
                   sortMode={sortMode}
                   compactMode={compactMode}
                   parentPathRefs={focusedComponent ? focusedPathRefs || [] : []}
+                  componentMap={formattedNestedSBOM.componentMap}
+                  dependencyGraph={formattedNestedSBOM.dependencyGraph}
                   onFocus={setFocusedPathRefs}
                 />
               </ComponentErrorBoundary>

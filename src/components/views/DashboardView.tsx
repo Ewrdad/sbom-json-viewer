@@ -44,6 +44,8 @@ export function DashboardView({
       unknown: 0,
     },
     vulnerableComponents: [],
+    allVulnerableComponents: [],
+    totalVulnerabilities: 0,
   };
 
   const vulnData = [

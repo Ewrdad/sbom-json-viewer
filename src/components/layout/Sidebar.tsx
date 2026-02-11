@@ -1,11 +1,11 @@
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../types";
-import { LayoutDashboard, List, Network } from "lucide-react";
+import { LayoutDashboard, List, Network, ShieldAlert } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 
 export function Sidebar() {
-  console.log("Sidebar component rendering...");
+  // console.log("Sidebar component rendering...");
   const { activeView, setActiveView } = useView();
 
   const navItems: { id: ViewType; label: string; icon: React.ReactNode }[] = [
@@ -13,6 +13,11 @@ export function Sidebar() {
       id: "dashboard",
       label: "Dashboard",
       icon: <LayoutDashboard className="h-4 w-4 mr-2" />,
+    },
+    {
+      id: "vulnerabilities",
+      label: "Vulnerabilities",
+      icon: <ShieldAlert className="h-4 w-4 mr-2" />,
     },
     {
       id: "explorer",

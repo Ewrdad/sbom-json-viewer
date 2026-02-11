@@ -1,3 +1,8 @@
+import type { Component, Metadata, License } from "@cyclonedx/cyclonedx-library/Models";
+import type * as Models from "@cyclonedx/cyclonedx-library/Models";
+
+type Vulnerability = Models.Vulnerability.Vulnerability;
+
 export interface SbomStats {
   totalComponents: number;
   vulnerabilityCounts: {
@@ -25,9 +30,78 @@ export interface SbomStats {
     low: number;
     total: number;
   }[];
+  allVulnerableComponents: {
+    name: string;
+    version: string;
+    ref: string;
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    total: number;
+  }[];
+  totalVulnerabilities: number;
 }
 
 export interface WorkerProgressUpdate {
   progress: number;
   message: string;
 }
+
+export interface LicenseDistribution {
+  permissive: number;
+  copyleft: number;
+  weakCopyleft: number;
+  proprietary: number;
+  unknown: number;
+}
+
+/**
+ * Enhanced Component with pre-calculated vulnerability and license metadata
+ */
+export interface EnhancedComponent extends Component {
+  vulnerabilities: {
+    inherent: {
+      Critical: Vulnerability[];
+      High: Vulnerability[];
+      Medium: Vulnerability[];
+      Low: Vulnerability[];
+      Informational: Vulnerability[];
+    };
+    transitive: {
+      Critical: Vulnerability[];
+      High: Vulnerability[];
+      Medium: Vulnerability[];
+      Low: Vulnerability[];
+      Informational: Vulnerability[];
+    };
+  };
+  licenseDistribution: LicenseDistribution;
+  transitiveLicenseDistribution: LicenseDistribution;
+}
+
+export type formattedSBOM = {
+  statistics: {
+    licenses: License[];
+    vulnerabilities: {
+      Critical: Vulnerability[];
+      High: Vulnerability[];
+      Medium: Vulnerability[];
+      Low: Vulnerability[];
+      Informational: Vulnerability[];
+    };
+  };
+  metadata: Metadata;
+  /**
+   * Flat map of components by their bomRef for O(1) lookup
+   */
+  componentMap: Map<string, EnhancedComponent>;
+  /**
+   * Adjacency list representing the dependency graph: bomRef -> string[] of dependency bomRefs
+   */
+  dependencyGraph: Map<string, string[]>;
+  /**
+   * Top level component refs (roots of the tree)
+   */
+  topLevelRefs: string[];
+};

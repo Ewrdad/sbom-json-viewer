@@ -31,11 +31,19 @@ const DependencyTree = lazy(() =>
     default: module.DependencyTree,
   })),
 );
-import { type Bom } from "@cyclonedx/cyclonedx-library/Models";
+const VulnerabilitiesView = lazy(() =>
+  import("./components/views/VulnerabilitiesView").then((module) => ({
+    default: module.VulnerabilitiesView,
+  })),
+);
+import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { Upload } from "lucide-react";
+import {
+  type SbomStats,
+  type formattedSBOM,
+} from "./types/sbom";
 import { getSbomSizeProfile } from "./lib/sbomSizing";
-
-// Why: defer heavy view bundles until the user selects them for large SBOMs.
+import { KeepAliveView } from "./components/common/KeepAliveView";
 
 function AppContent({
   sbom,
@@ -45,9 +53,9 @@ function AppContent({
   setCurrentFile,
   onImport,
 }: {
-  sbom: any;
-  formattedSbom: any;
-  sbomStats: any;
+  sbom: Bom | null;
+  formattedSbom: formattedSBOM | null;
+  sbomStats: SbomStats | null;
   currentFile: string;
   setCurrentFile: (f: string) => void;
   onImport: (file: File) => void;
@@ -131,7 +139,7 @@ function AppContent({
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         <Suspense
           fallback={
             <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
@@ -139,16 +147,25 @@ function AppContent({
             </div>
           }
         >
-          {activeView === "dashboard" && (
+          <KeepAliveView activeView={activeView} viewKey="dashboard">
             <DashboardView sbom={sbom} preComputedStats={sbomStats} />
-          )}
-          {activeView === "explorer" && <ComponentExplorer sbom={sbom} />}
-          {activeView === "tree" && (
-            <DependencyTree sbom={sbom} formattedData={formattedSbom} />
-          )}
-          {activeView === "graph" && (
-            <DependencyGraph sbom={sbom} formattedData={formattedSbom} />
-          )}
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="vulnerabilities">
+            <VulnerabilitiesView sbom={sbom} preComputedStats={sbomStats} />
+          </KeepAliveView>
+          
+          <KeepAliveView activeView={activeView} viewKey="explorer">
+            <ComponentExplorer sbom={sbom} formattedSbom={formattedSbom} />
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="tree">
+            <DependencyTree sbom={sbom} formattedSbom={formattedSbom} />
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="graph">
+            <DependencyGraph sbom={sbom} formattedSbom={formattedSbom} />
+          </KeepAliveView>
         </Suspense>
       </div>
     </div>
@@ -239,8 +256,8 @@ export function App() {
   });
   const loadSequence = useRef(0);
 
-  const [formattedSbom, setFormattedSbom] = useState<any>(null);
-  const [sbomStats, setSbomStats] = useState<any>(null);
+  const [formattedSbom, setFormattedSbom] = useState<formattedSBOM | null>(null);
+  const [sbomStats, setSbomStats] = useState<SbomStats | null>(null);
 
   const updateLoading = useCallback(
     (message: string, progress: number | null = null) => {
@@ -269,8 +286,23 @@ export function App() {
         if (type === "progress") {
           updateLoading(message, progress / 100);
         } else if (type === "complete") {
+          // Revive Maps from plain objects sent by worker
+          const formatted = result.formatted;
+          if (formatted) {
+            if (formatted.componentMap) {
+              formatted.componentMap = new Map(Object.entries(formatted.componentMap));
+            } else {
+              formatted.componentMap = new Map();
+            }
+            if (formatted.dependencyGraph) {
+              formatted.dependencyGraph = new Map(Object.entries(formatted.dependencyGraph));
+            } else {
+              formatted.dependencyGraph = new Map();
+            }
+          }
+          
           setSbom(result.bom);
-          setFormattedSbom(result.formatted);
+          setFormattedSbom(formatted);
           setSbomStats(result.stats);
           resetLoading();
           worker.terminate();

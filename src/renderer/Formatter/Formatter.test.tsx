@@ -2,16 +2,15 @@
  * Tests for the Formatter function
  *
  * Why: Validates the complete SBOM transformation process including:
- * - Nested component structure building
+ * - Flat component map building
+ * - Dependency graph construction
  * - Vulnerability aggregation (inherent and transitive)
  * - Circular dependency handling
- * - Component replication
  * - Progress tracking
  */
 
 import { describe, it, expect, vi } from "vitest";
 import { Formatter } from "./Formatter";
-import type { NestedSBOMComponent } from "./Formatter";
 import {
   createLinearDependencyBom,
   createDiamondDependencyBom,
@@ -44,7 +43,7 @@ describe("Formatter", () => {
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
       expect(result).toBeDefined();
-      expect(result.components).toEqual([]);
+      expect(result.componentMap.size).toBe(0);
       expect(result.statistics.licenses).toEqual([]);
     });
 
@@ -96,29 +95,24 @@ describe("Formatter", () => {
   });
 
   describe("Linear Dependency Structure", () => {
-    it("should build nested component structure for linear dependencies", async () => {
-      // Why: A -> B -> C should create nested structure
+    it("should build flat component map and dependency graph for linear dependencies", async () => {
+      // Why: A -> B -> C should create flat map and adjacency list
       const bom = createLinearDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      // Should have one top-level component (A)
-      expect(result.components).toHaveLength(1);
-      expect(result.components[0].name).toBe("a");
+      // Should have all components in the map
+      expect(result.componentMap.size).toBe(3);
+      expect(result.componentMap.has("pkg:npm/a@1.0.0")).toBe(true);
+      expect(result.componentMap.get("pkg:npm/a@1.0.0")?.name).toBe("a");
 
-      // A should have B as dependency
-      expect(result.components[0].formattedDependencies).toHaveLength(1);
-      expect(result.components[0].formattedDependencies[0].name).toBe("b");
+      // Dependency graph should reflect relationships
+      expect(result.dependencyGraph.get("pkg:npm/a@1.0.0")).toEqual(["pkg:npm/b@1.0.0"]);
+      expect(result.dependencyGraph.get("pkg:npm/b@1.0.0")).toEqual(["pkg:npm/c@1.0.0"]);
 
-      // B should have C as dependency
-      expect(
-        result.components[0].formattedDependencies[0].formattedDependencies,
-      ).toHaveLength(1);
-      expect(
-        result.components[0].formattedDependencies[0].formattedDependencies[0]
-          .name,
-      ).toBe("c");
+      // A should be the root
+      expect(result.topLevelRefs).toEqual(["pkg:npm/a@1.0.0"]);
     });
 
     it("should aggregate transitive vulnerabilities in linear chain", async () => {
@@ -128,15 +122,13 @@ describe("Formatter", () => {
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentA = result.components[0];
+      const componentA = result.componentMap.get("pkg:npm/a@1.0.0")!;
 
       // A should have no inherent vulnerabilities
       expect(componentA.vulnerabilities.inherent.High).toHaveLength(0);
 
       // A should have transitive vulnerability from C
-      expect(componentA.vulnerabilities.transitive.High.length).toBeGreaterThan(
-        0,
-      );
+      expect(componentA.vulnerabilities.transitive.High.length).toBeGreaterThan(0);
     });
 
     it("should track inherent vulnerabilities at the correct level", async () => {
@@ -146,79 +138,54 @@ describe("Formatter", () => {
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentC =
-        result.components[0].formattedDependencies[0].formattedDependencies[0];
+      const componentC = result.componentMap.get("pkg:npm/c@1.0.0")!;
 
       // C should have inherent vulnerability
       expect(componentC.vulnerabilities.inherent.High).toHaveLength(1);
-      expect(componentC.vulnerabilities.inherent.High[0].id).toBe(
-        "CVE-2024-0001",
-      );
+      expect(componentC.vulnerabilities.inherent.High[0].id).toBe("CVE-2024-0001");
     });
   });
 
   describe("Diamond Dependency Structure", () => {
-    it("should replicate shared dependencies", async () => {
-      // Why: D is used by both B and C, should appear fully in both places
+    it("should accurately represent shared dependencies in graph", async () => {
+      // Why: D is used by both B and C
       const bom = createDiamondDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentA = result.components[0];
-      expect(componentA.formattedDependencies).toHaveLength(2); // B and C
-
-      const componentB = componentA.formattedDependencies.find(
-        (c) => c.name === "b",
-      )!;
-      const componentC = componentA.formattedDependencies.find(
-        (c) => c.name === "c",
-      )!;
-
-      // Both B and C should have D as dependency
-      expect(componentB.formattedDependencies).toHaveLength(1);
-      expect(componentB.formattedDependencies[0].name).toBe("d");
-
-      expect(componentC.formattedDependencies).toHaveLength(1);
-      expect(componentC.formattedDependencies[0].name).toBe("d");
-
-      // D should be fully replicated (not a reference)
-      expect(componentB.formattedDependencies[0]).not.toBe(
-        componentC.formattedDependencies[0],
-      );
+      expect(result.topLevelRefs).toEqual(["pkg:npm/a@1.0.0"]);
+      expect(result.dependencyGraph.get("pkg:npm/a@1.0.0")).toContain("pkg:npm/b@1.0.0");
+      expect(result.dependencyGraph.get("pkg:npm/a@1.0.0")).toContain("pkg:npm/c@1.0.0");
+      expect(result.dependencyGraph.get("pkg:npm/b@1.0.0")).toEqual(["pkg:npm/d@1.0.0"]);
+      expect(result.dependencyGraph.get("pkg:npm/c@1.0.0")).toEqual(["pkg:npm/d@1.0.0"]);
     });
 
     it("should aggregate transitive vulnerabilities from multiple paths", async () => {
       // Why: A depends on B and C, both depend on D (with vuln)
-      // A should have D's vuln as transitive
       const bom = createDiamondDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentA = result.components[0];
+      const componentA = result.componentMap.get("pkg:npm/a@1.0.0")!;
 
       // A should have transitive critical vulnerability from D
-      expect(
-        componentA.vulnerabilities.transitive.Critical.length,
-      ).toBeGreaterThan(0);
+      expect(componentA.vulnerabilities.transitive.Critical.length).toBeGreaterThan(0);
     });
 
     it("should deduplicate transitive vulnerabilities", async () => {
       // Why: Same vulnerability from D appears via both B and C paths
-      // Should only appear once in A's transitive vulnerabilities
       const bom = createDiamondDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentA = result.components[0];
+      const componentA = result.componentMap.get("pkg:npm/a@1.0.0")!;
 
       // Should have exactly 1 critical vulnerability (deduplicated)
       expect(componentA.vulnerabilities.transitive.Critical).toHaveLength(1);
-      expect(componentA.vulnerabilities.transitive.Critical[0].id).toBe(
-        "CVE-2024-0002",
-      );
+      expect(componentA.vulnerabilities.transitive.Critical[0].id).toBe("CVE-2024-0002");
     });
   });
 
@@ -232,28 +199,19 @@ describe("Formatter", () => {
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
       expect(result).toBeDefined();
-      expect(result.components).toHaveLength(1); // A is top-level
+      expect(result.topLevelRefs).toEqual(["pkg:npm/a@1.0.0"]);
     });
 
-    it("should still build partial structure with circular dependencies", async () => {
-      // Why: Circular reference should be detected and skipped
+    it("should correctly represent circular dependencies in the graph", async () => {
+      // Why: Circular reference should be captured in the adjacency list
       const bom = createCircularDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentA = result.components[0];
-      expect(componentA.name).toBe("a");
-      expect(componentA.formattedDependencies).toHaveLength(1); // B
-
-      const componentB = componentA.formattedDependencies[0];
-      expect(componentB.name).toBe("b");
-      expect(componentB.formattedDependencies).toHaveLength(1); // C
-
-      const componentC = componentB.formattedDependencies[0];
-      expect(componentC.name).toBe("c");
-      // C's dependency on B should be skipped due to circular detection
-      expect(componentC.formattedDependencies).toHaveLength(0);
+      expect(result.dependencyGraph.get("pkg:npm/a@1.0.0")).toEqual(["pkg:npm/b@1.0.0"]);
+      expect(result.dependencyGraph.get("pkg:npm/b@1.0.0")).toEqual(["pkg:npm/c@1.0.0"]);
+      expect(result.dependencyGraph.get("pkg:npm/c@1.0.0")).toEqual(["pkg:npm/b@1.0.0"]);
     });
   });
 
@@ -293,19 +251,15 @@ describe("Formatter", () => {
       const { setProgress } = createMockProgressSetter();
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const formattedA = result.components[0];
+      const formattedA = result.componentMap.get("pkg:npm/a@1.0.0")!;
 
       // A should have its own vulnerability as inherent
       expect(formattedA.vulnerabilities.inherent.High).toHaveLength(1);
-      expect(formattedA.vulnerabilities.inherent.High[0].id).toBe(
-        "CVE-2024-0001",
-      );
+      expect(formattedA.vulnerabilities.inherent.High[0].id).toBe("CVE-2024-0001");
 
       // A should have B's vulnerability as transitive
       expect(formattedA.vulnerabilities.transitive.Critical).toHaveLength(1);
-      expect(formattedA.vulnerabilities.transitive.Critical[0].id).toBe(
-        "CVE-2024-0002",
-      );
+      expect(formattedA.vulnerabilities.transitive.Critical[0].id).toBe("CVE-2024-0002");
     });
   });
 
@@ -318,8 +272,9 @@ describe("Formatter", () => {
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      expect(result.components).toHaveLength(1);
-      expect(result.components[0].formattedDependencies).toHaveLength(0);
+      expect(result.componentMap.size).toBe(1);
+      expect(result.dependencyGraph.has("pkg:npm/a@1.0.0")).toBe(true);
+      expect(result.dependencyGraph.get("pkg:npm/a@1.0.0")).toEqual([]);
     });
 
     it("should handle component with missing dependency reference", async () => {
@@ -332,9 +287,10 @@ describe("Formatter", () => {
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      expect(result.components).toHaveLength(1);
-      // Should have no formatted dependencies since the reference is invalid
-      expect(result.components[0].formattedDependencies).toHaveLength(0);
+      expect(result.componentMap.size).toBe(1);
+      // Graph will still have the reference, but componentMap won't have the target
+      expect(result.dependencyGraph.get("pkg:npm/a@1.0.0")).toEqual(["pkg:npm/missing@1.0.0"]);
+      expect(result.componentMap.has("pkg:npm/missing@1.0.0")).toBe(false);
     });
 
     it("should handle SBOM with only vulnerabilities, no components", async () => {
@@ -350,36 +306,33 @@ describe("Formatter", () => {
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      expect(result.components).toHaveLength(0);
+      expect(result.componentMap.size).toBe(0);
       expect(result.statistics.vulnerabilities.High).toHaveLength(1);
     });
   });
 
   describe("Component Structure Integrity", () => {
-    it("should preserve component properties in nested structure", async () => {
-      // Why: Component metadata should not be lost during nesting
+    it("should preserve component properties in flat map", async () => {
+      // Why: Component metadata should not be lost
       const bom = createLinearDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const componentA = result.components[0];
-      expect(componentA.name).toBeDefined();
+      const componentA = result.componentMap.get("pkg:npm/a@1.0.0")!;
       expect(componentA.name).toBe("a");
-      expect(componentA.version).toBeDefined();
       expect(componentA.version).toBe("1.0.0");
-      // Check that component has expected properties (avoiding private field access)
       expect(componentA.type).toBeDefined();
     });
 
     it("should add vulnerability tracking to each component", async () => {
-      // Why: Every nested component should have vulnerability tracking structure
+      // Why: Every component should have vulnerability tracking structure
       const bom = createLinearDependencyBom();
       const { setProgress } = createMockProgressSetter();
 
       const result = await Formatter({ rawSBOM: bom, setProgress });
 
-      const checkVulnerabilityStructure = (component: NestedSBOMComponent) => {
+      result.componentMap.forEach((component) => {
         expect(component.vulnerabilities).toBeDefined();
         expect(component.vulnerabilities.inherent).toBeDefined();
         expect(component.vulnerabilities.transitive).toBeDefined();
@@ -388,27 +341,7 @@ describe("Formatter", () => {
         expect(component.vulnerabilities.inherent.Medium).toBeDefined();
         expect(component.vulnerabilities.inherent.Low).toBeDefined();
         expect(component.vulnerabilities.inherent.Informational).toBeDefined();
-
-        component.formattedDependencies.forEach(checkVulnerabilityStructure);
-      };
-
-      result.components.forEach(checkVulnerabilityStructure);
-    });
-
-    it("should add formattedDependencies array to each component", async () => {
-      // Why: Every component needs the formattedDependencies property
-      const bom = createLinearDependencyBom();
-      const { setProgress } = createMockProgressSetter();
-
-      const result = await Formatter({ rawSBOM: bom, setProgress });
-
-      const checkFormattedDeps = (component: NestedSBOMComponent) => {
-        expect(component.formattedDependencies).toBeDefined();
-        expect(Array.isArray(component.formattedDependencies)).toBe(true);
-        component.formattedDependencies.forEach(checkFormattedDeps);
-      };
-
-      result.components.forEach(checkFormattedDeps);
+      });
     });
   });
 });

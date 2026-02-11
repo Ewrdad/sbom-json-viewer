@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { SBOMComponent } from "./SBOMComponent";
-import type { NestedSBOMComponent } from "../Formatter/Formatter";
-// No BomRef import needed here
+import { type EnhancedComponent } from "../../types/sbom";
+import type * as Models from "@cyclonedx/cyclonedx-library/Models";
 
+type Vulnerability = Models.Vulnerability.Vulnerability;
 
 // Mock navigator.clipboard
 vi.stubGlobal('navigator', {
@@ -13,7 +14,7 @@ vi.stubGlobal('navigator', {
 });
 
 describe("SBOMComponent", () => {
-  let mockComponent: NestedSBOMComponent;
+  let mockComponent: EnhancedComponent;
 
   beforeEach(() => {
     // Create a basic mock component with plain-object structure
@@ -41,7 +42,8 @@ describe("SBOMComponent", () => {
           Informational: [],
         },
       },
-      formattedDependencies: [],
+      licenseDistribution: { permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0 },
+      transitiveLicenseDistribution: { permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0 },
     } as any;
   });
 
@@ -79,7 +81,7 @@ describe("SBOMComponent", () => {
       expect(screen.getByText(/No known vulnerabilities/)).toBeDefined();
     });
 
-    it("should display critical vulnerabilities count", () => {
+    it("should display critical vulnerabilities count", async () => {
       const vulnComponent = {
         ...mockComponent,
         vulnerabilities: {
@@ -90,15 +92,20 @@ describe("SBOMComponent", () => {
               {
                 id: "CVE-2024-0001",
                 description: "Test critical vulnerability",
-              } as any,
+              } as unknown as Vulnerability,
             ],
           },
         },
-      } as NestedSBOMComponent;
+      } as EnhancedComponent;
 
       render(<SBOMComponent component={vulnComponent} />);
 
-      expect(screen.getByText(/Critical: 1/)).toBeDefined();
+      const badge = screen.getByText(/Critical: 1/);
+      expect(badge).toBeDefined();
+      fireEvent.click(badge);
+
+      const cveLink = await screen.findByRole("link", { name: "CVE-2024-0001" });
+      expect(cveLink).toHaveAttribute("href", "https://nvd.nist.gov/vuln/detail/CVE-2024-0001");
     });
 
     it("should show inherited vulnerabilities separately", () => {
@@ -123,7 +130,7 @@ describe("SBOMComponent", () => {
             Informational: [],
           },
         },
-      } as NestedSBOMComponent;
+      } as EnhancedComponent;
 
       render(<SBOMComponent component={vulnComponent} />);
 
@@ -141,30 +148,47 @@ describe("SBOMComponent", () => {
     });
 
     it("should show dependencies count when present", () => {
-      const componentWithDeps = {
-        ...mockComponent,
-        formattedDependencies: [
-          { ...mockComponent, bomRef: "pkg:npm/dep1@1.0.0" },
-          { ...mockComponent, bomRef: "pkg:npm/dep2@1.0.0" },
-        ] as any[],
-      } as NestedSBOMComponent;
+      const dep1 = { ...mockComponent, bomRef: "pkg:npm/dep1@1.0.0", name: "dep1" } as unknown as EnhancedComponent;
+      const dep2 = { ...mockComponent, bomRef: "pkg:npm/dep2@1.0.0", name: "dep2" } as unknown as EnhancedComponent;
+      
+      const componentMap = new Map<string, EnhancedComponent>([
+        ["pkg:npm/test@1.0.0", mockComponent],
+        ["pkg:npm/dep1@1.0.0", dep1],
+        ["pkg:npm/dep2@1.0.0", dep2],
+      ]);
+      const dependencyGraph = new Map<string, string[]>([
+        ["pkg:npm/test@1.0.0", ["pkg:npm/dep1@1.0.0", "pkg:npm/dep2@1.0.0"]],
+      ]);
 
-      render(<SBOMComponent component={componentWithDeps} />);
-
-      expect(screen.getAllByText(/Dependencies \(2\)/).length).toBeGreaterThan(
-        0,
+      render(
+        <SBOMComponent 
+          component={mockComponent} 
+          componentMap={componentMap}
+          dependencyGraph={dependencyGraph}
+        />
       );
+
+      expect(screen.getAllByText(/Dependencies \(2\)/).length).toBeGreaterThan(0);
     });
 
     it("should respect maxDepth limit", () => {
-      const componentWithDeps = {
-        ...mockComponent,
-        formattedDependencies: [
-          { ...mockComponent, bomRef: "pkg:npm/dep1@1.0.0" },
-        ] as any[],
-      } as NestedSBOMComponent;
+      const dep1 = { ...mockComponent, bomRef: "pkg:npm/dep1@1.0.0", name: "dep1" } as unknown as EnhancedComponent;
+      const componentMap = new Map<string, EnhancedComponent>([
+        ["pkg:npm/test@1.0.0", mockComponent],
+        ["pkg:npm/dep1@1.0.0", dep1],
+      ]);
+      const dependencyGraph = new Map<string, string[]>([
+        ["pkg:npm/test@1.0.0", ["pkg:npm/dep1@1.0.0"]],
+      ]);
 
-      render(<SBOMComponent component={componentWithDeps} maxDepth={0} />);
+      render(
+        <SBOMComponent 
+          component={mockComponent} 
+          maxDepth={0} 
+          componentMap={componentMap}
+          dependencyGraph={dependencyGraph}
+        />
+      );
 
       // Should show message about max depth reached
       expect(
@@ -178,7 +202,7 @@ describe("SBOMComponent", () => {
       const componentWithLicense = {
         ...mockComponent,
         licenses: [{ id: "MIT" }] as any,
-      } as NestedSBOMComponent;
+      } as EnhancedComponent;
 
       render(<SBOMComponent component={componentWithLicense} />);
 
@@ -189,7 +213,7 @@ describe("SBOMComponent", () => {
       const componentWithLicenses = {
         ...mockComponent,
         licenses: [{ id: "MIT" }, { id: "Apache-2.0" }] as any,
-      } as NestedSBOMComponent;
+      } as EnhancedComponent;
 
       render(<SBOMComponent component={componentWithLicenses} />);
 
