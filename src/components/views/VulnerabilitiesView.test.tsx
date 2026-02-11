@@ -34,6 +34,8 @@ const mockStats: SbomStats = {
         { id: 'CVE-2024-002', severity: 'high', affectedCount: 5, title: 'High Vuln' },
         { id: 'GHSA-xxx', severity: 'medium', affectedCount: 2, title: 'Medium Vuln' },
     ],
+    allLicenses: [],
+    allLicenseComponents: [],
 };
 
 const emptyStats: SbomStats = {
@@ -46,6 +48,8 @@ const emptyStats: SbomStats = {
     allVulnerableComponents: [],
     totalVulnerabilities: 0,
     allVulnerabilities: [],
+    allLicenses: [],
+    allLicenseComponents: [],
 };
 
 describe('VulnerabilitiesView', () => {

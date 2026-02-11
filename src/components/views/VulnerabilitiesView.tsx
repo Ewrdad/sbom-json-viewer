@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/resizable";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
-import { cn } from "../../lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 const ITEMS_PER_PAGE = 20;
@@ -787,11 +786,14 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
 
                       {selectedVulnerability.id.startsWith('CVE-') && (
                         <div className="pt-4 mt-auto">
-                          <Button asChild className="w-full" variant="default">
-                            <a href={`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.id}`} target="_blank" rel="noopener noreferrer">
+                            <a 
+                              href={`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.id}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-9 px-4 text-sm font-medium hover:bg-primary/90 transition-colors"
+                            >
                               View on NVD
                             </a>
-                          </Button>
                         </div>
                       )}
                     </div>
