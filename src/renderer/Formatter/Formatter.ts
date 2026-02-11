@@ -1,63 +1,22 @@
-import { Bom, Component } from "@cyclonedx/cyclonedx-library/Models";
+import type { Bom, Component } from "@cyclonedx/cyclonedx-library/Models";
 import type * as Models from "@cyclonedx/cyclonedx-library/Models";
-import type { License, Metadata } from "@cyclonedx/cyclonedx-library/Models";
-// import type { Dispatch, SetStateAction } from "react";
-type SetProgress = (update: { progress: number; message: string } | ((prev: { progress: number; message: string }) => { progress: number; message: string })) => void;
+
+type Vulnerability = Models.Vulnerability.Vulnerability;
+
 import { uniqueLicenses } from "./Statistics/uniqueLicenses";
 import { uniqueVulnerabilities } from "./Statistics/uniqueVulnerabilities";
 import { batchProcess, tick } from "../../lib/asyncUtils";
 import { getLicenseCategory } from "../../lib/licenseUtils";
+import {
+  type formattedSBOM,
+  type EnhancedComponent,
+  type LicenseDistribution,
+} from "../../types/sbom";
 
-type Vulnerability = Models.Vulnerability.Vulnerability;
-
-export type formattedSBOM = {
-  statistics: {
-    licenses: License[]; // A list of unique licenses across all components
-    vulnerabilities: {
-      // aggregated unique vulnerabilities across all components
-      Critical: Vulnerability[];
-      High: Vulnerability[];
-      Medium: Vulnerability[];
-      Low: Vulnerability[];
-      Informational: Vulnerability[];
-    };
-  };
-  metadata: Metadata;
-  components: NestedSBOMComponent[];
-};
-
-export interface NestedSBOMComponent extends Component {
-  vulnerabilities: {
-    inherent: {
-      // vulnerabilities directly associated with the component
-      Critical: Vulnerability[];
-      High: Vulnerability[];
-      Medium: Vulnerability[];
-      Low: Vulnerability[];
-      Informational: Vulnerability[];
-    };
-    transitive: {
-      // vulnerabilities inherited from dependencies
-      Critical: Vulnerability[];
-      High: Vulnerability[];
-      Medium: Vulnerability[];
-      Low: Vulnerability[];
-      Informational: Vulnerability[];
-    };
-  };
-  licenseDistribution: {
-    permissive: number;
-    copyleft: number;
-    weakCopyleft: number;
-    proprietary: number;
-    unknown: number;
-  };
-  formattedDependencies: NestedSBOMComponent[];
-}
+type SetProgress = (update: { progress: number; message: string } | ((prev: { progress: number; message: string }) => { progress: number; message: string })) => void;
 
 /**
  * Helper function to categorize vulnerabilities by severity
- * @description Groups vulnerabilities affecting a specific component by their severity level
  */
 const categorizeVulnerabilities = (
   vulnerabilities: Vulnerability[],
@@ -77,7 +36,6 @@ const categorizeVulnerabilities = (
   };
 
   for (const vuln of vulnerabilities) {
-    // Extract severity from ratings
     let severity = "informational";
     for (const rating of vuln.ratings) {
       if (rating.severity) {
@@ -99,42 +57,37 @@ const categorizeVulnerabilities = (
   return categorized;
 };
 
-/**
- * Create a safe clone of a Component
- * Why: Component uses private fields (e.g., #bomRef) that break when Object.assign is used.
- */
-const cloneComponent = (component: Component): Component => {
-  return new Component(component.type, component.name, {
-    bomRef: component.bomRef.value,
-    author: component.author,
-    copyright: component.copyright,
-    description: component.description,
-    externalReferences: component.externalReferences,
-    group: component.group,
-    hashes: component.hashes,
-    licenses: component.licenses,
-    publisher: component.publisher,
-    purl: component.purl,
-    scope: component.scope,
-    supplier: component.supplier,
-    swid: component.swid,
-    version: component.version,
-    components: component.components,
-    cpe: component.cpe,
-    properties: component.properties,
-    evidence: component.evidence,
-    dependencies: component.dependencies,
-  });
+interface TransitiveVulnEntry {
+  vuln: Vulnerability;
+  sourceRef: string; // bomRef of the package where this vuln is inherent
+}
+
+interface TransitiveMetrics {
+  vulns: {
+    Critical: TransitiveVulnEntry[];
+    High: TransitiveVulnEntry[];
+    Medium: TransitiveVulnEntry[];
+    Low: TransitiveVulnEntry[];
+    Informational: TransitiveVulnEntry[];
+  };
+  licenses: LicenseDistribution;
+}
+
+const emptyTransitiveMetrics = (): TransitiveMetrics => ({
+  vulns: { Critical: [], High: [], Medium: [], Low: [], Informational: [] },
+  licenses: { permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0 }
+});
+
+const addLicenseMetrics = (target: LicenseDistribution, source: LicenseDistribution) => {
+  target.permissive += source.permissive;
+  target.copyleft += source.copyleft;
+  target.weakCopyleft += source.weakCopyleft;
+  target.proprietary += source.proprietary;
+  target.unknown += source.unknown;
 };
 
 /**
  * MARK: Formatter
- * @description Formats a raw SBOM into a nested structure suitable for tiered rendering. The priority is to find top level components and find their inherent vulns
- * @param {any} props
- * @param {Bom} props.rawSBOM A raw SBOM to format
- * @param {function} props.setProgress An async function to update progress during formatting
- * @example await setFormattedNestedSBOM(await Formatter({ rawSBOM: SBOM }));
- * @returns {Promise<formattedSBOM>} A formatted nested SBOM
  */
 export const Formatter = async ({
   rawSBOM,
@@ -151,89 +104,24 @@ export const Formatter = async ({
 
   const formattedSBOM: formattedSBOM = {
     statistics: {
-      licenses: [],
-      vulnerabilities: {
-        Critical: [],
-        High: [],
-        Medium: [],
-        Low: [],
-        Informational: [],
-      },
+      licenses: uniqueLicenses(rawSBOM.components),
+      vulnerabilities: uniqueVulnerabilities(rawSBOM),
     },
     metadata: rawSBOM.metadata,
-    components: [],
+    componentMap: new Map<string, EnhancedComponent>(),
+    dependencyGraph: new Map<string, string[]>(),
+    topLevelRefs: [],
   };
 
-  setProgress(() => ({ progress: 1, message: "Extracting unique licenses" }));
-  formattedSBOM.statistics.licenses = uniqueLicenses(rawSBOM.components);
-  await tick();
-  if (abortSignal?.aborted) throw new Error("Formatting aborted");
-  setProgress(() => ({
-    progress: 5,
-    message: "Finished extracting unique licenses",
-  }));
-  await tick();
-  setProgress(() => ({
-    progress: 6,
-    message: "Extracting unique vulnerabilities",
-  }));
-  formattedSBOM.statistics.vulnerabilities = uniqueVulnerabilities(rawSBOM);
-  await tick();
-  if (abortSignal?.aborted) throw new Error("Formatting aborted");
-  setProgress(() => ({
-    progress: 10,
-    message: "Finished extracting unique vulnerabilities",
-  }));
-  await tick();
-
-  setProgress(() => ({
-    progress: 15,
-    message: "Building component and dependency maps",
-  }));
-  await tick();
-
-  const componentMap = new Map<string, Component>();
-  const dependencyMap = new Map<string, string[]>();
-
-  await batchProcess(rawSBOM.components, (component) => {
-    if (abortSignal?.aborted) return;
-    const bomRef = component.bomRef.value;
-    if (!bomRef) return;
-
-    componentMap.set(bomRef, component);
-    const deps: string[] = [];
-    component.dependencies.forEach((depRef) => {
-      if (depRef.value) {
-        deps.push(depRef.value);
-      }
-    });
-    if (deps.length > 0) {
-      dependencyMap.set(bomRef, deps);
-    }
-  });
-
-  await tick();
-  setProgress(() => ({
-    progress: 20,
-    message: "Finished building maps",
-  }));
-  await tick();
-
-  setProgress(() => ({
-    progress: 25,
-    message: "Indexing vulnerabilities",
-  }));
-  await tick();
-
+  // 1. Build basic maps and Index Vulnerabilities
+  const rawComponentMap = new Map<string, Component>();
+  const allChildRefs = new Set<string>();
   const vulnIndex = new Map<string, Vulnerability[]>();
+
+  // Index vulns
   for (const vuln of rawSBOM.vulnerabilities) {
     for (const affect of vuln.affects) {
-      const ref =
-        typeof affect.ref === "object" && "value" in affect.ref
-          ? affect.ref.value
-          : typeof affect.ref === "string"
-            ? affect.ref
-            : null;
+      const ref = typeof affect.ref === "object" ? (affect.ref as any).value : (affect.ref as string);
       if (ref) {
         const list = vulnIndex.get(ref) || [];
         list.push(vuln);
@@ -242,192 +130,154 @@ export const Formatter = async ({
     }
   }
 
-  setProgress(() => ({
-    progress: 27,
-    message: "Building nested component structure",
-  }));
-  await tick();
-
-  let nestedWorkCounter = 0;
-  const buildNestedComponent = async (
-    componentRef: string,
-    visitedInCurrentPath: Set<string> = new Set(),
-  ): Promise<NestedSBOMComponent | null> => {
-    const component = componentMap.get(componentRef);
-    if (!component) return null;
-
-    const nestedComponent = cloneComponent(component) as NestedSBOMComponent;
-    nestedComponent.vulnerabilities = {
-      inherent: {
-        Critical: [],
-        High: [],
-        Medium: [],
-        Low: [],
-        Informational: [],
-      },
-      transitive: {
-        Critical: [],
-        High: [],
-        Medium: [],
-        Low: [],
-        Informational: [],
-      },
-    };
-    nestedComponent.licenseDistribution = {
-      permissive: 0,
-      copyleft: 0,
-      weakCopyleft: 0,
-      proprietary: 0,
-      unknown: 0,
-    };
-    nestedComponent.formattedDependencies = [];
-
-    // Calculate inherent licenses for this component
-    const licenses = Array.from(component.licenses || []);
-    if (licenses.length === 0) {
-      nestedComponent.licenseDistribution.unknown++;
-    } else {
-      licenses.forEach((l: any) => {
-        const id = l.id || l.name;
-        const category = getLicenseCategory(id);
-        if (category === "permissive") nestedComponent.licenseDistribution.permissive++;
-        else if (category === "copyleft") nestedComponent.licenseDistribution.copyleft++;
-        else if (category === "weak-copyleft") nestedComponent.licenseDistribution.weakCopyleft++;
-        else if (category === "proprietary") nestedComponent.licenseDistribution.proprietary++;
-        else nestedComponent.licenseDistribution.unknown++;
-      });
-    }
-
-    const componentVulns = vulnIndex.get(componentRef) || [];
-    nestedComponent.vulnerabilities.inherent =
-      categorizeVulnerabilities(componentVulns);
-
-    const dependencies = dependencyMap.get(componentRef) || [];
-    const newVisitedPath = new Set(visitedInCurrentPath);
-    newVisitedPath.add(componentRef);
-
-    for (const depRef of dependencies) {
-      if (visitedInCurrentPath.has(depRef)) continue;
-
-      const nestedDep = await buildNestedComponent(depRef, newVisitedPath);
-      if (!nestedDep) continue;
-
-      nestedComponent.formattedDependencies.push(nestedDep);
-
-      for (const severity of Object.keys(nestedDep.vulnerabilities.inherent)) {
-        const severityKey =
-          severity as keyof NestedSBOMComponent["vulnerabilities"]["inherent"];
-        nestedComponent.vulnerabilities.transitive[severityKey].push(
-          ...nestedDep.vulnerabilities.inherent[severityKey],
-        );
+  await batchProcess(rawSBOM.components, (component) => {
+    const bomRef = component.bomRef.value;
+    if (!bomRef) return;
+    rawComponentMap.set(bomRef, component);
+    
+    const deps: string[] = [];
+    component.dependencies.forEach((dep) => {
+      if (dep.value) {
+        deps.push(dep.value);
+        allChildRefs.add(dep.value);
       }
-
-      for (const severity of Object.keys(
-        nestedDep.vulnerabilities.transitive,
-      )) {
-        const severityKey =
-          severity as keyof NestedSBOMComponent["vulnerabilities"]["transitive"];
-        nestedComponent.vulnerabilities.transitive[severityKey].push(
-          ...nestedDep.vulnerabilities.transitive[severityKey],
-        );
-      }
-
-      // Aggregate license distribution
-      nestedComponent.licenseDistribution.permissive += nestedDep.licenseDistribution.permissive;
-      nestedComponent.licenseDistribution.copyleft += nestedDep.licenseDistribution.copyleft;
-      nestedComponent.licenseDistribution.weakCopyleft += nestedDep.licenseDistribution.weakCopyleft;
-      nestedComponent.licenseDistribution.proprietary += nestedDep.licenseDistribution.proprietary;
-      nestedComponent.licenseDistribution.unknown += nestedDep.licenseDistribution.unknown;
-
-      nestedWorkCounter += 1;
-       if (nestedWorkCounter % 60 === 0) {
-         await tick();
-         if (abortSignal?.aborted) return null;
-       }
-     }
-
-    return nestedComponent;
-  };
-
-  setProgress(() => ({
-    progress: 30,
-    message: "Identifying top-level components",
-  }));
-  await tick();
-
-  const allDependencies = new Set<string>();
-  dependencyMap.forEach((deps) => {
-    deps.forEach((dep) => allDependencies.add(dep));
+    });
+    formattedSBOM.dependencyGraph.set(bomRef, deps);
   });
 
-  const topLevelRefs: string[] = [];
-  componentMap.forEach((_, ref) => {
-    if (!allDependencies.has(ref)) {
-      topLevelRefs.push(ref);
+  // 2. Identify top-level refs
+  rawComponentMap.forEach((_, ref) => {
+    if (!allChildRefs.has(ref)) {
+      formattedSBOM.topLevelRefs.push(ref);
     }
   });
 
-  if (topLevelRefs.length === 0) {
+  if (formattedSBOM.topLevelRefs.length === 0) {
     if (rawSBOM.metadata?.component?.bomRef?.value) {
-      topLevelRefs.push(rawSBOM.metadata.component.bomRef.value);
-    } else {
-      const componentsArray = Array.from(rawSBOM.components);
-      if (componentsArray.length > 0 && componentsArray[0].bomRef?.value) {
-        topLevelRefs.push(componentsArray[0].bomRef.value);
-      }
+      formattedSBOM.topLevelRefs.push(rawSBOM.metadata.component.bomRef.value);
+    } else if (rawComponentMap.size > 0) {
+      formattedSBOM.topLevelRefs.push(rawComponentMap.keys().next().value);
     }
   }
 
-  setProgress(() => ({
-    progress: 35,
-    message: `Found ${topLevelRefs.length} top-level component(s)`,
-  }));
-  await tick();
+  // 3. Initialize Enhanced Map with Inherent Metrics (Phase 1)
+  const enhancedMap = new Map<string, EnhancedComponent>();
+  
+  for (const [ref, comp] of rawComponentMap.entries()) {
+    const inherentVulns = categorizeVulnerabilities(vulnIndex.get(ref) || []);
+    const inherentLicenses: LicenseDistribution = {
+      permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0
+    };
 
-   for (let index = 0; index < topLevelRefs.length; index += 1) {
-     if (abortSignal?.aborted) throw new Error("Formatting aborted");
-     const ref = topLevelRefs[index];
-     setProgress(() => ({
-       progress: 35 + (index / topLevelRefs.length) * 55,
-       message: `Processing top-level component ${index + 1}/${topLevelRefs.length}`,
-     }));
-     await tick();
-     if (abortSignal?.aborted) throw new Error("Formatting aborted");
+    const componentLicenses = Array.from(comp.licenses || []);
+    if (componentLicenses.length === 0) {
+      inherentLicenses.unknown++;
+    } else {
+      componentLicenses.forEach((l: any) => {
+        const cat = getLicenseCategory(l.id || l.name);
+        if (cat === "permissive") inherentLicenses.permissive++;
+        else if (cat === "copyleft") inherentLicenses.copyleft++;
+        else if (cat === "weak-copyleft") inherentLicenses.weakCopyleft++;
+        else if (cat === "proprietary") inherentLicenses.proprietary++;
+        else inherentLicenses.unknown++;
+      });
+    }
 
-     const nestedComponent = await buildNestedComponent(ref);
-     if (nestedComponent) {
-       formattedSBOM.components.push(nestedComponent);
-     }
-   }
+    const enhanced: EnhancedComponent = Object.assign(comp, {
+      vulnerabilities: {
+        inherent: inherentVulns,
+        transitive: {
+          Critical: [], High: [], Medium: [], Low: [], Informational: []
+        }
+      },
+      licenseDistribution: inherentLicenses,
+      transitiveLicenseDistribution: {
+        permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0
+      }
+    });
+    enhancedMap.set(ref, enhanced);
+  }
 
-  setProgress(() => ({
-    progress: 95,
-    message: "Finalizing formatted SBOM",
-  }));
-  await tick();
+  // 4. Compute Transitive Metrics (Phase 2 - Graph Traversal)
+  // Why: We tag each vulnerability with its source package ref so that:
+  //   - Same CVE on DIFFERENT packages counts separately (matches npm audit)
+  //   - Same CVE on SAME package via diamond paths is deduplicated correctly
+  const memo = new Map<string, TransitiveMetrics>();
+  const visiting = new Set<string>();
 
-  for (const component of formattedSBOM.components) {
-    for (const severity of Object.keys(component.vulnerabilities.transitive)) {
-      const severityKey =
-        severity as keyof NestedSBOMComponent["vulnerabilities"]["transitive"];
-      const uniqueVulns = new Map<string, Vulnerability>();
-      component.vulnerabilities.transitive[severityKey].forEach((vuln) => {
-        if (vuln.id) {
-          uniqueVulns.set(vuln.id, vuln);
+  const getTransitiveMetrics = (ref: string): TransitiveMetrics => {
+    if (memo.has(ref)) return memo.get(ref)!;
+    
+    // Cycle detection: return empty to break infinite recursion.
+    if (visiting.has(ref)) return emptyTransitiveMetrics();
+
+    visiting.add(ref);
+    
+    const children = formattedSBOM.dependencyGraph.get(ref) || [];
+    const collected = emptyTransitiveMetrics();
+
+    for (const childRef of children) {
+      const childComp = enhancedMap.get(childRef);
+      if (!childComp) continue;
+
+      // Add child's INHERENT vulns, tagged with childRef as the source
+      Object.keys(childComp.vulnerabilities.inherent).forEach(k => {
+        const key = k as keyof typeof childComp.vulnerabilities.inherent;
+        for (const v of childComp.vulnerabilities.inherent[key]) {
+          collected.vulns[key].push({ vuln: v, sourceRef: childRef });
         }
       });
-      component.vulnerabilities.transitive[severityKey] = Array.from(
-        uniqueVulns.values(),
-      );
+
+      // Add child's TRANSITIVE entries (already tagged with their original sourceRef)
+      const childTransitive = getTransitiveMetrics(childRef);
+      Object.keys(childTransitive.vulns).forEach(k => {
+        const key = k as keyof typeof childTransitive.vulns;
+        collected.vulns[key].push(...childTransitive.vulns[key]);
+      });
+
+      addLicenseMetrics(collected.licenses, childComp.licenseDistribution);
+      addLicenseMetrics(collected.licenses, childTransitive.licenses);
     }
-    await tick();
+
+    visiting.delete(ref);
+    
+    // Dedup by composite key (vulnId::sourceRef) — same CVE on different
+    // packages counts separately; same CVE on same package via different
+    // paths is deduplicated.
+    const result = emptyTransitiveMetrics();
+    result.licenses = collected.licenses;
+    
+    Object.keys(collected.vulns).forEach(k => {
+       const key = k as keyof typeof collected.vulns;
+       const seen = new Set<string>();
+       collected.vulns[key].forEach(entry => {
+         const dedupKey = `${entry.vuln.id || ''}::${entry.sourceRef}`;
+         if (!seen.has(dedupKey)) {
+           seen.add(dedupKey);
+           result.vulns[key].push(entry);
+         }
+       });
+    });
+
+    memo.set(ref, result);
+    return result;
   }
 
-  setProgress(() => ({
-    progress: 100,
-    message: "Formatting complete",
-  }));
-  await tick();
+  // Execute for all components — map tagged entries back to Vulnerability[]
+  for (const ref of enhancedMap.keys()) {
+    const trans = getTransitiveMetrics(ref);
+    const comp = enhancedMap.get(ref)!;
+    comp.vulnerabilities.transitive = {
+      Critical: trans.vulns.Critical.map(e => e.vuln),
+      High: trans.vulns.High.map(e => e.vuln),
+      Medium: trans.vulns.Medium.map(e => e.vuln),
+      Low: trans.vulns.Low.map(e => e.vuln),
+      Informational: trans.vulns.Informational.map(e => e.vuln),
+    };
+    comp.transitiveLicenseDistribution = trans.licenses;
+  }
 
+  formattedSBOM.componentMap = enhancedMap;
+  setProgress(() => ({ progress: 100, message: "Formatting complete" }));
   return formattedSBOM;
 };
