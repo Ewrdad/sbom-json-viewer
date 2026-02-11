@@ -41,6 +41,24 @@ export interface SbomStats {
     total: number;
   }[];
   totalVulnerabilities: number;
+  allVulnerabilities: {
+    id: string;
+    severity: string;
+    affectedCount: number;
+    title?: string;
+  }[];
+  allLicenses: {
+    id: string;
+    name: string;
+    category: string;
+    affectedCount: number;
+  }[];
+  allLicenseComponents: {
+    name: string;
+    version: string;
+    ref: string;
+    licenses: { id: string; name: string; category: string }[];
+  }[];
 }
 
 export interface WorkerProgressUpdate {

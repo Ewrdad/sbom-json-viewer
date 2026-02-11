@@ -29,6 +29,11 @@ const mockStats: SbomStats = {
         { name: 'axios', version: '0.21.0', ref: 'ref-axios', critical: 0, high: 1, medium: 2, low: 0, total: 3 },
     ],
     totalVulnerabilities: 50,
+    allVulnerabilities: [
+        { id: 'CVE-2024-001', severity: 'critical', affectedCount: 10, title: 'Critical Vuln' },
+        { id: 'CVE-2024-002', severity: 'high', affectedCount: 5, title: 'High Vuln' },
+        { id: 'GHSA-xxx', severity: 'medium', affectedCount: 2, title: 'Medium Vuln' },
+    ],
 };
 
 const emptyStats: SbomStats = {
@@ -40,6 +45,7 @@ const emptyStats: SbomStats = {
     vulnerableComponents: [],
     allVulnerableComponents: [],
     totalVulnerabilities: 0,
+    allVulnerabilities: [],
 };
 
 describe('VulnerabilitiesView', () => {
@@ -79,5 +85,34 @@ describe('VulnerabilitiesView', () => {
         expect(screen.getByText('lodash')).toBeInTheDocument();
         expect(screen.queryByText('express')).not.toBeInTheDocument();
         expect(screen.queryByText('axios')).not.toBeInTheDocument();
+    });
+
+    it('should switch to vulnerability view and show CVEs', async () => {
+        const user = userEvent.setup();
+        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+
+        const switchBtn = screen.getByText('By Vulnerability');
+        await user.click(switchBtn);
+
+        expect(screen.getByText('CVE-2024-001')).toBeInTheDocument();
+        expect(screen.getByText('CVE-2024-002')).toBeInTheDocument();
+        expect(screen.getByText('GHSA-xxx')).toBeInTheDocument();
+        // There might be multiple '10's (KPI card for High vulns is also 10)
+        const tens = screen.getAllByText('10');
+        expect(tens.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should filter CVEs when searching in vulnerability view', async () => {
+        const user = userEvent.setup();
+        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+
+        const switchBtn = screen.getByText('By Vulnerability');
+        await user.click(switchBtn);
+
+        const searchInput = screen.getByPlaceholderText('Search CVEs...');
+        await user.type(searchInput, 'CVE-2024-001');
+
+        expect(screen.getByText('CVE-2024-001')).toBeInTheDocument();
+        expect(screen.queryByText('CVE-2024-002')).not.toBeInTheDocument();
     });
 });

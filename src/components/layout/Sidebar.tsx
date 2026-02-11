@@ -1,6 +1,6 @@
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../types";
-import { LayoutDashboard, List, Network, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 
@@ -20,6 +20,11 @@ export function Sidebar() {
       icon: <ShieldAlert className="h-4 w-4 mr-2" />,
     },
     {
+      id: "licenses",
+      label: "Licenses",
+      icon: <ScrollText className="h-4 w-4 mr-2" />,
+    },
+    {
       id: "explorer",
       label: "Components",
       icon: <List className="h-4 w-4 mr-2" />,
@@ -33,6 +38,11 @@ export function Sidebar() {
       id: "graph",
       label: "Visual Graph",
       icon: <Network className="h-4 w-4 mr-2" />,
+    },
+    {
+      id: "metadata",
+      label: "Metadata",
+      icon: <Info className="h-4 w-4 mr-2" />,
     },
   ];
 

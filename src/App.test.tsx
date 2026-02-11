@@ -75,6 +75,11 @@ vi.mock("lucide-react", () => ({
   ShieldX: () => <div />,
   ShieldCheck: () => <div />,
   AlertTriangle: () => <div />,
+  ScrollText: () => <div />,
+  Scale: () => <div />,
+  FileCheck: () => <div />,
+  BookOpen: () => <div />,
+  Info: () => <div />,
 }));
 
 // Polyfill Worker
@@ -103,7 +108,9 @@ class MockWorker {
             topLicenses: [],
             vulnerableComponents: [],
             allVulnerableComponents: [],
-            totalVulnerabilities: 0
+            totalVulnerabilities: 0,
+            allLicenses: [],
+            allLicenseComponents: []
           }
         };
         this.onmessage({ data: { type: "complete", result: mockResult } });

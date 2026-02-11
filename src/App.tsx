@@ -36,6 +36,16 @@ const VulnerabilitiesView = lazy(() =>
     default: module.VulnerabilitiesView,
   })),
 );
+const LicensesView = lazy(() =>
+  import("./components/views/LicensesView").then((module) => ({
+    default: module.LicensesView,
+  })),
+);
+const MetadataView = lazy(() =>
+  import("./components/views/MetadataView").then((module) => ({
+    default: module.MetadataView,
+  })),
+);
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { Upload } from "lucide-react";
 import {
@@ -155,6 +165,10 @@ function AppContent({
             <VulnerabilitiesView sbom={sbom} preComputedStats={sbomStats} />
           </KeepAliveView>
           
+          <KeepAliveView activeView={activeView} viewKey="licenses">
+            <LicensesView sbom={sbom} preComputedStats={sbomStats} />
+          </KeepAliveView>
+          
           <KeepAliveView activeView={activeView} viewKey="explorer">
             <ComponentExplorer sbom={sbom} formattedSbom={formattedSbom} />
           </KeepAliveView>
@@ -165,6 +179,10 @@ function AppContent({
 
           <KeepAliveView activeView={activeView} viewKey="graph">
             <DependencyGraph sbom={sbom} formattedSbom={formattedSbom} />
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="metadata">
+            <MetadataView sbom={sbom} />
           </KeepAliveView>
         </Suspense>
       </div>
