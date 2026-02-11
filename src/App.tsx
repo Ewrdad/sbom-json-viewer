@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { Layout } from "./components/layout/Layout";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
+import { HelpGuide } from "./components/common/HelpGuide";
 const DashboardView = lazy(() =>
   import("./components/views/DashboardView").then((module) => ({
     default: module.DashboardView,
@@ -146,6 +147,8 @@ function AppContent({
           >
             Huge SBOM (20k)
           </Button>
+          <div className="w-px h-8 bg-border mx-2" />
+          <HelpGuide />
         </div>
       </header>
 

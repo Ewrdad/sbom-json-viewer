@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronDown, Package, Search, X, Layers, ShieldAlert, Maximize2, Minimize2, Settings2 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
@@ -609,8 +610,9 @@ export function DependencyTree({
     <div className="flex flex-col h-full overflow-hidden pb-6 gap-6">
       {/* Header Section */}
       <div className="flex flex-col gap-1 px-1">
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent flex items-center gap-2">
           Dependency Tree
+          <HelpTooltip text="Hierarchical view of all components and their dependencies. Shows how components bring in other components (transitive dependencies)." />
         </h2>
         <p className="text-sm text-muted-foreground">
           Explore {componentCount.toLocaleString()} components hierarchically through depth analysis and threat detection.
@@ -648,6 +650,7 @@ export function DependencyTree({
           <div className="flex items-center gap-1.5 px-2">
             <Settings2 className="h-4 w-4 text-muted-foreground/70" />
             <span className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">Mode:</span>
+            <HelpTooltip text="Summary: Show vulnerability counts. Severity: Show breakdown by severity. License: Show license types." />
           </div>
           <div className="flex items-center bg-muted/40 p-1 rounded-lg border border-muted-foreground/10">
             {[
@@ -679,6 +682,7 @@ export function DependencyTree({
           <div className="flex items-center gap-1.5 px-2">
             <Layers className="h-4 w-4 text-muted-foreground/70" />
             <span className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">Depth:</span>
+            <HelpTooltip text="Control how many levels of dependencies are expanded." />
           </div>
           
           <div className="flex items-center gap-1">

@@ -1,6 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSbomStats } from "../../hooks/useSbomStats";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { ReportGenerator } from "./reports/ReportGenerator";
 import type { SbomStats } from "@/types/sbom";
+import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import {
   Bar,
   BarChart,
@@ -20,7 +23,7 @@ export function DashboardView({
   sbom, 
   preComputedStats 
 }: { 
-  sbom: any; 
+  sbom: Bom | any; 
   preComputedStats?: SbomStats; 
 }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
@@ -103,8 +106,9 @@ export function DashboardView({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Total Components
+                <HelpTooltip text="Total number of components found in the SBOM file." />
               </CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -130,19 +134,15 @@ export function DashboardView({
                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
                   {displayStats.uniqueVulnerabilityCount} Unique CVEs
                 </p>
-                <div 
-                   className="h-3 w-3 rounded-full bg-muted flex items-center justify-center text-[8px] cursor-help border"
-                   title="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions."
-                >
-                  ?
-                </div>
+                <HelpTooltip text="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions." />
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Exposure Rate
+                <HelpTooltip text="Percentage of components that have at least one known vulnerability." />
               </CardTitle>
               <ShieldCheck className="h-4 w-4 text-green-600" />
             </CardHeader>
@@ -157,8 +157,9 @@ export function DashboardView({
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Secure Components
+                <HelpTooltip text="Number of components with no known vulnerabilities." />
               </CardTitle>
               <ShieldCheck className="h-4 w-4 text-sky-600" />
             </CardHeader>
@@ -175,7 +176,10 @@ export function DashboardView({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-4 shadow-sm border-muted-foreground/10">
             <CardHeader>
-              <CardTitle className="text-xl">Vulnerability Severity</CardTitle>
+              <CardTitle className="text-xl flex items-center gap-2">
+                Vulnerability Severity
+                <HelpTooltip text="Distribution of vulnerabilities by severity level (Critical, High, Medium, Low)." />
+              </CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               <div className="h-[300px]">
@@ -212,7 +216,10 @@ export function DashboardView({
 
           <Card className="col-span-3 shadow-sm border-muted-foreground/10">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xl">License Distribution</CardTitle>
+              <CardTitle className="text-xl flex items-center gap-2">
+                License Distribution
+                <HelpTooltip text="Breakdown of components by license type (Permissive, Copyleft, etc.)." />
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[200px] w-full">
@@ -257,7 +264,10 @@ export function DashboardView({
 
           <Card className="col-span-3 shadow-sm border-muted-foreground/10">
             <CardHeader>
-              <CardTitle className="text-xl">Top Licenses</CardTitle>
+              <CardTitle className="text-xl flex items-center gap-2">
+                Top Licenses
+                <HelpTooltip text="Most frequently used licenses across all components." />
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -382,6 +392,7 @@ export function DashboardView({
             </CardContent>
           </Card>
         </div>
+        <ReportGenerator stats={displayStats} />
       </div>
     </ScrollArea>
   );

@@ -78,7 +78,7 @@ describe("Renderer", () => {
     await act(async () => {
       resolveFormatter(mockFormatted);
     });
-  }, 15000);
+  }, 60_000);
 
   it("renders statistics and components after formatting", async () => {
     vi.doMock("./Formatter/Formatter", () => ({

@@ -80,6 +80,10 @@ vi.mock("lucide-react", () => ({
   FileCheck: () => <div />,
   BookOpen: () => <div />,
   Info: () => <div />,
+  HelpCircle: () => <div />,
+  FileText: () => <div />,
+  Shield: () => <div />,
+  X: () => <div />,
 }));
 
 // Polyfill Worker
@@ -184,6 +188,18 @@ describe("App Integration", () => {
     expect(await screen.findAllByText(/Total Components:/i)).toHaveLength(1);
     expect(await screen.findAllByText(/Unique Licenses:/i)).toHaveLength(1);
     expect(await screen.findAllByText(/Critical Vulns:/i)).toHaveLength(1);
+  });
+
+  it("should render the help button in the header", async () => {
+    render(<App />);
+    
+    // Wait for app to load (header is inside AppContent which renders after load)
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
+    }, { timeout: 5000 });
+
+    const helpButton = screen.getByRole("button", { name: /help guide/i });
+    expect(helpButton).toBeInTheDocument();
   });
 
   it("should switch views when sidebar buttons are clicked", async () => {

@@ -14,6 +14,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-react";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
 
 interface ComponentDetailPanelProps {
   component: Component | EnhancedComponent;
@@ -180,7 +181,10 @@ export function ComponentDetailPanel({
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <ShieldAlert className="h-4 w-4 text-destructive" />
-                  <h4 className="text-sm font-semibold">Vulnerabilities</h4>
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    Vulnerabilities
+                    <HelpTooltip text="Known security vulnerabilities affected this component." />
+                  </h4>
                 </div>
                 
                 <div className="space-y-4">
@@ -241,8 +245,9 @@ export function ComponentDetailPanel({
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Network className="h-4 w-4 text-primary" />
-              <h4 className="text-sm font-semibold">
+              <h4 className="text-sm font-semibold flex items-center gap-2">
                 Impact Analysis (Used By)
+                <HelpTooltip text="Reverse dependency lookup. Shows which other components in this SBOM depend on this component." />
               </h4>
             </div>
             {analysis ? (
@@ -322,8 +327,9 @@ export function ComponentDetailPanel({
 
           {component.purl && (
             <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-1">
+              <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 Package URL (PURL)
+                <HelpTooltip text="Standardized identifier for software packages." />
               </h4>
               <code className="bg-muted p-2 rounded text-[10px] break-all block border">
                 {component.purl.toString()}
@@ -333,8 +339,9 @@ export function ComponentDetailPanel({
 
           {component.bomRef && (
             <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-1">
+              <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 BOM Ref
+                <HelpTooltip text="Internal identifier used within the CycloneDX SBOM file." />
               </h4>
               <code className="bg-muted p-2 rounded text-[10px] break-all block border">
                 {component.bomRef.value}

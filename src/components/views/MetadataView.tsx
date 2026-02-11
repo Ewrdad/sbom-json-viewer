@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Hash
 } from "lucide-react";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
 
 export function MetadataView({ sbom }: { sbom: any }) {
   if (!sbom || !sbom.metadata) {
@@ -60,6 +61,7 @@ export function MetadataView({ sbom }: { sbom: any }) {
               <div>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Calendar className="h-3 w-3" /> Timestamp
+                  <HelpTooltip text="When this SBOM file was generated." />
                 </p>
                 <p className="text-sm font-medium">
                   {metadata.timestamp ? new Date(metadata.timestamp).toLocaleString() : "N/A"}
@@ -86,7 +88,10 @@ export function MetadataView({ sbom }: { sbom: any }) {
           {component && (
             <Card className="shadow-sm border-muted-foreground/10">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Subject Component</CardTitle>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  Subject Component
+                  <HelpTooltip text="The primary component described by this SBOM." />
+                </CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent className="space-y-4">
@@ -158,7 +163,10 @@ export function MetadataView({ sbom }: { sbom: any }) {
           {/* Tooling */}
           <Card className="shadow-sm border-muted-foreground/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg">Generating Tools</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                Generating Tools
+                <HelpTooltip text="Software used to create this SBOM." />
+              </CardTitle>
               <Wrench className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -204,7 +212,10 @@ export function MetadataView({ sbom }: { sbom: any }) {
           {/* Authors */}
           <Card className="shadow-sm border-muted-foreground/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg">Authors & Contact</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                Authors & Contact
+                <HelpTooltip text="Persons or entities responsible for creating this SBOM." />
+              </CardTitle>
               <User className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>

@@ -28,6 +28,7 @@ import {
 import { ChevronLeft, ChevronRight, ArrowUpDown, Search } from "lucide-react";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { cn } from "../../lib/utils";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import { type formattedSBOM } from "../../types/sbom";
@@ -78,19 +79,39 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "version",
-        header: "Version",
+        header: () => (
+          <div className="flex items-center gap-1">
+            Version
+            <HelpTooltip text="The specific version of the component found." />
+          </div>
+        ),
       },
       {
         accessorKey: "group",
-        header: "Group",
+        header: () => (
+          <div className="flex items-center gap-1">
+            Group
+            <HelpTooltip text="The vendor or namespace group of the component (e.g. @angular, org.apache)." />
+          </div>
+        ),
       },
       {
         accessorKey: "type",
-        header: "Type",
+        header: () => (
+          <div className="flex items-center gap-1">
+            Type
+            <HelpTooltip text="Component type (library, application, framework, container, etc.)." />
+          </div>
+        ),
       },
       {
         id: "formattedLicenses",
-        header: "Licenses",
+        header: () => (
+          <div className="flex items-center gap-1">
+            Licenses
+            <HelpTooltip text="Licenses declared by this component." />
+          </div>
+        ),
         accessorFn: (row) => row.licenses,
         cell: ({ row }) => {
           const licenses = row.original.licenses;
@@ -165,6 +186,7 @@ export function ComponentExplorer({
             <div className="flex items-center justify-between mb-4 flex-none">
               <h2 className="text-3xl font-bold tracking-tight">
                 Component Explorer
+                <HelpTooltip text="Searchable list of all components found in the SBOM." />
               </h2>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-[10px]">

@@ -28,6 +28,7 @@ import {
   X,
   Network,
 } from "lucide-react";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -247,7 +248,10 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card className="border-l-4 border-l-destructive/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Vulnerability Findings</CardTitle>
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                Vulnerability Findings
+                <HelpTooltip text="Total number of individual vulnerability instances found across all components." />
+              </CardTitle>
               <ShieldAlert className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
@@ -256,19 +260,17 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
                   {displayStats.uniqueVulnerabilityCount} Unique CVEs
                 </p>
-                <div 
-                   className="h-3 w-3 rounded-full bg-muted flex items-center justify-center text-[8px] cursor-help border"
-                   title="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions."
-                >
-                  ?
-                </div>
+                <HelpTooltip text="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions." />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-orange-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Exposure Rate</CardTitle>
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                Exposure Rate
+                <HelpTooltip text="The percentage of components in your SBOM that are affected by at least one vulnerability." />
+              </CardTitle>
               <ShieldAlert className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
@@ -543,7 +545,10 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
                     <tr>
                       <th className="px-4 py-3">
-                        {renderSortHeader("Component", "name")}
+                        <div className="flex items-center gap-1">
+                          {renderSortHeader("Component", "name")}
+                          <HelpTooltip text="Name of the software component/package." />
+                        </div>
                       </th>
                       <th className="px-4 py-3">Version</th>
                       <th className="px-4 py-3 text-center">
@@ -627,11 +632,17 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
                     <tr>
                       <th className="px-4 py-3">
-                        {renderSortHeader("Vulnerability ID", "id")}
+                        <div className="flex items-center gap-1">
+                          {renderSortHeader("Vulnerability ID", "id")}
+                          <HelpTooltip text="Common Vulnerabilities and Exposures (CVE) or GitHub Security Advisory (GHSA) identifier." />
+                        </div>
                       </th>
                       <th className="px-4 py-3">Severity</th>
                       <th className="px-4 py-3 text-center">
-                        {renderSortHeader("Affected Components", "affectedCount")}
+                        <div className="flex items-center justify-center gap-1">
+                          {renderSortHeader("Affected Components", "affectedCount")}
+                          <HelpTooltip text="Number of components affected by this specific vulnerability." />
+                        </div>
                       </th>
                       <th className="px-4 py-3">Description</th>
                       <th className="px-4 py-3 text-right pr-6">Action</th>
