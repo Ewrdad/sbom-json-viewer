@@ -18,7 +18,7 @@ import {
 import { ShieldAlert, ShieldCheck, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS } from "@/lib/chartTheme";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
 
 export function DashboardView({ 
   sbom, 
@@ -197,6 +197,8 @@ export function DashboardView({
                     <Tooltip
                       cursor={CHART_CURSOR}
                       contentStyle={CHART_TOOLTIP_STYLE}
+                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                     />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -231,6 +233,8 @@ export function DashboardView({
                     </Pie>
                     <Tooltip
                       contentStyle={CHART_TOOLTIP_STYLE}
+                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                     />
                   </PieChart>
                 </ResponsiveContainer>

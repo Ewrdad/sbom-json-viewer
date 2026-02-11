@@ -37,7 +37,7 @@ import {
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { Separator } from "@/components/ui/separator";
-import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS } from "@/lib/chartTheme";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -352,6 +352,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                       </Pie>
                       <Tooltip
                         contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -392,6 +394,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     <Tooltip
                       cursor={CHART_CURSOR}
                       contentStyle={CHART_TOOLTIP_STYLE}
+                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                     />
                     <Bar dataKey="count" radius={[6, 6, 0, 0]} />
                   </BarChart>

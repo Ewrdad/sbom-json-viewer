@@ -7,18 +7,29 @@
 
 /** Drop this into every Recharts `<Tooltip contentStyle={…} />`. */
 export const CHART_TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: "hsl(var(--card))",
-  borderColor: "hsl(var(--border))",
+  backgroundColor: "var(--card)",
+  borderColor: "var(--border)",
   borderRadius: "8px",
-  color: "hsl(var(--foreground))",
+  color: "var(--foreground)",
+};
+
+/** Shared label style for tooltips. */
+export const CHART_TOOLTIP_LABEL_STYLE: React.CSSProperties = {
+  color: "var(--foreground)",
+  fontWeight: "600",
+};
+
+/** Shared item style for tooltip content. */
+export const CHART_TOOLTIP_ITEM_STYLE: React.CSSProperties = {
+  color: "var(--muted-foreground)",
 };
 
 /** Cursor highlight when hovering a bar chart. */
-export const CHART_CURSOR = { fill: "rgba(0,0,0,0.05)" };
+export const CHART_CURSOR = { fill: "rgba(255,255,255,0.05)" };
 
 /** Common axis props — spread onto `<XAxis>` / `<YAxis>`. */
 export const CHART_AXIS_PROPS = {
-  stroke: "hsl(var(--muted-foreground))",
+  stroke: "var(--muted-foreground)",
   fontSize: 12,
   tickLine: false,
   axisLine: false,

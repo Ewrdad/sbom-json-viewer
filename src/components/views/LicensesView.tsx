@@ -39,7 +39,7 @@ import {
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { Separator } from "@/components/ui/separator";
-import { CHART_TOOLTIP_STYLE, CHART_CURSOR } from "@/lib/chartTheme";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -313,6 +313,8 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                       </Pie>
                       <Tooltip
                         contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -352,6 +354,8 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                     <Tooltip
                       cursor={CHART_CURSOR}
                       contentStyle={CHART_TOOLTIP_STYLE}
+                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                     />
                     <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20} />
                   </BarChart>
