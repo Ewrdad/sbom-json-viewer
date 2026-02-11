@@ -39,7 +39,7 @@ import {
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { Separator } from "@/components/ui/separator";
-import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE, CHART_AXIS_PROPS } from "@/lib/chartTheme";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -348,8 +348,9 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                     <YAxis 
                       dataKey="name" 
                       type="category" 
-                      tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }} 
                       width={100}
+                      {...CHART_AXIS_PROPS}
+                      tick={{ fill: "var(--foreground)", fontSize: 11 }}
                     />
                     <Tooltip
                       cursor={CHART_CURSOR}
