@@ -39,6 +39,7 @@ import {
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { Separator } from "@/components/ui/separator";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR } from "@/lib/chartTheme";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -174,7 +175,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
   const topBarData = displayStats.topLicenses.map((l, i) => ({
     name: l.name,
     count: l.count,
-    fill: i === 0 ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.6)",
+    fill: i === 0 ? "#6366f1" : "#818cf8",
   }));
 
   const renderSortHeader = (label: string, sortKeyVal: SortKey) => {
@@ -311,11 +312,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                         ))}
                       </Pie>
                       <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          borderColor: "hsl(var(--border))",
-                          borderRadius: "8px",
-                        }}
+                        contentStyle={CHART_TOOLTIP_STYLE}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -349,16 +346,12 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                     <YAxis 
                       dataKey="name" 
                       type="category" 
-                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} 
+                      tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }} 
                       width={100}
                     />
                     <Tooltip
-                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
+                      cursor={CHART_CURSOR}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                     />
                     <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20} />
                   </BarChart>

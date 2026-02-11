@@ -18,6 +18,7 @@ import {
 import { ShieldAlert, ShieldCheck, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS } from "@/lib/chartTheme";
 
 export function DashboardView({ 
   sbom, 
@@ -187,25 +188,15 @@ export function DashboardView({
                   <BarChart data={vulnData}>
                     <XAxis
                       dataKey="name"
-                      stroke="#888888"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
+                      {...CHART_AXIS_PROPS}
                     />
                     <YAxis
-                      stroke="#888888"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
+                      {...CHART_AXIS_PROPS}
                       tickFormatter={(value) => `${value}`}
                     />
                     <Tooltip
-                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
+                      cursor={CHART_CURSOR}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                     />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -239,11 +230,7 @@ export function DashboardView({
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                     />
                   </PieChart>
                 </ResponsiveContainer>

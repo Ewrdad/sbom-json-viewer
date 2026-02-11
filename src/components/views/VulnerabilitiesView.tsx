@@ -37,6 +37,7 @@ import {
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { Separator } from "@/components/ui/separator";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS } from "@/lib/chartTheme";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -350,11 +351,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         ))}
                       </Pie>
                       <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          borderColor: "hsl(var(--border))",
-                          borderRadius: "8px",
-                        }}
+                        contentStyle={CHART_TOOLTIP_STYLE}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -390,15 +387,11 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
               <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={barData}>
-                    <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
+                    <YAxis {...CHART_AXIS_PROPS} />
                     <Tooltip
-                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
+                      cursor={CHART_CURSOR}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                     />
                     <Bar dataKey="count" radius={[6, 6, 0, 0]} />
                   </BarChart>
