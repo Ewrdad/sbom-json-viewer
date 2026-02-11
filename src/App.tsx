@@ -193,70 +193,7 @@ function AppContent({
   );
 }
 
-type ProgressReporter = (loaded: number, total: number | null) => void;
-
-const readStreamToText = async (
-  reader: ReadableStreamDefaultReader<Uint8Array>,
-  onProgress?: ProgressReporter,
-  totalBytes: number | null = null,
-): Promise<string> => {
-  const decoder = new TextDecoder();
-  const chunks: string[] = [];
-  let loaded = 0;
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) {
-      loaded += value.length;
-      chunks.push(decoder.decode(value, { stream: true }));
-      onProgress?.(loaded, totalBytes);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-
-  chunks.push(decoder.decode());
-  return chunks.join("");
-};
-
-const streamResponseText = async (
-  response: Response,
-  onProgress?: ProgressReporter,
-): Promise<string> => {
-  const lengthHeader = response.headers?.get?.("content-length");
-  const total = lengthHeader ? Number(lengthHeader) : null;
-  const reader = response.body?.getReader?.();
-  if (reader) {
-    const text = await readStreamToText(reader, onProgress, total);
-    reader.releaseLock();
-    return text;
-  }
-
-  if (typeof response.text === "function") {
-    const text = await response.text();
-    onProgress?.(text.length, total);
-    return text;
-  }
-
-  if (typeof response.json === "function") {
-    const json = await response.json();
-    const text = JSON.stringify(json);
-    onProgress?.(text.length, total);
-    return text;
-  }
-
-  throw new Error("Unable to read SBOM response");
-};
-
-const streamFileText = async (
-  file: File,
-  onProgress?: ProgressReporter,
-): Promise<string> => {
-  const reader = file.stream().getReader();
-  const text = await readStreamToText(reader, onProgress, file.size || null);
-  reader.releaseLock();
-  return text;
-};
+// Utility helpers for progress reporting removed - now handled in worker for reliability
 
 type LoadingState = {
   status: "idle" | "loading";
@@ -291,7 +228,7 @@ export function App() {
     setLoadingState({ status: "idle", message: "", progress: null });
   }, []);
 
-  const processWithWorker = useCallback((jsonText: string, filename: string, loadId: number) => {
+  const processWithWorker = useCallback((options: { jsonText?: string; url?: string; file?: File; filename: string }, loadId: number) => {
     return new Promise<void>((resolve, reject) => {
       const worker = new Worker(new URL("./workers/sbomWorker.ts", import.meta.url), {
         type: "module",
@@ -356,7 +293,7 @@ export function App() {
         reject(new Error(e.message));
       };
 
-      worker.postMessage({ jsonText, filename });
+      worker.postMessage(options);
     });
   }, [updateLoading, resetLoading]);
 
@@ -367,24 +304,10 @@ export function App() {
       setFormattedSbom(null);
       setSbomStats(null);
       setError(null);
-      updateLoading(`Downloading ${filename}`, null);
+      updateLoading(`Preparing ${filename}...`, null);
 
       try {
-        const response = await fetch(`/${filename}`);
-        if (!response.ok) {
-          throw new Error(`Failed to load SBOM: ${filename}`);
-        }
-
-        const text = await streamResponseText(response, (loaded, total) => {
-          if (loadSequence.current !== loadId) return;
-          updateLoading(
-            `Downloading ${filename}`,
-            total ? Math.min(loaded / total, 1) : null,
-          );
-        });
-
-        if (loadSequence.current !== loadId) return;
-        await processWithWorker(text, filename, loadId);
+        await processWithWorker({ url: `/${filename}`, filename }, loadId);
       } catch (err) {
         if (loadSequence.current !== loadId) return;
         const message =
@@ -411,19 +334,10 @@ export function App() {
       setSbomStats(null);
       setError(null);
       setCurrentFile(`Local: ${file.name}`);
-      updateLoading(`Reading ${file.name}`, 0);
+      updateLoading(`Preparing ${file.name}...`, 0);
 
       try {
-        const text = await streamFileText(file, (loaded, total) => {
-          if (loadSequence.current !== loadId) return;
-          updateLoading(
-            `Reading ${file.name}`,
-            total ? Math.min(loaded / total, 1) : null,
-          );
-        });
-
-        if (loadSequence.current !== loadId) return;
-        await processWithWorker(text, file.name, loadId);
+        await processWithWorker({ file, filename: file.name }, loadId);
       } catch (err) {
         if (loadSequence.current !== loadId) return;
         const message =

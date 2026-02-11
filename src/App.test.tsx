@@ -31,7 +31,7 @@ vi.stubGlobal(
 
 // Mock lazy views to avoid import issues in tests
 vi.mock("./components/views/DashboardView", () => ({
-  DashboardView: ({ preComputedStats }: { preComputedStats: any }) => (
+  DashboardView: ({ preComputedStats }: { preComputedStats: import("./types/sbom").SbomStats | null }) => (
     <div data-testid="dashboard-view">
       Dashboard View
       <div>Total Components: {preComputedStats?.totalComponents ?? 0}</div>
@@ -42,10 +42,10 @@ vi.mock("./components/views/DashboardView", () => ({
   ),
 }));
 vi.mock("./components/views/ComponentExplorer", () => ({
-  ComponentExplorer: ({ sbom }: { sbom: any }) => (
+  ComponentExplorer: ({ sbom }: { sbom: import("@cyclonedx/cyclonedx-library/Models").Bom | null }) => (
     <div data-testid="explorer-view">
       Explorer
-      {sbom.components?.map((c: any) => (
+      {(sbom?.components as any)?.map((c: any) => (
         <div key={c.name}>{c.name}</div>
       ))}
     </div>
@@ -91,11 +91,23 @@ class MockWorker {
   onmessage: (e: any) => void = () => {};
   onerror: (e: any) => void = () => {};
   
-  postMessage(data: any) {
+  postMessage(options: { jsonText?: string; url?: string; file?: File; filename: string }) {
     // Simulate worker processing
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        const json = JSON.parse(data.jsonText);
+        let json: any;
+        if (options.jsonText) {
+          json = JSON.parse(options.jsonText);
+        } else if (options.url) {
+          // Simulate fetch for mock
+          const response = await fetch(options.url);
+          json = await (response as any).json();
+        } else if (options.file) {
+          // Simulate file reading for mock
+          const text = await options.file.text();
+          json = JSON.parse(text);
+        }
+
         // Mock the minimal results expected by App.tsx
         const mockResult = {
           bom: json, // Simple pass through for mock
@@ -173,11 +185,12 @@ describe("App Integration", () => {
     render(<App />);
 
     // Should show loading initially
-    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
+    expect(screen.getByText(/Preparing/i)).toBeInTheDocument();
 
     // Wait for dashboard to appear (lazy-loaded)
     await waitFor(
       () => {
+        expect(screen.queryByText(/Preparing/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
         expect(screen.getAllByText(/Dashboard/i).length).toBeGreaterThan(0);
       },
@@ -193,8 +206,9 @@ describe("App Integration", () => {
   it("should render the help button in the header", async () => {
     render(<App />);
     
-    // Wait for app to load (header is inside AppContent which renders after load)
+    // Wait for app to load
     await waitFor(() => {
+      expect(screen.queryByText(/Preparing/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
     }, { timeout: 5000 });
 
@@ -207,6 +221,7 @@ describe("App Integration", () => {
 
     // Wait for initial load to finish
     await waitFor(() => {
+      expect(screen.queryByText(/Preparing/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
     }, { timeout: 10000 });
 

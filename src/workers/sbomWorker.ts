@@ -8,28 +8,90 @@ import { calculateSbomStats } from "../lib/statsUtils";
  */
 
 self.onmessage = async (e: MessageEvent) => {
-  const { jsonText, filename } = e.data;
+  const { jsonText, url, file, filename: providedFilename } = e.data;
+  const filename = providedFilename || (file ? file.name : (url ? url.split('/').pop() : 'SBOM'));
+
   if (import.meta.env.DEV) {
     console.log(`[Worker] Started processing ${filename}`);
   }
 
   try {
-    // 1. Parse JSON
+    let finalJsonText = jsonText;
+
+    // 1. Get JSON Text (either from direct string, URL or File)
+    if (url) {
+      self.postMessage({ type: "progress", message: `Downloading ${filename}...`, progress: 0 });
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Failed to fetch SBOM from ${url}`);
+      
+      const reader = response.body?.getReader();
+      const contentLength = Number(response.headers.get("Content-Length") || 0);
+      
+      if (reader) {
+        const chunks: Uint8Array[] = [];
+        let loaded = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          loaded += value.length;
+          if (contentLength) {
+            self.postMessage({ type: "progress", message: `Downloading ${filename}...`, progress: (loaded / contentLength) * 100 });
+          }
+        }
+        const combined = new Uint8Array(loaded);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        finalJsonText = new TextDecoder().decode(combined);
+      } else {
+        finalJsonText = await response.text();
+      }
+    } else if (file) {
+      self.postMessage({ type: "progress", message: `Reading ${filename}...`, progress: 0 });
+      // Using stream reader to report progress for local files too
+      const reader = file.stream().getReader();
+      const chunks: Uint8Array[] = [];
+      let loaded = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        loaded += value.length;
+        self.postMessage({ type: "progress", message: `Reading ${filename}...`, progress: (loaded / file.size) * 100 });
+      }
+      const combined = new Uint8Array(loaded);
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.length;
+      }
+      finalJsonText = new TextDecoder().decode(combined);
+    }
+
+    if (!finalJsonText) throw new Error("No SBOM data provided or found");
+
+    // 2. Parse JSON
     self.postMessage({ type: "progress", message: `Parsing ${filename}...`, progress: 0 });
-    const json = JSON.parse(jsonText);
+    const json = JSON.parse(finalJsonText);
+    // Help GC by clearing the large string if possible
+    finalJsonText = ""; 
+    
     if (import.meta.env.DEV) console.log(`[Worker] JSON parsed`);
 
-    // 2. Convert to Bom
+    // 3. Convert to Bom
     self.postMessage({ type: "progress", message: "Converting to CycloneDX model...", progress: 5 });
     const bom = await convertJsonToBom(json);
     if (import.meta.env.DEV) console.log(`[Worker] Bom converted`);
 
-    // 3. Compute Stats
+    // 4. Compute Stats
     self.postMessage({ type: "progress", message: "Computing statistics...", progress: 10 });
     const stats = calculateSbomStats(bom);
     if (import.meta.env.DEV) console.log(`[Worker] Stats computed`);
 
-    // 4. Format
+    // 5. Format
     self.postMessage({ type: "progress", message: "Building dependency tree...", progress: 20 });
     const formatted = await Formatter({
       rawSBOM: bom,
@@ -42,7 +104,7 @@ self.onmessage = async (e: MessageEvent) => {
     });
     if (import.meta.env.DEV) console.log(`[Worker] Tree formatted`);
 
-    // 5. Serialize and Send
+    // 6. Serialize and Send
     self.postMessage({ type: "progress", message: "Finalizing...", progress: 95 });
     
     // Convert to plain objects to ensure compatibility with all browsers' structured clone
@@ -60,11 +122,12 @@ self.onmessage = async (e: MessageEvent) => {
       }
     });
 
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error occurring during background processing";
     console.error(`[Worker] Error processing SBOM:`, error);
     self.postMessage({
       type: "error",
-      message: error.message || "Unknown error occurring during background processing",
+      message,
     });
   }
 };
@@ -127,7 +190,7 @@ function deepToPlain(obj: any, ancestors = new WeakSet()): any {
   }
 
   // Handle plain objects and class instances
-  const plain: any = {};
+  const plain: Record<string, unknown> = {};
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] !== 'function') {
       plain[key] = deepToPlain(obj[key], ancestors);
