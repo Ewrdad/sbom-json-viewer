@@ -63,6 +63,7 @@ function AppContent({
   currentFile,
   setCurrentFile,
   onImport,
+  manifest,
 }: {
   sbom: Bom | null;
   formattedSbom: formattedSBOM | null;
@@ -70,6 +71,7 @@ function AppContent({
   currentFile: string;
   setCurrentFile: (f: string) => void;
   onImport: (file: File) => void;
+  manifest: Manifest | null;
 }) {
   const { activeView } = useView();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +87,6 @@ function AppContent({
       onImport(file);
     }
   };
-
   return (
     <div className="flex flex-col h-full p-6 pb-0">
       <header className="flex items-center justify-between pb-6 border-b mb-6 flex-none">
@@ -118,35 +119,18 @@ function AppContent({
             Upload SBOM
           </Button>
           <div className="w-px h-8 bg-border mx-2" />
-          <Button
-            variant={
-              currentFile === "sample-simple.cyclonedx.json"
-                ? "default"
-                : "outline"
-            }
-            size="sm"
-            onClick={() => setCurrentFile("sample-simple.cyclonedx.json")}
-          >
-            Simple Sample
-          </Button>
-          <Button
-            variant={
-              currentFile === "sbom.cyclonedx.json" ? "default" : "outline"
-            }
-            size="sm"
-            onClick={() => setCurrentFile("sbom.cyclonedx.json")}
-          >
-            Full SBOM
-          </Button>
-          <Button
-            variant={
-              currentFile === "sbom-huge.json" ? "default" : "outline"
-            }
-            size="sm"
-            onClick={() => setCurrentFile("sbom-huge.json")}
-          >
-            Huge SBOM (20k)
-          </Button>
+          {manifest?.files.map((file) => (
+            <Button
+              key={file.id}
+              variant={currentFile === file.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                window.location.hash = `#/${file.id}`;
+              }}
+            >
+              {file.name}
+            </Button>
+          ))}
           <div className="w-px h-8 bg-border mx-2" />
           <HelpGuide />
         </div>
@@ -201,17 +185,27 @@ type LoadingState = {
   progress: number | null;
 };
 
+interface ManifestFile {
+  name: string;
+  path: string;
+  id: string;
+}
+
+interface Manifest {
+  default: string;
+  files: ManifestFile[];
+}
+
 export function App() {
   const [sbom, setSbom] = useState<Bom | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [currentFile, setCurrentFile] = useState<string>(
-    "sample-simple.cyclonedx.json",
-  );
+  const [currentFile, setCurrentFile] = useState<string>("");
   const [loadingState, setLoadingState] = useState<LoadingState>({
     status: "loading",
     message: "Preparing viewer...",
     progress: null,
   });
+  const [manifest, setManifest] = useState<Manifest | null>(null);
   const loadSequence = useRef(0);
 
   const [formattedSbom, setFormattedSbom] = useState<formattedSBOM | null>(null);
@@ -298,7 +292,7 @@ export function App() {
   }, [updateLoading, resetLoading]);
 
   const loadSBOM = useCallback(
-    async (filename: string) => {
+    async (url: string, filename: string) => {
       const loadId = ++loadSequence.current;
       setSbom(null);
       setFormattedSbom(null);
@@ -307,7 +301,7 @@ export function App() {
       updateLoading(`Preparing ${filename}...`, null);
 
       try {
-        await processWithWorker({ url: `/${filename}`, filename }, loadId);
+        await processWithWorker({ url, filename }, loadId);
       } catch (err) {
         if (loadSequence.current !== loadId) return;
         const message =
@@ -321,10 +315,66 @@ export function App() {
   );
 
   useEffect(() => {
-    if (currentFile.endsWith(".json") && !currentFile.startsWith("Local:")) {
-      loadSBOM(currentFile);
-    }
-  }, [currentFile, loadSBOM]);
+    const fetchManifest = async () => {
+      try {
+        const response = await fetch("/sboms/manifest.json");
+        if (response.ok) {
+          const data = await response.json();
+          setManifest(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch manifest:", err);
+      }
+    };
+    fetchManifest();
+  }, []);
+
+  useEffect(() => {
+    if (!manifest) return;
+
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      let targetId = "";
+      let targetUrl = "";
+
+      if (hash.startsWith("#/")) {
+        targetId = hash.substring(2);
+        const found = manifest.files.find((f) => f.id === targetId);
+        if (found) {
+          targetUrl = `/${found.path}`;
+        } else {
+          // Direct mapping fallback
+          const parts = targetId.split("/");
+          if (parts.length >= 2) {
+            targetUrl = `/sboms/${targetId}.sbom.json`;
+          }
+        }
+      } else if (!currentFile.startsWith("Local:")) {
+        // Use default from manifest
+        targetId = manifest.default;
+        const found = manifest.files.find((f) => f.id === targetId);
+        if (found) {
+          targetUrl = `/${found.path}`;
+        }
+      }
+
+      // Only load if it's a new file and not already loading it
+      if (targetId && targetId !== currentFile) {
+        loadSBOM(targetUrl, targetId);
+        setCurrentFile(targetId);
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    handleHashChange();
+
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, [loadSBOM, currentFile, manifest]);
+
+  useEffect(() => {
+    // If we are in local mode, we don't want the hash change to trigger anything
+    // but the above effect already handles that by checking startsWith("Local:")
+  }, [currentFile]);
 
   const handleImport = useCallback(
     async (file: File) => {
@@ -356,7 +406,23 @@ export function App() {
       resetLoading();
       return;
     }
-    loadSBOM(currentFile);
+    
+    // Attempt to reconstruct URL from currentFile if manifest is present
+    if (manifest) {
+      const found = manifest.files.find(f => f.id === currentFile);
+      if (found) {
+        loadSBOM(`/${found.path}`, currentFile);
+        return;
+      }
+    }
+    
+    // Fallback logic
+    const parts = currentFile.split("/");
+    if (parts.length >= 2) {
+      loadSBOM(`/sboms/${currentFile}.sbom.json`, currentFile);
+    } else {
+      loadSBOM(`/sboms/examples/${currentFile}.sbom.json`, currentFile);
+    }
   };
 
   const progressWidth =
@@ -403,6 +469,7 @@ export function App() {
       currentFile={currentFile}
       setCurrentFile={setCurrentFile}
       onImport={handleImport}
+      manifest={manifest}
     />
   );
 

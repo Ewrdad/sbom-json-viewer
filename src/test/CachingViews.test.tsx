@@ -81,8 +81,19 @@ class MockWorker {
 vi.stubGlobal("Worker", MockWorker);
 
 // Mock fetch
-vi.stubGlobal('fetch', vi.fn().mockImplementation(() =>
-  Promise.resolve({
+vi.stubGlobal('fetch', vi.fn().mockImplementation((url) => {
+  if (url.toString().endsWith("manifest.json")) {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        default: "examples/sample-simple",
+        files: [
+          { name: "Simple Sample", path: "sboms/examples/sample-simple.sbom.json", id: "examples/sample-simple" }
+        ]
+      })
+    });
+  }
+  return Promise.resolve({
     ok: true,
     headers: new Map([["content-length", "100"]]),
     body: {
@@ -92,8 +103,9 @@ vi.stubGlobal('fetch', vi.fn().mockImplementation(() =>
       }),
     },
     text: () => Promise.resolve('{}'),
-  })
-));
+    json: () => Promise.resolve({}),
+  });
+}));
 
 describe("View Caching Integration", () => {
   it("should preserve Component Explorer search state when switching views", async () => {

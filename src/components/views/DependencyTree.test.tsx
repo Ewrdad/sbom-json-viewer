@@ -13,6 +13,10 @@ vi.mock("../../lib/sbomSizing", () => ({
   getSbomSizeProfile: () => ({ componentCount: 20000, isLarge: true }),
 }));
 
+vi.mock("../../hooks/useDependencyAnalysis", () => ({
+  useDependencyAnalysis: () => ({ analysis: null, status: "idle" }),
+}));
+
 describe("DependencyTree", () => {
   it("shows large SBOM guard and skips formatting", async () => {
     render(<DependencyTree sbom={createMockBom({ components: [] })} />);

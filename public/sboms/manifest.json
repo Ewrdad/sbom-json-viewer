@@ -1,0 +1,25 @@
+{
+  "default": "examples/sample-simple",
+  "files": [
+    {
+      "name": "Simple Example",
+      "path": "sboms/examples/sample-simple.sbom.json",
+      "id": "examples/sample-simple"
+    },
+    {
+      "name": "Full SBOM",
+      "path": "sboms/examples/sbom-full.sbom.json",
+      "id": "examples/sbom-full"
+    },
+    {
+      "name": "Huge Example (20k)",
+      "path": "sboms/examples/sbom-huge.sbom.json",
+      "id": "examples/sbom-huge"
+    },
+    {
+      "name": "Self Scan (Latest)",
+      "path": "sboms/self/latest.sbom.json",
+      "id": "self/latest"
+    }
+  ]
+}

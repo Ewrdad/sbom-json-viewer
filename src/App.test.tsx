@@ -149,14 +149,32 @@ describe("App Integration", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    window.location.hash = "";
 
     // Mock fetch
     vi.stubGlobal(
       "fetch",
       vi.fn().mockImplementation((url) => {
+        const urlStr = url.toString();
+        if (urlStr.endsWith("manifest.json")) {
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve({
+                default: "examples/sample-simple",
+                files: [
+                  {
+                    name: "Simple Example",
+                    path: "sboms/examples/sample-simple.sbom.json",
+                    id: "examples/sample-simple",
+                  },
+                ],
+              }),
+          });
+        }
         if (
-          url.toString().endsWith("sample-simple.cyclonedx.json") ||
-          url.toString().endsWith("sbom.cyclonedx.json")
+          urlStr.endsWith("sample-simple.sbom.json") ||
+          urlStr.endsWith("sbom-full.sbom.json")
         ) {
           return Promise.resolve({
             ok: true,

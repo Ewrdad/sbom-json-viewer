@@ -1,13 +1,17 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-const gotoViewer = async (page) => {
+const gotoViewer = async (page: Page) => {
   await page.goto("/");
-  // Why: the sidebar and default sample indicator should show before interacting.
+  
+  // Wait for initial loading to complete
+  await expect(page.getByText(/Preparing viewer|Loading analysis/)).not.toBeVisible({ timeout: 15000 });
+
+  // Now the manifest buttons should be visible
   await expect(
-    page.getByRole("button", { name: "Simple Sample" }),
+    page.getByRole("button", { name: "Simple Example" }),
   ).toBeVisible();
   await expect(
-    page.getByText("Viewing: sample-simple.cyclonedx.json"),
+    page.getByText("Viewing: examples/sample-simple"),
   ).toBeVisible();
 };
 
@@ -16,7 +20,7 @@ test.describe("SBOM Viewer", () => {
     await gotoViewer(page);
 
     await expect(
-      page.getByText("Viewing: sample-simple.cyclonedx.json"),
+      page.getByText("Viewing: examples/sample-simple"),
     ).toBeVisible();
   });
 
@@ -24,11 +28,11 @@ test.describe("SBOM Viewer", () => {
     await gotoViewer(page);
 
     await page.getByRole("button", { name: "Full SBOM" }).click();
-    await expect(page.getByText("Viewing: sbom.cyclonedx.json")).toBeVisible();
+    await expect(page.getByText("Viewing: examples/sbom-full")).toBeVisible();
 
-    await page.getByRole("button", { name: "Simple Sample" }).click();
+    await page.getByRole("button", { name: "Simple Example" }).click();
     await expect(
-      page.getByText("Viewing: sample-simple.cyclonedx.json"),
+      page.getByText("Viewing: examples/sample-simple"),
     ).toBeVisible();
   });
 
