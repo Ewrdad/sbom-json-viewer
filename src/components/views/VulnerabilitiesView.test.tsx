@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { VulnerabilitiesView } from './VulnerabilitiesView';
 import { describe, it, expect, vi } from 'vitest';
 import type { SbomStats } from '@/types/sbom';
@@ -129,7 +129,7 @@ describe('VulnerabilitiesView', () => {
         await user.click(switchBtn);
 
         const searchInput = screen.getByPlaceholderText('Search CVEs...');
-        await user.type(searchInput, 'CVE-2024-001');
+        fireEvent.change(searchInput, { target: { value: 'CVE-2024-001' } });
 
         expect(screen.getByText('CVE-2024-001')).toBeInTheDocument();
         expect(screen.queryByText('CVE-2024-002')).not.toBeInTheDocument();
