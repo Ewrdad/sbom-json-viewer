@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSbomStats } from "../../hooks/useSbomStats";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { ReportGenerator } from "./reports/ReportGenerator";
 import type { SbomStats } from "@/types/sbom";
-import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import {
   Bar,
   BarChart,
@@ -24,7 +24,7 @@ export function DashboardView({
   sbom, 
   preComputedStats 
 }: { 
-  sbom: Bom | any; 
+  sbom: any; 
   preComputedStats?: SbomStats; 
 }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
@@ -215,127 +215,133 @@ export function DashboardView({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
           {/* Severity Chart */}
           <Card className="lg:col-span-8 shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                Vulnerability Severity
-                <HelpTooltip text="Distribution of vulnerabilities by severity level (Critical, High, Medium, Low)." />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={vulnData}>
-                    <XAxis
-                      dataKey="name"
-                      {...CHART_AXIS_PROPS}
-                    />
-                    <YAxis
-                      {...CHART_AXIS_PROPS}
-                      tickFormatter={(value) => `${value}`}
-                    />
-                    <Tooltip
-                      cursor={CHART_CURSOR}
-                      contentStyle={CHART_TOOLTIP_STYLE}
-                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                    />
-                    <Bar dataKey="count" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
+            <ErrorBoundary fallback={<div className="h-[300px] flex items-center justify-center text-muted-foreground text-sm">Severity chart unavailable</div>}>
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  Vulnerability Severity
+                  <HelpTooltip text="Distribution of vulnerabilities by severity level (Critical, High, Medium, Low)." />
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={vulnData}>
+                      <XAxis
+                        dataKey="name"
+                        {...CHART_AXIS_PROPS}
+                      />
+                      <YAxis
+                        {...CHART_AXIS_PROPS}
+                        tickFormatter={(value) => `${value}`}
+                      />
+                      <Tooltip
+                        cursor={CHART_CURSOR}
+                        contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                      />
+                      <Bar dataKey="count" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </ErrorBoundary>
           </Card>
 
           {/* Dependency Composition */}
           <Card className="lg:col-span-4 shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                Dependency Centrality
-                <HelpTooltip text="Shows how many other components depend on each package. High numbers indicate critical hubs." />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[200px] w-full mt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={dependencyData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={70}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {dependencyData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={CHART_TOOLTIP_STYLE}
-                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="space-y-2 mt-6">
-                {dependencyData.map((entry) => (
-                  <div key={entry.name} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.fill }} />
-                    <span className="text-xs font-medium">{entry.name}</span>
-                    <span className="text-xs font-bold ml-auto">{entry.value}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
+            <ErrorBoundary fallback={<div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">Dependency distribution chart unavailable</div>}>
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  Dependency Centrality
+                  <HelpTooltip text="Shows how many other components depend on each package. High numbers indicate critical hubs." />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[200px] w-full mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={dependencyData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {dependencyData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="space-y-2 mt-6">
+                  {dependencyData.map((entry) => (
+                    <div key={entry.name} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.fill }} />
+                      <span className="text-xs font-medium">{entry.name}</span>
+                      <span className="text-xs font-bold ml-auto">{entry.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </ErrorBoundary>
           </Card>
 
           {/* License Pie Chart */}
           <Card className="lg:col-span-12 xl:col-span-4 shadow-sm border-muted-foreground/10">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xl flex items-center gap-2">
-                License Distribution
-                <HelpTooltip text="Breakdown of components by license type." />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={licenseDistData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {licenseDistData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={CHART_TOOLTIP_STYLE}
-                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                {licenseDistData.map((entry) => (
-                  <div key={entry.name} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-[10px] font-medium truncate">{entry.name}</span>
-                    <span className="text-[10px] text-muted-foreground ml-auto">
-                      {Math.round((entry.value / (totalLicenseCount || 1)) * 100)}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
+            <ErrorBoundary fallback={<div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">License distribution chart unavailable</div>}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  License Distribution
+                  <HelpTooltip text="Breakdown of components by license type." />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[200px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={licenseDistData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {licenseDistData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  {licenseDistData.map((entry) => (
+                    <div key={entry.name} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                      <span className="text-[10px] font-medium truncate">{entry.name}</span>
+                      <span className="text-[10px] text-muted-foreground ml-auto">
+                        {Math.round((entry.value / (totalLicenseCount || 1)) * 100)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </ErrorBoundary>
           </Card>
 
           {/* Top Licenses */}
@@ -417,92 +423,94 @@ export function DashboardView({
         {/* Most Vulnerable Components Table */}
         <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-xl">
-                Most Vulnerable Components
-              </CardTitle>
-              <Badge variant="outline" className="text-xs">
-                Top 5 by Severity
-              </Badge>
-            </CardHeader>
-            <CardContent>
-              <div className="relative overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
-                    <tr>
-                      <th className="px-4 py-3">Component</th>
-                      <th className="px-4 py-3">Version</th>
-                      <th className="px-4 py-3 text-center">Critical</th>
-                      <th className="px-4 py-3 text-center">High</th>
-                      <th className="px-4 py-3 text-center">Medium</th>
-                      <th className="px-4 py-3 text-center font-bold">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayStats.vulnerableComponents.map((comp, i) => (
-                      <tr
-                        key={i}
-                        className="border-b hover:bg-muted/50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-medium">{comp.name}</td>
-                        <td className="px-4 py-3 font-mono text-xs">
-                          {comp.version}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.critical > 0 ? (
-                            <Badge
-                              variant="destructive"
-                              className="h-5 min-w-[20px] justify-center"
-                            >
-                              {comp.critical}
-                            </Badge>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.high > 0 ? (
-                            <Badge
-                              variant="secondary"
-                              className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center"
-                            >
-                              {comp.high}
-                            </Badge>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.medium > 0 ? (
-                            <Badge
-                              variant="secondary"
-                              className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center"
-                            >
-                              {comp.medium}
-                            </Badge>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center font-bold">
-                          {comp.total}
-                        </td>
-                      </tr>
-                    ))}
-                    {displayStats.vulnerableComponents.length === 0 && (
+            <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">Components table unavailable due to a rendering error.</div>}>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-xl">
+                  Most Vulnerable Components
+                </CardTitle>
+                <Badge variant="outline" className="text-xs">
+                  Top 5 by Severity
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="relative overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
                       <tr>
-                        <td
-                          colSpan={6}
-                          className="px-4 py-8 text-center text-muted-foreground italic"
-                        >
-                          No vulnerabilities detected in any components.
-                        </td>
+                        <th className="px-4 py-3">Component</th>
+                        <th className="px-4 py-3">Version</th>
+                        <th className="px-4 py-3 text-center">Critical</th>
+                        <th className="px-4 py-3 text-center">High</th>
+                        <th className="px-4 py-3 text-center">Medium</th>
+                        <th className="px-4 py-3 text-center font-bold">Total</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
+                    </thead>
+                    <tbody>
+                      {displayStats.vulnerableComponents.map((comp, i) => (
+                        <tr
+                          key={i}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="px-4 py-3 font-medium">{comp.name}</td>
+                          <td className="px-4 py-3 font-mono text-xs">
+                            {comp.version}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.critical > 0 ? (
+                              <Badge
+                                variant="destructive"
+                                className="h-5 min-w-[20px] justify-center"
+                              >
+                                {comp.critical}
+                              </Badge>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.high > 0 ? (
+                              <Badge
+                                variant="secondary"
+                                className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center"
+                              >
+                                {comp.high}
+                              </Badge>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.medium > 0 ? (
+                              <Badge
+                                variant="secondary"
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center"
+                              >
+                                {comp.medium}
+                              </Badge>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center font-bold">
+                            {comp.total}
+                          </td>
+                        </tr>
+                      ))}
+                      {displayStats.vulnerableComponents.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="px-4 py-8 text-center text-muted-foreground italic"
+                          >
+                            No vulnerabilities detected in any components.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </ErrorBoundary>
           </Card>
         </div>
         <ReportGenerator stats={displayStats} />

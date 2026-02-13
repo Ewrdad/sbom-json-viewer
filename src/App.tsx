@@ -150,35 +150,51 @@ function AppContent({
           }
         >
           <KeepAliveView activeView={activeView} viewKey="dashboard">
-            <DashboardView sbom={sbom} preComputedStats={sbomStats} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <DashboardView sbom={sbom} preComputedStats={sbomStats} />
+            </ErrorBoundary>
           </KeepAliveView>
 
           <KeepAliveView activeView={activeView} viewKey="vulnerabilities">
-            <VulnerabilitiesView sbom={sbom} preComputedStats={sbomStats} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <VulnerabilitiesView sbom={sbom} preComputedStats={sbomStats} />
+            </ErrorBoundary>
           </KeepAliveView>
           
           <KeepAliveView activeView={activeView} viewKey="licenses">
-            <LicensesView sbom={sbom} preComputedStats={sbomStats} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <LicensesView sbom={sbom} preComputedStats={sbomStats} />
+            </ErrorBoundary>
           </KeepAliveView>
           
           <KeepAliveView activeView={activeView} viewKey="explorer">
-            <ComponentExplorer sbom={sbom} formattedSbom={formattedSbom} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <ComponentExplorer sbom={sbom} formattedSbom={formattedSbom} />
+            </ErrorBoundary>
           </KeepAliveView>
 
           <KeepAliveView activeView={activeView} viewKey="tree">
-            <DependencyTree sbom={sbom} formattedSbom={formattedSbom} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <DependencyTree sbom={sbom} formattedSbom={formattedSbom} />
+            </ErrorBoundary>
           </KeepAliveView>
 
           <KeepAliveView activeView={activeView} viewKey="graph">
-            <DependencyGraph sbom={sbom} formattedSbom={formattedSbom} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <DependencyGraph sbom={sbom} formattedSbom={formattedSbom} />
+            </ErrorBoundary>
           </KeepAliveView>
 
           <KeepAliveView activeView={activeView} viewKey="reverse-tree">
-            <ReverseDependencyTree sbom={sbom} formattedSbom={formattedSbom} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <ReverseDependencyTree sbom={sbom} formattedSbom={formattedSbom} />
+            </ErrorBoundary>
           </KeepAliveView>
 
           <KeepAliveView activeView={activeView} viewKey="metadata">
-            <MetadataView sbom={sbom} />
+            <ErrorBoundary resetKeys={[sbom]}>
+              <MetadataView sbom={sbom} />
+            </ErrorBoundary>
           </KeepAliveView>
         </Suspense>
       </div>

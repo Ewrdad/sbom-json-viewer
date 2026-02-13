@@ -47,6 +47,8 @@ const createMockSbom = (
   metadata: {} as any,
   componentMap: new Map(nodes.map((n) => [typeof n.bomRef === 'string' ? n.bomRef : n.bomRef?.value || "", n])),
   dependencyGraph: new Map(Object.entries(graph)),
+  dependentsGraph: new Map(),
+  blastRadius: new Map(),
   topLevelRefs,
 });
 

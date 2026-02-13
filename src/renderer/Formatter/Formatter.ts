@@ -111,6 +111,7 @@ export const Formatter = async ({
     componentMap: new Map<string, EnhancedComponent>(),
     dependencyGraph: new Map<string, string[]>(),
     dependentsGraph: new Map<string, string[]>(),
+    blastRadius: new Map<string, number>(),
     topLevelRefs: [],
   };
 

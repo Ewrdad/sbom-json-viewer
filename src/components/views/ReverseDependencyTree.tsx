@@ -3,7 +3,7 @@ import { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import type { formattedSBOM, EnhancedComponent } from "../../types/sbom";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
-import { ScrollArea } from "../ui/scroll-area";
+import { Virtuoso } from "react-virtuoso";
 import { Badge } from "../ui/badge";
 import { GitGraph, Search, ArrowRight, Layers, ShieldAlert, ShieldCheck, Scale, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { getLicenseCategory } from "../../lib/licenseUtils";
@@ -16,6 +16,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "../ui/select";
+import { HelpTooltip } from "../common/HelpTooltip";
 
 interface ReverseDependencyTreeProps {
   sbom: Bom | null;
@@ -152,6 +153,11 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                 Advanced Filters
                 {showFilters ? <ChevronUp className="h-3 w-3 ml-auto" /> : <ChevronDown className="h-3 w-3 ml-auto" />}
             </Button>
+            <HelpTooltip 
+                text="Filter components by vulnerability status, dependency counts, or license type." 
+                className="ml-1"
+                size={12}
+            />
             {(onlyVulnerable || minDirectDeps > 0 || minBlastRadius > 0 || licenseFilter !== "all") && (
                 <Button 
                     variant="ghost" 
@@ -224,54 +230,61 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
           )}
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">
-          <ScrollArea className="h-full">
-            <div className="flex flex-col">
-              {sortedComponents.map(({ component, directDependentsCount }, index) => (
-                <button
-                  key={component.bomRef?.value || index}
-                  onClick={() => setSelectedComponentId(component.bomRef?.value || null)}
-                  className={`flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors border-b group ${
-                    selectedComponentId === component.bomRef?.value ? "bg-muted" : ""
-                  } ${
-                    getVulnCount(component.vulnerabilities?.inherent).critical > 0 
-                      ? "border-l-4 border-l-destructive" 
-                      : getVulnCount(component.vulnerabilities?.inherent).high > 0 
-                      ? "border-l-4 border-l-orange-500" 
-                      : ""
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    <div className="font-medium truncate group-hover:text-primary transition-colors" title={component.name}>
-                        {component.name}
-                    </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                        {component.version}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
-                    <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
-                      {directDependentsCount} / {blastRadius?.get(component.bomRef?.value || "") || 0}
-                    </Badge>
-                    {getVulnCount(component.vulnerabilities?.inherent).total > 0 && (
-                      <div className="flex gap-1">
-                        {getVulnCount(component.vulnerabilities?.inherent).critical > 0 && (
-                          <div className="h-2 w-2 rounded-full bg-destructive" title="Critical Vulnerabilities" />
-                        )}
-                        {getVulnCount(component.vulnerabilities?.inherent).high > 0 && (
-                          <div className="h-2 w-2 rounded-full bg-orange-500" title="High Vulnerabilities" />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
-              {sortedComponents.length === 0 && (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  No components found
-                </div>
-              )}
+          {sortedComponents.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              No components found
             </div>
-          </ScrollArea>
+          ) : (
+            <Virtuoso
+              style={{ height: "100%" }}
+              data={sortedComponents}
+              initialItemCount={20}
+              itemContent={(index, item) => {
+                const { component, directDependentsCount, blastRadius: itemBlastRadius } = item;
+                const v = getVulnCount(component.vulnerabilities?.inherent);
+                
+                return (
+                  <button
+                    key={component.bomRef?.value || index}
+                    onClick={() => setSelectedComponentId(component.bomRef?.value || null)}
+                    className={`flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors border-b group w-full ${
+                      selectedComponentId === component.bomRef?.value ? "bg-muted" : ""
+                    } ${
+                      v.critical > 0 
+                        ? "border-l-4 border-l-destructive" 
+                        : v.high > 0 
+                        ? "border-l-4 border-l-orange-500" 
+                        : ""
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                        <div className="font-medium truncate group-hover:text-primary transition-colors" title={component.name}>
+                            {component.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                            {component.version}
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+                        <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                        {directDependentsCount} / {itemBlastRadius}
+                        </Badge>
+                        {v.total > 0 && (
+                        <div className="flex gap-1">
+                            {v.critical > 0 && (
+                            <div className="h-2 w-2 rounded-full bg-destructive" title="Critical Vulnerabilities" />
+                            )}
+                            {v.high > 0 && (
+                            <div className="h-2 w-2 rounded-full bg-orange-500" title="High Vulnerabilities" />
+                            )}
+                        </div>
+                        )}
+                    </div>
+                  </button>
+                );
+              }}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -316,10 +329,14 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                                 <div className="flex items-center gap-1 text-xs">
                                     <GitGraph className="h-3 w-3 text-muted-foreground" />
                                     <span>Blast Radius: <strong>{blastRadius?.get(selectedComponentId || "") || 0}</strong> components</span>
+                                    <HelpTooltip 
+                                        text="Total number of components upstream that depend on this library (direct + transitive). If this library breaks or has a vulnerability, all these components could be affected." 
+                                        size={12}
+                                    />
                                 </div>
                             </div>
                             
-                            <div className="mt-3 flex flex-wrap gap-2">
+                            <div className="mt-3 flex flex-wrap gap-2 items-center">
                                 {(() => {
                                     const v = getVulnCount(selectedComponent.vulnerabilities?.inherent);
                                     if (v.total === 0) return (
@@ -354,7 +371,12 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                     </div>
 
                     <div>
-                        <h4 className="text-lg font-semibold mb-3">Used By ({selectedDependents.length})</h4>
+                        <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                            Used By ({selectedDependents.length})
+                            <HelpTooltip 
+                                text="Direct dependents Only. These are the components that explicitly import or declare formattedSbom.dependentsGraph dependency on the selected component." 
+                            />
+                        </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {selectedDependents.map((dep, idx) => {
                                 const v = getVulnCount(dep.vulnerabilities?.inherent);

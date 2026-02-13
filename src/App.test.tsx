@@ -118,9 +118,10 @@ class MockWorker {
         const mockResult = {
           bom: json, // Simple pass through for mock
           formatted: {
-            componentMap: {},
-            dependencyGraph: {},
-            dependentsGraph: {},
+            componentMap: new Map(),
+            dependencyGraph: new Map(),
+            dependentsGraph: new Map(),
+            blastRadius: new Map(),
             topLevelRefs: []
           },
           stats: {

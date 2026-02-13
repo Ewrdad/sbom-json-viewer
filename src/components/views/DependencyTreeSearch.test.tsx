@@ -49,6 +49,8 @@ const mockFormattedSbom: formattedSBOM = {
   dependencyGraph: new Map([
     ["parent-ref", ["child-ref"]]
   ]),
+  dependentsGraph: new Map(),
+  blastRadius: new Map(),
   topLevelRefs: ["parent-ref"],
 };
 
@@ -76,6 +78,8 @@ const mockFormattedSbomDeep: formattedSBOM = {
     ["root-ref", ["mid-ref"]],
     ["mid-ref", ["leaf-ref"]]
   ]),
+  dependentsGraph: new Map(),
+  blastRadius: new Map(),
   topLevelRefs: ["root-ref"],
 };
 
@@ -229,6 +233,8 @@ describe("DependencyTree Search", () => {
         ["child-ref", createMockNode("child-pkg", "child-ref")],
       ]),
       dependencyGraph: new Map([["root-ref", ["child-ref"]]]),
+      dependentsGraph: new Map(),
+      blastRadius: new Map(),
       topLevelRefs: ["root-ref"],
     };
 

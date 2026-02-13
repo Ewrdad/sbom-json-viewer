@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSbomStats } from "../../hooks/useSbomStats";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
   ResponsiveContainer,
@@ -81,8 +82,8 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [licenseSortDir, setLicenseSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
-  const [selectedComponent, setSelectedComponent] = useState<any | null>(null);
-  const [selectedLicense, setSelectedLicense] = useState<any | null>(null);
+  const [selectedComponent, setSelectedComponent] = useState<unknown | null>(null);
+  const [selectedLicense, setSelectedLicense] = useState<unknown | null>(null);
 
   const { analysis } = useDependencyAnalysis(sbom);
 
@@ -290,315 +291,321 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {/* Category Donut */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-lg">License Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="h-[220px] w-full md:w-1/2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={distributionPieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {distributionPieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={CHART_TOOLTIP_STYLE}
-                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+            <ErrorBoundary fallback={<div className="h-[220px] flex items-center justify-center text-muted-foreground text-sm">License distribution unavailable</div>}>
+              <CardHeader>
+                <CardTitle className="text-lg">License Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="h-[220px] w-full md:w-1/2">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={distributionPieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {distributionPieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                          itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="w-full md:w-1/2 space-y-3">
+                    {distributionPieData.map((entry) => (
+                      <div key={entry.name} className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                        <span className="text-sm font-medium">{entry.name}</span>
+                        <div className="flex-1 border-b border-muted mx-2 border-dotted" />
+                        <span className="text-sm text-muted-foreground font-mono">
+                           {entry.value} ({totalInDistribution > 0 ? Math.round((entry.value / totalInDistribution) * 100) : 0}%)
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="w-full md:w-1/2 space-y-3">
-                  {distributionPieData.map((entry) => (
-                    <div key={entry.name} className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                      <span className="text-sm font-medium">{entry.name}</span>
-                      <div className="flex-1 border-b border-muted mx-2 border-dotted" />
-                      <span className="text-sm text-muted-foreground font-mono">
-                         {entry.value} ({totalInDistribution > 0 ? Math.round((entry.value / totalInDistribution) * 100) : 0}%)
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            </ErrorBoundary>
           </Card>
 
           {/* Top Licenses Bar Chart */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-lg">Top 5 Licenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[220px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={topBarData} layout="vertical">
-                    <XAxis type="number" hide />
-                    <YAxis 
-                      dataKey="name" 
-                      type="category" 
-                      width={100}
-                      {...CHART_AXIS_PROPS}
-                      tick={{ fill: "var(--foreground)", fontSize: 11 }}
-                    />
-                    <Tooltip
-                      cursor={CHART_CURSOR}
-                      contentStyle={CHART_TOOLTIP_STYLE}
-                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                    />
-                    <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
+            <ErrorBoundary fallback={<div className="h-[220px] flex items-center justify-center text-muted-foreground text-sm">Top licenses chart unavailable</div>}>
+              <CardHeader>
+                <CardTitle className="text-lg">Top 5 Licenses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={topBarData} layout="vertical">
+                      <XAxis type="number" hide />
+                      <YAxis 
+                        dataKey="name" 
+                        type="category" 
+                        width={100}
+                        {...CHART_AXIS_PROPS}
+                        tick={{ fill: "var(--foreground)", fontSize: 11 }}
+                      />
+                      <Tooltip
+                        cursor={CHART_CURSOR}
+                        contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                      />
+                      <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </ErrorBoundary>
           </Card>
         </div>
 
         {/* Table Card */}
         <Card className="shadow-sm border-muted-foreground/10">
-          <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-3">
-                <CardTitle className="text-xl">
-                  {viewMode === "components" ? "Component Licenses" : "License Registry"}
-                </CardTitle>
-                <Badge variant="outline" className="text-xs">
-                  {activeList.length} total
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {viewMode === "components" 
-                  ? "Breakdown of licenses for each component in the project" 
-                  : "List of all unique licenses detected and their reach"}
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-md">
-              <Button 
-                variant={viewMode === "components" ? "secondary" : "ghost"} 
-                size="sm"
-                className="text-xs h-8 px-3"
-                onClick={() => {
-                  setViewMode("components");
-                  setPage(0);
-                }}
-              >
-                By Component
-              </Button>
-              <Button 
-                variant={viewMode === "licenses" ? "secondary" : "ghost"} 
-                size="sm"
-                className="text-xs h-8 px-3"
-                onClick={() => {
-                  setViewMode("licenses");
-                  setPage(0);
-                }}
-              >
-                By License
-              </Button>
-            </div>
-            
-            <div className="relative w-full max-w-xs ml-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={viewMode === "components" ? "Search components or licenses..." : "Search licenses..."}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(0);
-                }}
-                className="pl-9"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="relative overflow-x-auto rounded-lg border">
-              <table className="w-full text-sm text-left">
-                {viewMode === "components" ? (
-                  <>
-                  <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
-                    <tr>
-                      <th className="px-4 py-3">
-                        {renderSortHeader("Component", "name")}
-                      </th>
-                      <th className="px-4 py-3">Version</th>
-                      <th className="px-4 py-3">Licenses</th>
-                       <th className="px-4 py-3 text-right pr-6">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pageItems.map((comp: any, i) => (
-                      <tr
-                        key={`${comp.ref}-${i}`}
-                        className="border-b hover:bg-muted/50 transition-colors"
-                      >
-                         <td className="px-4 py-3 font-medium cursor-pointer hover:underline" onClick={() => {
-                            const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
-                            setSelectedComponent(fullComp || comp);
-                            setSelectedLicense(null);
-                         }}>
-                           {comp.name}
-                         </td>
-                         <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
-                         <td className="px-4 py-3">
-                           <div className="flex flex-wrap gap-1">
-                             {comp.licenses.length > 0 ? (
-                               comp.licenses.map((l: any, idx: number) => (
-                                 <Badge 
-                                   key={`${idx}`} 
-                                   variant="outline" 
-                                   className="text-[10px] whitespace-nowrap"
-                                   style={{ 
-                                     borderColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "40",
-                                     color: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS],
-                                     backgroundColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "10"
-                                   }}
-                                 >
-                                   {l.id}
-                                 </Badge>
-                               ))
-                             ) : (
-                               <Badge variant="secondary" className="text-[10px] opacity-50">Unknown</Badge>
-                             )}
-                           </div>
-                         </td>
-                         <td className="px-4 py-3 text-right pr-6">
-                           <Button
-                             variant="outline"
-                             size="xs"
-                             className="h-7 text-[10px]"
-                             onClick={() => {
-                               const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
-                               setSelectedComponent(fullComp || comp);
-                               setSelectedLicense(null);
-                             }}
-                           >
-                             Details
-                           </Button>
-                         </td>
-                       </tr>
-                    ))}
-                  </tbody>
-                  </>
-                ) : (
-                  <>
-                  <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
-                    <tr>
-                      <th className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          {renderSortHeader("License ID", "id")}
-                          <HelpTooltip text="SPDX License Identifier." />
-                        </div>
-                      </th>
-                      <th className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          {renderSortHeader("Category", "category")}
-                          <HelpTooltip text="Legal categorization of the license (Permissive, Copyleft, etc.)." />
-                        </div>
-                      </th>
-                      <th className="px-4 py-3 text-center">
-                        {renderSortHeader("Affected Components", "affectedCount")}
-                      </th>
-                      <th className="px-4 py-3 text-right pr-6">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pageItems.map((license: any, i) => (
-                      <tr
-                        key={`${license.id}-${i}`}
-                        className="border-b hover:bg-muted/50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-bold font-mono text-xs">
-                          {license.id}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge 
-                            variant="secondary" 
-                            className="text-white border-0 h-5 text-[10px] uppercase"
-                            style={{ 
-                              backgroundColor: CATEGORY_COLORS[license.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.unknown
-                            }}
-                          >
-                            {license.category}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center font-bold">
-                          {license.affectedCount}
-                        </td>
-                         <td className="px-4 py-3 text-right pr-6">
-                           <Button 
-                             variant="outline" 
-                             size="xs" 
-                             className="h-7 text-[10px]"
-                             onClick={() => {
-                               setSelectedLicense(license);
-                               setSelectedComponent(null);
-                             }}
-                           >
-                             Full Terms
-                           </Button>
-                         </td>
-                       </tr>
-                    ))}
-                  </tbody>
-                  </>
-                )}
-                
-                {activeList.length === 0 && (
-                  <tbody>
-                    <tr>
-                      <td colSpan={viewMode === "components" ? 3 : 4} className="px-4 py-12 text-center text-muted-foreground italic">
-                        No results match your search.
-                      </td>
-                    </tr>
-                  </tbody>
-                )}
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-xs text-muted-foreground">
-                  Showing {page * ITEMS_PER_PAGE + 1}–{Math.min((page + 1) * ITEMS_PER_PAGE, activeList.length)} of{" "}
-                  {activeList.length} {viewMode === "components" ? "components" : "licenses"}
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page === 0}
-                    onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Page {page + 1} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= totalPages - 1}
-                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
+          <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">License list unavailable due to a rendering error.</div>}>
+            <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-xl">
+                    {viewMode === "components" ? "Component Licenses" : "License Registry"}
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    {activeList.length} total
+                  </Badge>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  {viewMode === "components" 
+                    ? "Breakdown of licenses for each component in the project" 
+                    : "List of all unique licenses detected and their reach"}
+                </p>
               </div>
-            )}
-          </CardContent>
+              
+              <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-md">
+                <Button 
+                  variant={viewMode === "components" ? "secondary" : "ghost"} 
+                  size="sm"
+                  className="text-xs h-8 px-3"
+                  onClick={() => {
+                    setViewMode("components");
+                    setPage(0);
+                  }}
+                >
+                  By Component
+                </Button>
+                <Button 
+                  variant={viewMode === "licenses" ? "secondary" : "ghost"} 
+                  size="sm"
+                  className="text-xs h-8 px-3"
+                  onClick={() => {
+                    setViewMode("licenses");
+                    setPage(0);
+                  }}
+                >
+                  By License
+                </Button>
+              </div>
+              
+              <div className="relative w-full max-w-xs ml-auto">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={viewMode === "components" ? "Search components or licenses..." : "Search licenses..."}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(0);
+                  }}
+                  className="pl-9"
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="relative overflow-x-auto rounded-lg border">
+                <table className="w-full text-sm text-left">
+                  {viewMode === "components" ? (
+                    <>
+                    <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
+                      <tr>
+                        <th className="px-4 py-3">
+                          {renderSortHeader("Component", "name")}
+                        </th>
+                        <th className="px-4 py-3">Version</th>
+                        <th className="px-4 py-3">Licenses</th>
+                         <th className="px-4 py-3 text-right pr-6">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pageItems.map((comp: any, i) => (
+                        <tr
+                          key={`${comp.ref}-${i}`}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                           <td className="px-4 py-3 font-medium cursor-pointer hover:underline" onClick={() => {
+                              const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
+                              setSelectedComponent(fullComp || comp);
+                              setSelectedLicense(null);
+                           }}>
+                             {comp.name}
+                           </td>
+                           <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
+                           <td className="px-4 py-3">
+                             <div className="flex flex-wrap gap-1">
+                               {comp.licenses.length > 0 ? (
+                                 comp.licenses.map((l: any, idx: number) => (
+                                   <Badge 
+                                     key={`${idx}`} 
+                                     variant="outline" 
+                                     className="text-[10px] whitespace-nowrap"
+                                     style={{ 
+                                       borderColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "40",
+                                       color: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS],
+                                       backgroundColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "10"
+                                     }}
+                                   >
+                                     {l.id}
+                                   </Badge>
+                                 ))
+                               ) : (
+                                 <Badge variant="secondary" className="text-[10px] opacity-50">Unknown</Badge>
+                               )}
+                             </div>
+                           </td>
+                           <td className="px-4 py-3 text-right pr-6">
+                             <Button
+                               variant="outline"
+                               size="xs"
+                               className="h-7 text-[10px]"
+                               onClick={() => {
+                                 const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
+                                 setSelectedComponent(fullComp || comp);
+                                 setSelectedLicense(null);
+                               }}
+                             >
+                               Details
+                             </Button>
+                           </td>
+                         </tr>
+                      ))}
+                    </tbody>
+                    </>
+                  ) : (
+                    <>
+                    <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
+                      <tr>
+                        <th className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            {renderSortHeader("License ID", "id")}
+                            <HelpTooltip text="SPDX License Identifier." />
+                          </div>
+                        </th>
+                        <th className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            {renderSortHeader("Category", "category")}
+                            <HelpTooltip text="Legal categorization of the license (Permissive, Copyleft, etc.)." />
+                          </div>
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          {renderSortHeader("Affected Components", "affectedCount")}
+                        </th>
+                        <th className="px-4 py-3 text-right pr-6">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pageItems.map((license: any, i) => (
+                        <tr
+                          key={`${license.id}-${i}`}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="px-4 py-3 font-bold font-mono text-xs">
+                            {license.id}
+                          </td>
+                          <td className="px-4 py-3">
+                            <Badge 
+                              variant="secondary" 
+                              className="text-white border-0 h-5 text-[10px] uppercase"
+                              style={{ 
+                                backgroundColor: CATEGORY_COLORS[license.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.unknown
+                              }}
+                            >
+                              {license.category}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-center font-bold">
+                            {license.affectedCount}
+                          </td>
+                           <td className="px-4 py-3 text-right pr-6">
+                             <Button 
+                               variant="outline" 
+                               size="xs" 
+                               className="h-7 text-[10px]"
+                               onClick={() => {
+                                 setSelectedLicense(license);
+                                 setSelectedComponent(null);
+                               }}
+                             >
+                               Full Terms
+                             </Button>
+                           </td>
+                         </tr>
+                      ))}
+                    </tbody>
+                    </>
+                  )}
+                  
+                  {activeList.length === 0 && (
+                    <tbody>
+                      <tr>
+                        <td colSpan={viewMode === "components" ? 3 : 4} className="px-4 py-12 text-center text-muted-foreground italic">
+                          No results match your search.
+                        </td>
+                      </tr>
+                    </tbody>
+                  )}
+                </table>
+              </div>
+  
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-xs text-muted-foreground">
+                    Showing {page * ITEMS_PER_PAGE + 1}–{Math.min((page + 1) * ITEMS_PER_PAGE, activeList.length)} of{" "}
+                    {activeList.length} {viewMode === "components" ? "components" : "licenses"}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page === 0}
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Page {page + 1} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page >= totalPages - 1}
+                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </ErrorBoundary>
         </Card>
       </div>
         </ScrollArea>
@@ -609,74 +616,79 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
           <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/50 transition-colors" />
           <ResizablePanel defaultSize={40} minSize={20}>
             <div className="h-full pl-2">
-              {selectedComponent ? (
-                <ComponentDetailPanel
-                  component={selectedComponent}
-                  analysis={analysis}
-                  onClose={() => setSelectedComponent(null)}
-                />
-              ) : (
-                <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
-                  <div className="flex items-center justify-between p-4 border-b flex-none">
-                    <div className="flex items-center gap-2">
-                      <Scale className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold text-lg breadcrumb">License Details</h3>
+              <ErrorBoundary 
+                resetKeys={[selectedComponent, selectedLicense]} 
+                fallback={<div className="h-full border-l flex items-center justify-center p-6 text-center text-muted-foreground text-sm">Details panel failed to load.</div>}
+              >
+                {selectedComponent ? (
+                  <ComponentDetailPanel
+                    component={selectedComponent as any}
+                    analysis={analysis}
+                    onClose={() => setSelectedComponent(null)}
+                  />
+                ) : (
+                  <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
+                    <div className="flex items-center justify-between p-4 border-b flex-none">
+                      <div className="flex items-center gap-2">
+                        <Scale className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold text-lg breadcrumb">License Details</h3>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => setSelectedLicense(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setSelectedLicense(null)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <ScrollArea className="flex-1">
-                    <div className="p-4 space-y-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">License ID</h4>
-                        <div className="text-xl font-bold font-mono">{selectedLicense.id}</div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Category</h4>
-                        <Badge 
-                          variant="secondary" 
-                          className="text-white border-0 uppercase"
-                          style={{ 
-                            backgroundColor: CATEGORY_COLORS[selectedLicense.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.unknown
-                          }}
-                        >
-                          {selectedLicense.category}
-                        </Badge>
-                      </div>
+                    <ScrollArea className="flex-1">
+                      <div className="p-4 space-y-6">
+                        <div>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">License ID</h4>
+                          <div className="text-xl font-bold font-mono">{(selectedLicense as any).id}</div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Category</h4>
+                          <Badge 
+                            variant="secondary" 
+                            className="text-white border-0 uppercase"
+                            style={{ 
+                              backgroundColor: CATEGORY_COLORS[(selectedLicense as any).category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.unknown
+                            }}
+                          >
+                            {(selectedLicense as any).category}
+                          </Badge>
+                        </div>
 
-                      <Separator />
+                        <Separator />
 
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                          <Network className="h-4 w-4" /> Affected Components ({selectedLicense.affectedCount})
-                        </h4>
-                        <div className="space-y-2">
-                          {displayStats.allLicenseComponents
-                            .filter(c => c.licenses.some((l: any) => l.id === selectedLicense.id))
-                            .slice(0, 15).map((comp: any, i: number) => (
-                              <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
-                                <span className="font-medium truncate mr-2">{comp.name}</span>
-                                <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
-                              </div>
-                            ))
-                          }
-                          {selectedLicense.affectedCount > 15 && (
-                            <p className="text-[10px] text-muted-foreground text-center">+ {selectedLicense.affectedCount - 15} more components</p>
-                          )}
+                        <div>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                            <Network className="h-4 w-4" /> Affected Components ({(selectedLicense as any).affectedCount})
+                          </h4>
+                          <div className="space-y-2">
+                            {displayStats.allLicenseComponents
+                              .filter(c => c.licenses.some((l: any) => l.id === (selectedLicense as any).id))
+                              .slice(0, 15).map((comp: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
+                                  <span className="font-medium truncate mr-2">{comp.name}</span>
+                                  <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
+                                </div>
+                              ))
+                            }
+                            {(selectedLicense as any).affectedCount > 15 && (
+                              <p className="text-[10px] text-muted-foreground text-center">+ {(selectedLicense as any).affectedCount - 15} more components</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 mt-auto">
+                          <Button className="w-full" variant="outline" onClick={() => window.open(`https://spdx.org/licenses/${(selectedLicense as any).id}.html`, '_blank', 'noopener,noreferrer')}>
+                            View SPDX License Terms
+                          </Button>
                         </div>
                       </div>
-
-                      <div className="pt-4 mt-auto">
-                        <Button className="w-full" variant="outline" onClick={() => window.open(`https://spdx.org/licenses/${selectedLicense.id}.html`, '_blank', 'noopener,noreferrer')}>
-                          View SPDX License Terms
-                        </Button>
-                      </div>
-                    </div>
-                  </ScrollArea>
-                </div>
-              )}
+                    </ScrollArea>
+                  </div>
+                )}
+              </ErrorBoundary>
             </div>
           </ResizablePanel>
         </>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSbomStats } from "../../hooks/useSbomStats";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
   ResponsiveContainer,
@@ -102,8 +103,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [cveSortDir, setCveSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
-  const [selectedComponent, setSelectedComponent] = useState<any | null>(null);
-  const [selectedVulnerability, setSelectedVulnerability] = useState<any | null>(null);
+  const [selectedComponent, setSelectedComponent] = useState<unknown | null>(null);
+  const [selectedVulnerability, setSelectedVulnerability] = useState<unknown | null>(null);
 
   const { analysis } = useDependencyAnalysis(sbom);
 
@@ -139,8 +140,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     }
 
     const sorted = [...list].sort((a, b) => {
-      const aVal = sortKey === "name" ? a.name : (a as any)[sortKey];
-      const bVal = sortKey === "name" ? b.name : (b as any)[sortKey];
+      const aVal = sortKey === "name" ? a.name : (a as Record<string, unknown>)[sortKey];
+      const bVal = sortKey === "name" ? b.name : (b as Record<string, unknown>)[sortKey];
       if (typeof aVal === "string" && typeof bVal === "string") {
         return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
@@ -164,8 +165,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     }
 
     const sorted = [...list].sort((a, b) => {
-      const aVal = (a as any)[cveSortKey];
-      const bVal = (b as any)[cveSortKey];
+      const aVal = (a as Record<string, unknown>)[cveSortKey];
+      const bVal = (b as Record<string, unknown>)[cveSortKey];
       if (typeof aVal === "string" && typeof bVal === "string") {
         return cveSortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
@@ -478,274 +479,276 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
 
         {/* Vulnerable Components Table */}
         <Card className="shadow-sm border-muted-foreground/10">
-          <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-3">
-                <CardTitle className="text-xl">
-                  {viewMode === "components" ? "Vulnerable Components" : "Unique Vulnerabilities"}
-                </CardTitle>
-                <Badge variant="outline" className="text-xs">
-                  {activeList.length} total
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {viewMode === "components" 
-                  ? "List of components with detected security issues" 
-                  : "Unique security vulnerabilities affecting your software"}
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-md">
-              <Button 
-                variant={viewMode === "components" ? "secondary" : "ghost"} 
-                size="sm"
-                className="text-xs h-8 px-3"
-                onClick={() => {
-                  setViewMode("components");
-                  setPage(0);
-                }}
-              >
-                By Component
-              </Button>
-              <Button 
-                variant={viewMode === "vulnerabilities" ? "secondary" : "ghost"} 
-                size="sm"
-                className="text-xs h-8 px-3"
-                onClick={() => {
-                  setViewMode("vulnerabilities");
-                  setPage(0);
-                }}
-              >
-                By Vulnerability
-              </Button>
-            </div>
-            
-            <div className="relative w-full max-w-xs ml-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={viewMode === "components" ? "Search components..." : "Search CVEs..."}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(0);
-                }}
-                className="pl-9"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="relative overflow-x-auto rounded-lg border">
-              <table className="w-full text-sm text-left">
-                {viewMode === "components" ? (
-                  <>
-                  <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
-                    <tr>
-                      <th className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          {renderSortHeader("Component", "name")}
-                          <HelpTooltip text="Name of the software component/package." />
-                        </div>
-                      </th>
-                      <th className="px-4 py-3">Version</th>
-                      <th className="px-4 py-3 text-center">
-                        {renderSortHeader("Critical", "critical")}
-                      </th>
-                      <th className="px-4 py-3 text-center">
-                        {renderSortHeader("High", "high")}
-                      </th>
-                      <th className="px-4 py-3 text-center">
-                        {renderSortHeader("Medium", "medium")}
-                      </th>
-                      <th className="px-4 py-3 text-center">
-                        {renderSortHeader("Low", "low")}
-                      </th>
-                      <th className="px-4 py-3 text-center">
-                        {renderSortHeader("Total", "total")}
-                      </th>
-                      <th className="px-4 py-3 text-right pr-6">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pageItems.map((comp: any, i) => (
-                      <tr
-                        key={`${comp.ref}-${i}`}
-                        className="border-b hover:bg-muted/50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-medium max-w-[200px] truncate" title={comp.name}>
-                          {comp.name}
-                        </td>
-                        <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.critical > 0 ? (
-                            <Badge variant="destructive" className="h-5 min-w-[20px] justify-center">
-                              {comp.critical}
-                            </Badge>
-                          ) : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.high > 0 ? (
-                            <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center">
-                              {comp.high}
-                            </Badge>
-                          ) : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.medium > 0 ? (
-                            <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center">
-                              {comp.medium}
-                            </Badge>
-                          ) : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {comp.low > 0 ? (
-                            <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white border-0 h-5 min-w-[20px] justify-center">
-                              {comp.low}
-                            </Badge>
-                          ) : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-center font-bold">{comp.total}</td>
-                        <td className="px-4 py-3 text-right pr-6">
-                          <Button
-                            variant="outline"
-                            size="xs"
-                            className="h-7 text-[10px]"
-                            onClick={() => {
-                              // Cross-reference with SBOM components to get the full object
-                              const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
-                              setSelectedComponent(fullComp || comp);
-                              setSelectedVulnerability(null);
-                            }}
-                          >
-                            Details
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  </>
-                ) : (
-                  <>
-                  <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
-                    <tr>
-                      <th className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          {renderSortHeader("Vulnerability ID", "id")}
-                          <HelpTooltip text="Common Vulnerabilities and Exposures (CVE) or GitHub Security Advisory (GHSA) identifier." />
-                        </div>
-                      </th>
-                      <th className="px-4 py-3">Severity</th>
-                      <th className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          {renderSortHeader("Affected Components", "affectedCount")}
-                          <HelpTooltip text="Number of components affected by this specific vulnerability." />
-                        </div>
-                      </th>
-                      <th className="px-4 py-3">Description</th>
-                      <th className="px-4 py-3 text-right pr-6">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pageItems.map((vuln: any, i) => (
-                      <tr
-                        key={`${vuln.id}-${i}`}
-                        className="border-b hover:bg-muted/50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-bold font-mono text-xs text-destructive">
-                          {vuln.id.startsWith('CVE-') ? (
-                            <a 
-                              href={`https://nvd.nist.gov/vuln/detail/${vuln.id}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="hover:underline flex items-center gap-1"
-                            >
-                              {vuln.id}
-                            </a>
-                          ) : vuln.id}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge 
-                            variant="secondary" 
-                            className="text-white border-0 h-5"
-                            style={{ 
-                              backgroundColor: SEVERITY_COLORS[vuln.severity.charAt(0).toUpperCase() + vuln.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
-                            }}
-                          >
-                            {vuln.severity}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center font-bold">
-                          {vuln.affectedCount}
-                        </td>
-                        <td className="px-4 py-3 max-w-[300px] truncate text-muted-foreground italic text-xs" title={vuln.title}>
-                          {vuln.title || "No description provided"}
-                        </td>
-                        <td className="px-4 py-3 text-right pr-6">
-                          <Button 
-                            variant="outline" 
-                            size="xs" 
-                            className="h-7 text-[10px]"
-                            onClick={() => {
-                              setSelectedVulnerability(vuln);
-                              setSelectedComponent(null);
-                            }}
-                          >
-                            Details
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  </>
-                )}
-                
-                {activeList.length === 0 && (
-                  <tbody>
-                    <tr>
-                      <td colSpan={viewMode === "components" ? 7 : 5} className="px-4 py-12 text-center">
-                        <div className="space-y-2">
-                          <ShieldCheck className="h-10 w-10 text-green-500 mx-auto" />
-                          <p className="text-muted-foreground text-sm font-medium">
-                            {searchQuery ? "No results match your search." : "No vulnerabilities detected — all components are secure!"}
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                )}
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-xs text-muted-foreground">
-                  Showing {page * ITEMS_PER_PAGE + 1}–{Math.min((page + 1) * ITEMS_PER_PAGE, activeList.length)} of{" "}
-                  {activeList.length} {viewMode === "components" ? "components" : "vulnerabilities"}
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page === 0}
-                    onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Page {page + 1} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= totalPages - 1}
-                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
+          <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">Vulnerabilities list unavailable due to a rendering error.</div>}>
+            <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-xl">
+                    {viewMode === "components" ? "Vulnerable Components" : "Unique Vulnerabilities"}
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    {activeList.length} total
+                  </Badge>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  {viewMode === "components" 
+                    ? "List of components with detected security issues" 
+                    : "Unique security vulnerabilities affecting your software"}
+                </p>
               </div>
-            )}
-          </CardContent>
+              
+              <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-md">
+                <Button 
+                  variant={viewMode === "components" ? "secondary" : "ghost"} 
+                  size="sm"
+                  className="text-xs h-8 px-3"
+                  onClick={() => {
+                    setViewMode("components");
+                    setPage(0);
+                  }}
+                >
+                  By Component
+                </Button>
+                <Button 
+                  variant={viewMode === "vulnerabilities" ? "secondary" : "ghost"} 
+                  size="sm"
+                  className="text-xs h-8 px-3"
+                  onClick={() => {
+                    setViewMode("vulnerabilities");
+                    setPage(0);
+                  }}
+                >
+                  By Vulnerability
+                </Button>
+              </div>
+              
+              <div className="relative w-full max-w-xs ml-auto">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={viewMode === "components" ? "Search components..." : "Search CVEs..."}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(0);
+                  }}
+                  className="pl-9"
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="relative overflow-x-auto rounded-lg border">
+                <table className="w-full text-sm text-left">
+                  {viewMode === "components" ? (
+                    <>
+                    <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
+                      <tr>
+                        <th className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            {renderSortHeader("Component", "name")}
+                            <HelpTooltip text="Name of the software component/package." />
+                          </div>
+                        </th>
+                        <th className="px-4 py-3">Version</th>
+                        <th className="px-4 py-3 text-center">
+                          {renderSortHeader("Critical", "critical")}
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          {renderSortHeader("High", "high")}
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          {renderSortHeader("Medium", "medium")}
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          {renderSortHeader("Low", "low")}
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          {renderSortHeader("Total", "total")}
+                        </th>
+                        <th className="px-4 py-3 text-right pr-6">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pageItems.map((comp: any, i) => (
+                        <tr
+                          key={`${comp.ref}-${i}`}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="px-4 py-3 font-medium max-w-[200px] truncate" title={comp.name}>
+                            {comp.name}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.critical > 0 ? (
+                              <Badge variant="destructive" className="h-5 min-w-[20px] justify-center">
+                                {comp.critical}
+                              </Badge>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.high > 0 ? (
+                              <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center">
+                                {comp.high}
+                              </Badge>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.medium > 0 ? (
+                              <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center">
+                                {comp.medium}
+                              </Badge>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {comp.low > 0 ? (
+                              <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white border-0 h-5 min-w-[20px] justify-center">
+                                {comp.low}
+                              </Badge>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-center font-bold">{comp.total}</td>
+                          <td className="px-4 py-3 text-right pr-6">
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              className="h-7 text-[10px]"
+                              onClick={() => {
+                                // Cross-reference with SBOM components to get the full object
+                                const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
+                                setSelectedComponent(fullComp || comp);
+                                setSelectedVulnerability(null);
+                              }}
+                            >
+                              Details
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    </>
+                  ) : (
+                    <>
+                    <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
+                      <tr>
+                        <th className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            {renderSortHeader("Vulnerability ID", "id")}
+                            <HelpTooltip text="Common Vulnerabilities and Exposures (CVE) or GitHub Security Advisory (GHSA) identifier." />
+                          </div>
+                        </th>
+                        <th className="px-4 py-3">Severity</th>
+                        <th className="px-4 py-3 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            {renderSortHeader("Affected Components", "affectedCount")}
+                            <HelpTooltip text="Number of components affected by this specific vulnerability." />
+                          </div>
+                        </th>
+                        <th className="px-4 py-3">Description</th>
+                        <th className="px-4 py-3 text-right pr-6">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pageItems.map((vuln: any, i) => (
+                        <tr
+                          key={`${vuln.id}-${i}`}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="px-4 py-3 font-bold font-mono text-xs text-destructive">
+                            {vuln.id.startsWith('CVE-') ? (
+                              <a 
+                                href={`https://nvd.nist.gov/vuln/detail/${vuln.id}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hover:underline flex items-center gap-1"
+                              >
+                                {vuln.id}
+                              </a>
+                            ) : vuln.id}
+                          </td>
+                          <td className="px-4 py-3">
+                            <Badge 
+                              variant="secondary" 
+                              className="text-white border-0 h-5"
+                              style={{ 
+                                backgroundColor: SEVERITY_COLORS[vuln.severity.charAt(0).toUpperCase() + vuln.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
+                              }}
+                            >
+                              {vuln.severity}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-center font-bold">
+                            {vuln.affectedCount}
+                          </td>
+                          <td className="px-4 py-3 max-w-[300px] truncate text-muted-foreground italic text-xs" title={vuln.title}>
+                            {vuln.title || "No description provided"}
+                          </td>
+                          <td className="px-4 py-3 text-right pr-6">
+                            <Button 
+                              variant="outline" 
+                              size="xs" 
+                              className="h-7 text-[10px]"
+                              onClick={() => {
+                                setSelectedVulnerability(vuln);
+                                setSelectedComponent(null);
+                              }}
+                            >
+                              Details
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    </>
+                  )}
+                  
+                  {activeList.length === 0 && (
+                    <tbody>
+                      <tr>
+                        <td colSpan={viewMode === "components" ? 7 : 5} className="px-4 py-12 text-center">
+                          <div className="space-y-2">
+                            <ShieldCheck className="h-10 w-10 text-green-500 mx-auto" />
+                            <p className="text-muted-foreground text-sm font-medium">
+                              {searchQuery ? "No results match your search." : "No vulnerabilities detected — all components are secure!"}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  )}
+                </table>
+              </div>
+  
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-xs text-muted-foreground">
+                    Showing {page * ITEMS_PER_PAGE + 1}–{Math.min((page + 1) * ITEMS_PER_PAGE, activeList.length)} of{" "}
+                    {activeList.length} {viewMode === "components" ? "components" : "vulnerabilities"}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page === 0}
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Page {page + 1} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page >= totalPages - 1}
+                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </ErrorBoundary>
         </Card>
       </div>
         </ScrollArea>
@@ -756,96 +759,96 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/50 transition-colors" />
           <ResizablePanel defaultSize={40} minSize={20}>
             <div className="h-full pl-2">
-              {selectedComponent ? (
-                <ComponentDetailPanel
-                  component={selectedComponent}
-                  analysis={analysis}
-                  onClose={() => setSelectedComponent(null)}
-                />
-              ) : (
-                <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
-                  <div className="flex items-center justify-between p-4 border-b flex-none">
-                    <div className="flex items-center gap-2">
-                      <ShieldAlert className="h-5 w-5 text-destructive" />
-                      <h3 className="font-semibold text-lg breadcrumb">Vulnerability Details</h3>
+              <ErrorBoundary 
+                resetKeys={[selectedComponent, selectedVulnerability]} 
+                fallback={<div className="h-full border-l flex items-center justify-center p-6 text-center text-muted-foreground text-sm">Details panel failed to load.</div>}
+              >
+                {selectedComponent ? (
+                  <ComponentDetailPanel
+                    component={selectedComponent as any}
+                    analysis={analysis}
+                    onClose={() => setSelectedComponent(null)}
+                  />
+                ) : (
+                  <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
+                    <div className="flex items-center justify-between p-4 border-b flex-none">
+                      <div className="flex items-center gap-2">
+                        <ShieldAlert className="h-5 w-5 text-destructive" />
+                        <h3 className="font-semibold text-lg breadcrumb">Vulnerability Details</h3>
+                      </div>
+                      <Button aria-label="Close" variant="ghost" size="icon" onClick={() => setSelectedVulnerability(null)}>
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setSelectedVulnerability(null)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <ScrollArea className="flex-1">
-                    <div className="p-4 space-y-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">ID</h4>
-                        <div className="text-xl font-bold font-mono text-destructive">{selectedVulnerability.id}</div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Severity</h4>
-                        <Badge 
-                          variant="secondary" 
-                          className="text-white border-0"
-                          style={{ 
-                            backgroundColor: SEVERITY_COLORS[selectedVulnerability.severity.charAt(0).toUpperCase() + selectedVulnerability.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
-                          }}
-                        >
-                          {selectedVulnerability.severity}
-                        </Badge>
-                      </div>
-
-                      {selectedVulnerability.title && (
+                    <ScrollArea className="flex-1">
+                      <div className="p-4 space-y-6">
                         <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
-                          <p className="text-sm leading-relaxed">{selectedVulnerability.title}</p>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">ID</h4>
+                          <div className="text-xl font-bold font-mono text-destructive">{(selectedVulnerability as any).id}</div>
                         </div>
-                      )}
-
-                      <Separator />
-
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                          <Network className="h-4 w-4" /> Affected Components ({selectedVulnerability.affectedCount})
-                        </h4>
-                        <div className="space-y-2">
-                          {displayStats.allVulnerableComponents
-                            .filter(c => {
-                               // This is a bit complex as we need to know if this specific vuln affects this component
-                               // In useSbomStats, we didn't preserve the mapping back from vuln to component in a simple way for the UI
-                               // But we can check if the component ref is in the vulnSummaryMap's affectedRefs
-                               // Actually, the stats object we have here is already processed.
-                               // Let's rely on the sbom itself if needed, or just list names if available.
-                               // For now, let's just show the count or a simple list if we can find them.
-                               return true; // Placeholder: we'd need to re-scan or improve stats
-                            })
-                            .slice(0, 10).map((comp: any, i: number) => (
-                              <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
-                                <span className="font-medium truncate mr-2">{comp.name}</span>
-                                <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
-                              </div>
-                            ))
-                          }
-                          {selectedVulnerability.affectedCount > 10 && (
-                            <p className="text-[10px] text-muted-foreground text-center">+ {selectedVulnerability.affectedCount - 10} more components</p>
-                          )}
+                        
+                        <div>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Severity</h4>
+                          <Badge 
+                            variant="secondary" 
+                            className="text-white border-0"
+                            style={{ 
+                              backgroundColor: SEVERITY_COLORS[(selectedVulnerability as any).severity.charAt(0).toUpperCase() + (selectedVulnerability as any).severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
+                            }}
+                          >
+                            {(selectedVulnerability as any).severity}
+                          </Badge>
                         </div>
+
+                        {((selectedVulnerability as any).title) && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
+                            <p className="text-sm leading-relaxed">{(selectedVulnerability as any).title}</p>
+                          </div>
+                        )}
+
+                        <Separator />
+
+                        <div>
+                          <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                            <Network className="h-4 w-4" /> Affected Components ({(selectedVulnerability as any).affectedCount})
+                          </h4>
+                          <div className="space-y-2">
+                            {displayStats.allVulnerableComponents
+                              .filter(c => {
+                                 // This is a bit complex as we need to know if this specific vuln affects this component
+                                 return true; // Placeholder
+                              })
+                              .slice(0, 10).map((comp: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
+                                  <span className="font-medium truncate mr-2">{comp.name}</span>
+                                  <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
+                                </div>
+                              ))
+                            }
+                            {(selectedVulnerability as any).affectedCount > 10 && (
+                              <p className="text-[10px] text-muted-foreground text-center">+ {(selectedVulnerability as any).affectedCount - 10} more components</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {(selectedVulnerability as any).id.startsWith('CVE-') && (
+                          <div className="pt-4 mt-auto">
+                              <a 
+                                href={`https://nvd.nist.gov/vuln/detail/${(selectedVulnerability as any).id}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-9 px-4 text-sm font-medium hover:bg-primary/90 transition-colors"
+                              >
+                                View on NVD
+                              </a>
+                          </div>
+                        )}
                       </div>
-
-                      {selectedVulnerability.id.startsWith('CVE-') && (
-                        <div className="pt-4 mt-auto">
-                            <a 
-                              href={`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.id}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-9 px-4 text-sm font-medium hover:bg-primary/90 transition-colors"
-                            >
-                              View on NVD
-                            </a>
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-              )}
+                    </ScrollArea>
+                  </div>
+                )}
+              </ErrorBoundary>
             </div>
           </ResizablePanel>
         </>
