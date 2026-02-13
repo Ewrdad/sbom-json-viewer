@@ -1,0 +1,115 @@
+import { describe, it, expect } from 'vitest';
+import { calculateSbomStats } from './statsUtils';
+
+describe('statsUtils Dependency Analysis', () => {
+    it('should correctly count dependents from standard JSON top-level dependencies', () => {
+        const bom = {
+            components: [
+                { "bom-ref": "pkg1", name: "Package 1", version: "1.0.0" },
+                { "bom-ref": "pkg2", name: "Package 2", version: "1.0.0" },
+                { "bom-ref": "pkg3", name: "Package 3", version: "1.0.0" }
+            ],
+            dependencies: [
+                { ref: "pkg1", dependsOn: ["pkg2", "pkg3"] },
+                { ref: "pkg2", dependsOn: ["pkg3"] }
+            ],
+            vulnerabilities: []
+        };
+
+        const stats = calculateSbomStats(bom);
+        
+        // Dependents counts:
+        // pkg3 <- pkg1, pkg2 (2 dependents)
+        // pkg2 <- pkg1 (1 dependent)
+        // pkg1 <- (0 dependents)
+
+        expect(stats.dependentsDistribution[0]).toBe(1); // pkg1
+        expect(stats.dependentsDistribution[1]).toBe(1); // pkg2
+        expect(stats.dependentsDistribution[2]).toBe(1); // pkg3
+    });
+
+    it('should correctly count dependents from legacy component-level dependencies (fallback)', () => {
+        const bom = {
+            components: [
+                { 
+                    "bom-ref": "pkg1", 
+                    name: "Package 1", 
+                    version: "1.0.0",
+                    dependencies: ["pkg2"] 
+                },
+                { 
+                    "bom-ref": "pkg2", 
+                    name: "Package 2", 
+                    version: "1.0.0",
+                    dependencies: []
+                }
+            ],
+            vulnerabilities: []
+        };
+
+        const stats = calculateSbomStats(bom);
+        
+        expect(stats.dependentsDistribution[0]).toBe(1); // pkg1
+        expect(stats.dependentsDistribution[1]).toBe(1); // pkg2
+    });
+
+    it('should handle Sets/Iterables in component dependencies (Library Model)', () => {
+        // Simulating the CycloneDX library behavior where dependencies are Sets of objects/refs
+        const bom = {
+            components: [
+                { 
+                    "bom-ref": "pkg1", 
+                    name: "Package 1", 
+                    version: "1.0.0",
+                    dependencies: new Set([{ value: "pkg2" }, { value: "pkg3" }])
+                },
+                { 
+                    "bom-ref": "pkg2", 
+                    name: "Package 2", 
+                    version: "1.0.0",
+                    dependencies: new Set([{ value: "pkg3" }])
+                },
+                { 
+                    "bom-ref": "pkg3", 
+                    name: "Package 3", 
+                    version: "1.0.0",
+                    dependencies: new Set()
+                }
+            ],
+            vulnerabilities: []
+        };
+
+        const stats = calculateSbomStats(bom);
+        
+        expect(stats.dependentsDistribution[0]).toBe(1); // pkg1
+        expect(stats.dependentsDistribution[1]).toBe(1); // pkg2
+        expect(stats.dependentsDistribution[2]).toBe(1); // pkg3
+    });
+
+    it('should correctly link root component to direct dependencies if metadata is present', () => {
+        // This test verifies logic often handled in bomConverter but also implicit in graph traversal
+        const bom = {
+            metadata: {
+                component: { "bom-ref": "root-app", name: "Root App", version: "1.0.0" }
+            },
+            components: [
+                { "bom-ref": "pkg1", name: "Package 1", version: "1.0.0" }
+            ],
+            dependencies: [
+                { ref: "root-app", dependsOn: ["pkg1"] }
+            ],
+            vulnerabilities: []
+        };
+
+        const stats = calculateSbomStats(bom);
+
+        // pkg1 has 1 dependent (root-app)
+        // root-app has 0 dependents (it's the root)
+        
+        expect(stats.dependentsDistribution[1]).toBe(1); // pkg1
+        
+        // Check if root is counted in distribution (stats logic iterates over `components` prop + metadata root is separate logic sometimes)
+        // In statsUtils, we iterate over `components`. If root is not in `components`, it won't be in distribution counts unless added there.
+        // `calculateSbomStats` iterates over `components`.
+    });
+});

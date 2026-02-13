@@ -314,14 +314,14 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
               <div class="card-subtext">${stats.uniqueVulnerabilityCount} Unique CVEs</div>
             </div>
             <div class="card">
-              <div class="card-title">Exposure Rate</div>
-              <div class="card-value">${stats.exposureRate}%</div>
-              <div class="card-subtext">${stats.allVulnerableComponents.length} impacted</div>
-            </div>
-            <div class="card">
               <div class="card-title">Secure Components</div>
               <div class="card-value">${secureComponents}</div>
               <div class="card-subtext">No known issues</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Unique Licenses</div>
+              <div class="card-value">${stats.allLicenses.length}</div>
+              <div class="card-subtext">License variations</div>
             </div>
           </div>
 
@@ -355,6 +355,104 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
               </div>
             </div>
 
+            <!-- Dependency Tiers Pie Chart -->
+            <div class="card">
+              <h2 class="section-title">Dependency Tiers</h2>
+              <div class="license-dist">
+                <div class="pie-wrapper">
+                  ${(() => {
+                    const data = [
+                      { 
+                        name: "None (Leaf)", 
+                        value: stats.dependentsDistribution[0] || 0, 
+                        color: "#94a3b8" 
+                      },
+                      { 
+                        name: "1 Dependent", 
+                        value: stats.dependentsDistribution[1] || 0, 
+                        color: "#60a5fa" 
+                      },
+                      { 
+                        name: "2-5 Dependents", 
+                        value: Object.entries(stats.dependentsDistribution)
+                          .filter(([count]) => parseInt(count) >= 2 && parseInt(count) <= 5)
+                          .reduce((sum, [, count]) => sum + count, 0),
+                        color: "#3b82f6" 
+                      },
+                      { 
+                        name: "6+ Dependents", 
+                        value: Object.entries(stats.dependentsDistribution)
+                          .filter(([count]) => parseInt(count) >= 6)
+                          .reduce((sum, [, count]) => sum + count, 0),
+                        color: "#2563eb" 
+                      },
+                    ].filter(d => d.value > 0);
+                    
+                    if (data.length === 0) return `<div style="color:#94a3b8; font-size:13px;">No dependency data</div>`;
+                    
+                    const total = data.reduce((acc, d) => acc + d.value, 0);
+                    let accumulatedAngle = 0;
+                    
+                    const paths = data.map(d => {
+                      const percentage = d.value / total;
+                      const angle = percentage * 360;
+                      const startAngle = accumulatedAngle;
+                      const endAngle = accumulatedAngle + angle;
+                      
+                      const x1 = 50 + 50 * Math.cos(Math.PI * (startAngle - 90) / 180);
+                      const y1 = 50 + 50 * Math.sin(Math.PI * (startAngle - 90) / 180);
+                      const x2 = 50 + 50 * Math.cos(Math.PI * (endAngle - 90) / 180);
+                      const y2 = 50 + 50 * Math.sin(Math.PI * (endAngle - 90) / 180);
+                      
+                      const largeArcFlag = angle > 180 ? 1 : 0;
+                      const pathData = `M 50 50 L ${x1} ${y1} A 50 50 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+                      
+                      accumulatedAngle += angle;
+                      return `<path d="${pathData}" fill="${d.color}" stroke="#ffffff" stroke-width="1.5"></path>`;
+                    }).join('');
+                    
+                    return `<svg viewBox="0 0 100 100" class="pie-chart">${paths}</svg>`;
+                  })()}
+                </div>
+                <div class="legend-grid">
+                  ${[
+                    { 
+                      name: "None (Leaf)", 
+                      value: stats.dependentsDistribution[0] || 0, 
+                      color: "#94a3b8" 
+                    },
+                    { 
+                      name: "1 Dependent", 
+                      value: stats.dependentsDistribution[1] || 0, 
+                      color: "#60a5fa" 
+                    },
+                    { 
+                      name: "2-5 Dependents", 
+                      value: Object.entries(stats.dependentsDistribution)
+                        .filter(([count]) => parseInt(count) >= 2 && parseInt(count) <= 5)
+                        .reduce((sum, [, count]) => sum + count, 0),
+                      color: "#3b82f6" 
+                    },
+                    { 
+                      name: "6+ Dependents", 
+                      value: Object.entries(stats.dependentsDistribution)
+                        .filter(([count]) => parseInt(count) >= 6)
+                        .reduce((sum, [, count]) => sum + count, 0),
+                      color: "#2563eb" 
+                    },
+                  ].filter(d => d.value > 0).map(d => `
+                    <div class="legend-item">
+                      <span class="legend-dot" style="background-color: ${d.color}"></span>
+                      <span class="legend-name">${d.name}</span>
+                      <span class="legend-pct" style="font-weight:bold; color:#0f172a;">${d.value}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-grid">
             <!-- License Distribution Pie Chart -->
             <div class="card">
               <h2 class="section-title">License Distribution</h2>
@@ -412,9 +510,7 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="content-grid" style="grid-template-columns: 1fr 1fr;">
              <!-- Top Licenses -->
             <div class="card">
               <h2 class="section-title">Top Licenses</h2>
@@ -435,11 +531,6 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
                 }).join('')}
                 ${stats.topLicenses.length === 0 ? '<p style="color:#94a3b8; font-size:13px; text-align:center; padding: 20px 0;">No license data found.</p>' : ''}
               </div>
-            </div>
-
-            <!-- Empty slot or more info -->
-            <div class="card" style="border: 1px dashed #e2e8f0; background: transparent; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 13px;">
-              Component vulnerability and license audit summary.
             </div>
           </div>
 

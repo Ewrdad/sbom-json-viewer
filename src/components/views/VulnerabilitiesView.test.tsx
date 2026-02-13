@@ -37,8 +37,10 @@ const mockStats: SbomStats = {
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 3,
-    exposureRate: 3,
     avgVulnerabilitiesPerComponent: 0.5,
+    dependencyStats: { direct: 30, transitive: 70 },
+    dependentsDistribution: { 0: 30, 1: 40, 5: 30 },
+    vulnerabilityImpactDistribution: { 0: 10, 1: 20, 5: 20 },
 };
 
 const emptyStats: SbomStats = {
@@ -54,17 +56,20 @@ const emptyStats: SbomStats = {
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
-    exposureRate: 0,
     avgVulnerabilitiesPerComponent: 0,
+    dependencyStats: { direct: 50, transitive: 0 },
+    dependentsDistribution: { 0: 50 },
+    vulnerabilityImpactDistribution: {},
 };
 
 describe('VulnerabilitiesView', () => {
     it('should render KPI cards with correct counts', () => {
         render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
 
-        expect(screen.getByText('Vulnerability Findings')).toBeInTheDocument();
+        expect(screen.getByText('Total Findings')).toBeInTheDocument();
         expect(screen.getByText('50')).toBeInTheDocument();
-        expect(screen.getByText(/3 unique CVEs/i)).toBeInTheDocument();
+        expect(screen.getByText('Unique CVEs')).toBeInTheDocument();
+        expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
 
         // Use a more resilient way to find severity counts: find the label and ensure the count is nearby
         // or just check that they exist in the document.

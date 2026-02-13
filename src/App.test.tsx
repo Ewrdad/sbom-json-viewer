@@ -60,6 +60,9 @@ vi.mock("./components/views/DependencyTree", () => ({
 vi.mock("./components/views/VulnerabilitiesView", () => ({
   VulnerabilitiesView: () => <div data-testid="vulnerabilities-view">Vulnerabilities View</div>,
 }));
+vi.mock("./components/views/ReverseDependencyTree", () => ({
+  ReverseDependencyTree: () => <div data-testid="reverse-tree-view">Reverse Tree View</div>,
+}));
 
 // Mock Lucide icons
 vi.mock("lucide-react", () => ({
@@ -84,6 +87,9 @@ vi.mock("lucide-react", () => ({
   FileText: () => <div />,
   Shield: () => <div />,
   X: () => <div />,
+  GitGraph: () => <div />,
+  Layers: () => <div />,
+  ArrowRight: () => <div />,
 }));
 
 // Polyfill Worker
@@ -112,10 +118,10 @@ class MockWorker {
         const mockResult = {
           bom: json, // Simple pass through for mock
           formatted: {
-            // Minimal structure for DependencyTree
-            components: [],
-            dependencyMap: {},
-            inverseDependencyMap: {}
+            componentMap: {},
+            dependencyGraph: {},
+            dependentsGraph: {},
+            topLevelRefs: []
           },
           stats: {
             totalComponents: json.components?.length || 0,

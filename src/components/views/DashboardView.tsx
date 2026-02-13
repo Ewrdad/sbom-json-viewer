@@ -15,7 +15,7 @@ import {
   PieChart,
   Cell,
 } from "recharts";
-import { ShieldAlert, ShieldCheck, Package } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Package, Fingerprint, Scale } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
@@ -54,8 +54,10 @@ export function DashboardView({
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
-    exposureRate: 0,
     avgVulnerabilitiesPerComponent: 0,
+    dependencyStats: { direct: 0, transitive: 0 },
+    dependentsDistribution: {},
+    vulnerabilityImpactDistribution: {},
   };
 
   const vulnData = [
@@ -91,6 +93,33 @@ export function DashboardView({
 
   const totalLicenseCount = Object.values(displayStats.licenseDistribution).reduce((a, b) => a + b, 0);
 
+  const dependencyData = [
+    { 
+      name: "None (Leaf)", 
+      value: displayStats.dependentsDistribution[0] || 0, 
+      fill: "#94a3b8" 
+    },
+    { 
+      name: "1 Dependent", 
+      value: displayStats.dependentsDistribution[1] || 0, 
+      fill: "#60a5fa" 
+    },
+    { 
+      name: "2-5 Dependents", 
+      value: Object.entries(displayStats.dependentsDistribution)
+        .filter(([count]) => parseInt(count) >= 2 && parseInt(count) <= 5)
+        .reduce((sum, [, count]) => sum + count, 0),
+      fill: "#3b82f6" 
+    },
+    { 
+      name: "6+ Dependents (Hubs)", 
+      value: Object.entries(displayStats.dependentsDistribution)
+        .filter(([count]) => parseInt(count) >= 6)
+        .reduce((sum, [, count]) => sum + count, 0),
+      fill: "#2563eb" 
+    },
+  ].filter(d => d.value > 0);
+
   return (
     <ScrollArea className="h-full">
       <div className="pb-6 space-y-6 animate-in fade-in duration-500">
@@ -104,7 +133,7 @@ export function DashboardView({
         </div>
 
         {/* KPI Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -131,31 +160,25 @@ export function DashboardView({
               <div className="text-2xl font-bold text-destructive">
                 {displayStats.totalVulnerabilities}
               </div>
-              <div className="flex items-center gap-1.5 mt-1">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-                  {displayStats.uniqueVulnerabilityCount} Unique CVEs
-                </p>
-                <HelpTooltip text="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions." />
-              </div>
+              <p className="text-xs text-muted-foreground">Total package hits</p>
             </CardContent>
           </Card>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                Exposure Rate
-                <HelpTooltip text="Percentage of components that have at least one known vulnerability." />
+              <CardTitle className="text-sm font-medium">
+                Unique CVEs
               </CardTitle>
-              <ShieldCheck className="h-4 w-4 text-green-600" />
+              <Fingerprint className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {displayStats.exposureRate}%
+              <div className="text-2xl font-bold text-orange-500">
+                {displayStats.uniqueVulnerabilityCount}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {displayStats.allVulnerableComponents.length} of {displayStats.totalComponents} impacted
-              </p>
+              <p className="text-xs text-muted-foreground">Distinct issues</p>
             </CardContent>
           </Card>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -171,11 +194,27 @@ export function DashboardView({
               <p className="text-xs text-muted-foreground">No known issues</p>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Unique Licenses
+              </CardTitle>
+              <Scale className="h-4 w-4 text-indigo-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {displayStats.allLicenses.length}
+              </div>
+              <p className="text-xs text-muted-foreground">License variations</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Charts Section */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4 shadow-sm border-muted-foreground/10">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
+          {/* Severity Chart */}
+          <Card className="lg:col-span-8 shadow-sm border-muted-foreground/10">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 Vulnerability Severity
@@ -207,11 +246,57 @@ export function DashboardView({
             </CardContent>
           </Card>
 
-          <Card className="col-span-3 shadow-sm border-muted-foreground/10">
+          {/* Dependency Composition */}
+          <Card className="lg:col-span-4 shadow-sm border-muted-foreground/10">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                Dependency Centrality
+                <HelpTooltip text="Shows how many other components depend on each package. High numbers indicate critical hubs." />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={dependencyData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {dependencyData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={CHART_TOOLTIP_STYLE}
+                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-2 mt-6">
+                {dependencyData.map((entry) => (
+                  <div key={entry.name} className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.fill }} />
+                    <span className="text-xs font-medium">{entry.name}</span>
+                    <span className="text-xs font-bold ml-auto">{entry.value}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* License Pie Chart */}
+          <Card className="lg:col-span-12 xl:col-span-4 shadow-sm border-muted-foreground/10">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-xl flex items-center gap-2">
                 License Distribution
-                <HelpTooltip text="Breakdown of components by license type (Permissive, Copyleft, etc.)." />
+                <HelpTooltip text="Breakdown of components by license type." />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -243,8 +328,8 @@ export function DashboardView({
                 {licenseDistData.map((entry) => (
                   <div key={entry.name} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-xs font-medium">{entry.name}</span>
-                    <span className="text-xs text-muted-foreground ml-auto">
+                    <span className="text-[10px] font-medium truncate">{entry.name}</span>
+                    <span className="text-[10px] text-muted-foreground ml-auto">
                       {Math.round((entry.value / (totalLicenseCount || 1)) * 100)}%
                     </span>
                   </div>
@@ -253,11 +338,11 @@ export function DashboardView({
             </CardContent>
           </Card>
 
-          <Card className="col-span-3 shadow-sm border-muted-foreground/10">
+          {/* Top Licenses */}
+          <Card className="lg:col-span-6 xl:col-span-4 shadow-sm border-muted-foreground/10">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 Top Licenses
-                <HelpTooltip text="Most frequently used licenses across all components." />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -285,6 +370,43 @@ export function DashboardView({
                 {displayStats.topLicenses.length === 0 && (
                   <p className="text-muted-foreground text-sm text-center py-8">
                     No license data found.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Impactful CVEs */}
+          <Card className="lg:col-span-6 xl:col-span-4 shadow-sm border-muted-foreground/10">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                Impactful CVEs
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {displayStats.allVulnerabilities.slice(0, 5).map((vuln) => (
+                  <div key={vuln.id} className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">
+                          {vuln.severity}
+                        </Badge>
+                        <p className="text-sm font-bold leading-none">{vuln.id}</p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1 max-w-[180px]">
+                        {vuln.title || "No description available"}
+                      </p>
+                    </div>
+                    <div className="text-xs text-right">
+                      <span className="font-bold">{vuln.affectedCount}</span>
+                      <p className="text-[10px] text-muted-foreground">affects</p>
+                    </div>
+                  </div>
+                ))}
+                {displayStats.allVulnerabilities.length === 0 && (
+                  <p className="text-muted-foreground text-sm text-center py-8">
+                    No vulnerabilities found.
                   </p>
                 )}
               </div>

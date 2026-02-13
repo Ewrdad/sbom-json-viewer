@@ -1,6 +1,7 @@
 import { Bom, BomRef, Component } from "@cyclonedx/cyclonedx-library/Models";
 import { batchProcess, tick } from "./asyncUtils";
 
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const convertJsonToBom = async (
   rawJson: Record<string, any>,
@@ -64,16 +65,24 @@ export const convertJsonToBom = async (
   const dependenciesArray = Array.isArray(rawJson.dependencies)
     ? rawJson.dependencies
     : [];
+  
+  // Link metadata component if not in dependenciesArray
+  const rootRef = rawJson.metadata?.component?.["bom-ref"] || rawJson.metadata?.component?.bomRef;
+  const rootComponent = bom.metadata?.component;
+
+  if (rootRef && rootComponent && !dependenciesArray.some(d => d.ref === rootRef)) {
+    // If we have direct components, the root depends on them
+    const directRefs = componentsArray.map((c: any) => c["bom-ref"] || c.bomRef).filter(Boolean);
+    directRefs.forEach((r: string) => rootComponent.dependencies.add(new BomRef(r)));
+  }
+
   await batchProcess(dependenciesArray, (dep: Record<string, any>) => {
+    const childRefs = (dep.dependsOn || []).map((r: string) => new BomRef(r));
+    
+    // Link to component object
     const component = componentLookup.get(dep.ref);
     if (component) {
-      if (Array.isArray(dep.dependsOn)) {
-        dep.dependsOn.forEach((depRef: string) => {
-          if (typeof depRef === "string") {
-            component.dependencies.add(new BomRef(depRef));
-          }
-        });
-      }
+      childRefs.forEach(cr => component.dependencies.add(cr));
     }
   });
 

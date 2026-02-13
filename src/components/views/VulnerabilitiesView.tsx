@@ -21,6 +21,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   AlertTriangle,
+  Fingerprint,
   Search,
   ChevronLeft,
   ChevronRight,
@@ -72,8 +73,10 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
-    exposureRate: 0,
     avgVulnerabilitiesPerComponent: 0,
+    dependencyStats: { direct: 0, transitive: 0 },
+    dependentsDistribution: {},
+    vulnerabilityImpactDistribution: {},
   };
 
   const displayStats: SbomStats = {
@@ -199,16 +202,33 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     { name: "Low", count: low, fill: SEVERITY_COLORS.Low },
   ];
 
-  const componentsBySeverity = {
-    critical: displayStats.allVulnerableComponents.filter(c => (c as any).critical > 0).length,
-    high: displayStats.allVulnerableComponents.filter(c => (c as any).high > 0).length,
-    medium: displayStats.allVulnerableComponents.filter(c => (c as any).medium > 0).length,
-    low: displayStats.allVulnerableComponents.filter(c => (c as any).low > 0).length,
-  };
 
-  const affectedPct = displayStats.totalComponents > 0
-    ? Math.round((displayStats.allVulnerableComponents.length / displayStats.totalComponents) * 100)
-    : 0;
+  const originData = [
+    { 
+      name: "None (Leaf)", 
+      value: displayStats.vulnerabilityImpactDistribution[0] || 0, 
+      color: "#94a3b8" 
+    },
+    { 
+      name: "1 Dependent", 
+      value: displayStats.vulnerabilityImpactDistribution[1] || 0, 
+      color: "#60a5fa" 
+    },
+    { 
+      name: "2-5 Dependents", 
+      value: Object.entries(displayStats.vulnerabilityImpactDistribution)
+        .filter(([count]) => parseInt(count) >= 2 && parseInt(count) <= 5)
+        .reduce((sum, [, count]) => sum + count, 0),
+      color: "#3b82f6" 
+    },
+    { 
+      name: "6+ Dependents (Hubs)", 
+      value: Object.entries(displayStats.vulnerabilityImpactDistribution)
+        .filter(([count]) => parseInt(count) >= 6)
+        .reduce((sum, [, count]) => sum + count, 0),
+      color: "#2563eb" 
+    },
+  ].filter(d => d.value > 0);
 
   const renderSortHeader = (label: string, sortKeyVal: SortKey) => {
     const activeSortKey = viewMode === "components" ? sortKey : cveSortKey;
@@ -246,37 +266,30 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         </div>
 
         {/* KPI Cards Row */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mb-6">
           <Card className="border-l-4 border-l-destructive/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                Vulnerability Findings
-                <HelpTooltip text="Total number of individual vulnerability instances found across all components." />
+              <CardTitle className="text-sm font-medium">
+                Total Findings
               </CardTitle>
               <ShieldAlert className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{totalVulns}</div>
-              <div className="flex items-center gap-1.5 mt-1">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-                  {displayStats.uniqueVulnerabilityCount} Unique CVEs
-                </p>
-                <HelpTooltip text="Findings: One CVE affecting multiple packages counts multiple times (npm audit style). Unique CVEs: Distinct vulnerability definitions." />
-              </div>
+              <p className="text-xs text-muted-foreground mt-1">Total package hits</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-orange-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                Exposure Rate
-                <HelpTooltip text="The percentage of components in your SBOM that are affected by at least one vulnerability." />
+              <CardTitle className="text-sm font-medium">
+                Unique CVEs
               </CardTitle>
-              <ShieldAlert className="h-4 w-4 text-orange-500" />
+              <Fingerprint className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">{displayStats.exposureRate}%</div>
-              <p className="text-xs text-muted-foreground mt-1">{displayStats.allVulnerableComponents.length} packages affected</p>
+              <div className="text-3xl font-bold">{displayStats.uniqueVulnerabilityCount}</div>
+              <p className="text-xs text-muted-foreground mt-1">Distinct definitions</p>
             </CardContent>
           </Card>
 
@@ -287,7 +300,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-red-600">{critical}</div>
-              <p className="text-xs text-muted-foreground mt-1">Immediate action required</p>
+              <p className="text-xs text-muted-foreground mt-1">Immediate action</p>
             </CardContent>
           </Card>
 
@@ -309,7 +322,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-yellow-600">{medium}</div>
-              <p className="text-xs text-muted-foreground mt-1">Should be addressed</p>
+              <p className="text-xs text-muted-foreground mt-1">Should be fixed</p>
             </CardContent>
           </Card>
 
@@ -320,7 +333,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-blue-600">{low}</div>
-              <p className="text-xs text-muted-foreground mt-1">Low priority</p>
+              <p className="text-xs text-muted-foreground mt-1">Minor issues</p>
             </CardContent>
           </Card>
         </div>
@@ -329,11 +342,14 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* Severity Donut */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-lg">Severity Breakdown</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Severity Breakdown
+                <HelpTooltip text="Breakdown of individual findings by severity level." />
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[220px]">
+              <div className="h-[200px]">
                 {severityPieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -341,8 +357,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         data={severityPieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={52}
-                        outerRadius={80}
+                        innerRadius={55}
+                        outerRadius={75}
                         paddingAngle={4}
                         dataKey="value"
                       >
@@ -366,12 +382,12 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   </div>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-3">
+              <div className="grid grid-cols-2 gap-2 mt-4">
                 {severityPieData.map((entry) => (
                   <div key={entry.name} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-xs font-medium">{entry.name}</span>
-                    <span className="text-xs text-muted-foreground ml-auto">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+                    <span className="text-[10px] font-medium">{entry.name}</span>
+                    <span className="text-[10px] text-muted-foreground ml-auto">
                       {totalVulns > 0 ? Math.round((entry.value / totalVulns) * 100) : 0}%
                     </span>
                   </div>
@@ -382,11 +398,14 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
 
           {/* Bar Chart */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-lg">Vulnerability Distribution</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Vulnerability Distribution
+                <HelpTooltip text="Count of findings per severity level." />
+              </CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-              <div className="h-[280px]">
+              <div className="h-[260px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={barData}>
                     <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
@@ -397,81 +416,61 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                       labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                       itemStyle={CHART_TOOLTIP_ITEM_STYLE}
                     />
-                    <Bar dataKey="count" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="count" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          {/* Exposure Summary */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader>
-              <CardTitle className="text-lg">Component Exposure</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                Vulnerability Impact
+                <HelpTooltip text="Shows the blast radius of vulnerabilities based on how many other components depend on the affected package." />
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium mb-1">
-                  <span>Exposure Rate</span>
-                  <span>{affectedPct}%</span>
-                </div>
-                <div className="w-full h-2 bg-muted rounded-full overflow-hidden flex">
-                  <div 
-                    className="h-full bg-destructive transition-all duration-1000" 
-                    style={{ width: `${affectedPct}%` }}
-                  />
-                  <div 
-                    className="h-full bg-green-500/20 transition-all duration-1000" 
-                    style={{ width: `${100 - affectedPct}%` }}
-                  />
-                </div>
-                <p className="text-[10px] text-muted-foreground text-center">
-                  {displayStats.allVulnerableComponents.length} of {displayStats.totalComponents} components have at least one vulnerability
-                </p>
+            <CardContent>
+              <div className="h-[200px]">
+                {originData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={originData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={75}
+                        paddingAngle={4}
+                        dataKey="value"
+                      >
+                        {originData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center">
+                    <p className="text-sm text-muted-foreground italic text-center px-4">
+                      No dependency graph data available to track impact.
+                    </p>
+                  </div>
+                )}
               </div>
-
-              <div className="space-y-3">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Impacted Components</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  <div className="flex items-center justify-between text-xs p-2 rounded-md bg-red-500/5 border border-red-500/10">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-red-600" />
-                      <span>Critical Severity</span>
-                    </div>
-                    <span className="font-bold">{componentsBySeverity.critical}</span>
+              <div className="space-y-2 mt-4">
+                {originData.map((entry) => (
+                  <div key={entry.name} className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+                    <span className="text-[10px] font-medium">{entry.name}</span>
+                    <span className="text-[10px] font-bold ml-auto">{entry.value}</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs p-2 rounded-md bg-orange-500/5 border border-orange-500/10">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-orange-500" />
-                      <span>High Severity</span>
-                    </div>
-                    <span className="font-bold">{componentsBySeverity.high}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs p-2 rounded-md bg-yellow-500/5 border border-yellow-500/10">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                      <span>Medium Severity</span>
-                    </div>
-                    <span className="font-bold">{componentsBySeverity.medium}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs p-2 rounded-md bg-blue-500/5 border border-blue-500/10">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />
-                      <span>Low Severity</span>
-                    </div>
-                    <span className="font-bold">{componentsBySeverity.low}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-green-500" />
-                  <span className="text-xs">Secure components</span>
-                </div>
-                <span className="text-xs font-bold">
-                  {Math.max(0, displayStats.totalComponents - displayStats.allVulnerableComponents.length)}
-                </span>
+                ))}
               </div>
             </CardContent>
           </Card>

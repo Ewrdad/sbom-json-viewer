@@ -110,6 +110,7 @@ export const Formatter = async ({
     metadata: rawSBOM.metadata,
     componentMap: new Map<string, EnhancedComponent>(),
     dependencyGraph: new Map<string, string[]>(),
+    dependentsGraph: new Map<string, string[]>(),
     topLevelRefs: [],
   };
 
@@ -121,7 +122,9 @@ export const Formatter = async ({
   // Index vulns
   for (const vuln of rawSBOM.vulnerabilities) {
     for (const affect of vuln.affects) {
-      const ref = typeof affect.ref === "object" ? (affect.ref as any).value : (affect.ref as string);
+      const ref = (affect.ref && typeof affect.ref === "object" && 'value' in affect.ref) 
+        ? (affect.ref as { value: string }).value 
+        : (affect.ref as unknown as string);
       if (ref) {
         const list = vulnIndex.get(ref) || [];
         list.push(vuln);
@@ -195,6 +198,17 @@ export const Formatter = async ({
         permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0
       }
     });
+
+    // We must manually ensure bomRef is an 'own' enumerable property so deepToPlain picks it up.
+    // comp.bomRef is a getter on the class, so Object.assign won't copy it.
+    // And we can't simple assign it because there's no setter.
+    Object.defineProperty(enhanced, "bomRef", {
+      value: comp.bomRef as unknown,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+
     enhancedMap.set(ref, enhanced);
   }
 

@@ -23,8 +23,10 @@ export function calculateSbomStats(bom: any): SbomStats {
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
-    exposureRate: 0,
     avgVulnerabilitiesPerComponent: 0,
+    dependencyStats: { direct: 0, transitive: 0 },
+    dependentsDistribution: {},
+    vulnerabilityImpactDistribution: {},
   };
 
   const licenseSummaryMap = new Map<string, { id: string; name: string; category: string; affectedRefs: Set<string> }>();
@@ -94,7 +96,7 @@ export function calculateSbomStats(bom: any): SbomStats {
   // 2. Process licenses
   for (const component of components) {
     const licenses = Array.from(component.licenses || []);
-    const ref = component.bomRef?.value || (component as any).bomRef;
+    const ref = component.bomRef?.value || component.bomRef || component["bom-ref"];
 
     if (licenses.length === 0) {
       stats.licenseDistribution.unknown++;
@@ -147,7 +149,7 @@ export function calculateSbomStats(bom: any): SbomStats {
       let name = "Unknown";
       let version = "";
       for (const c of components) {
-        if (c.bomRef?.value === ref || (c as any).bomRef === ref) {
+        if (c.bomRef?.value === ref || c.bomRef === ref || c["bom-ref"] === ref) {
           name = c.name;
           version = c.version;
           break;
@@ -167,7 +169,7 @@ export function calculateSbomStats(bom: any): SbomStats {
       let name = "Unknown";
       let version = "";
       for (const c of components) {
-        if (c.bomRef?.value === ref || (c as any).bomRef === ref) {
+        if (c.bomRef?.value === ref || c.bomRef === ref || c["bom-ref"] === ref) {
           name = c.name;
           version = c.version;
           break;
@@ -189,8 +191,118 @@ export function calculateSbomStats(bom: any): SbomStats {
     stats.vulnerabilityCounts.low;
 
   if (stats.totalComponents > 0) {
-    stats.exposureRate = Math.round((stats.allVulnerableComponents.length / stats.totalComponents) * 100);
     stats.avgVulnerabilitiesPerComponent = parseFloat((stats.totalVulnerabilities / stats.totalComponents).toFixed(2));
+  }
+
+  // 4. Build universal adjacency list for graph analysis
+  const adjList = new Map<string, string[]>();
+  const depthMap = new Map<string, number>();
+  
+  // A) Process top-level dependencies (spec canonical)
+  const topLevelDeps = bom.dependencies || [];
+  const depEntries = Array.isArray(topLevelDeps) ? topLevelDeps : (typeof topLevelDeps.values === 'function' ? Array.from(topLevelDeps.values()) : []);
+  
+  for (const dep of depEntries as any[]) {
+    const parentRef = dep.ref?.value || dep.ref;
+    if (!parentRef) continue;
+    const children = Array.isArray(dep.dependsOn) 
+      ? dep.dependsOn.map((c: any) => c.value || c)
+      : (dep.dependsOn && typeof dep.dependsOn.values === 'function' 
+          ? Array.from(dep.dependsOn.values()).map((c: any) => c.value || c) 
+          : (typeof dep.dependsOn?.forEach === 'function'
+              ? (() => { const r: string[] = []; dep.dependsOn.forEach((c: any) => r.push(c.value || c)); return r; })()
+              : []));
+    
+    if (children.length > 0) {
+      const existing = adjList.get(parentRef) || [];
+      adjList.set(parentRef, [...new Set([...existing, ...children])]);
+    }
+  }
+
+  // B) Process per-component dependencies (fallback/redundancy)
+  for (const component of components) {
+    const parentRef = component.bomRef?.value || component.bomRef || component["bom-ref"];
+    if (!parentRef) continue;
+    
+    const compDeps = component.dependencies;
+    if (compDeps) {
+      const children = Array.isArray(compDeps)
+        ? compDeps.map((c: any) => c.value || c)
+        : (typeof compDeps.values === 'function' 
+            ? Array.from(compDeps.values()).map((c: any) => c.value || c)
+            : (typeof compDeps.forEach === 'function'
+                ? (() => { const r: string[] = []; compDeps.forEach((c: any) => r.push(c.value || c)); return r; })()
+                : []));
+      
+      if (children.length > 0) {
+        const existing = adjList.get(parentRef) || [];
+        adjList.set(parentRef, [...new Set([...existing, ...children])]);
+      }
+    }
+  }
+
+  const metadataComponent = bom.metadata?.component?.bomRef?.value || 
+                            bom.metadata?.component?.bomRef || 
+                            bom.metadata?.component?.["bom-ref"];
+
+  if (metadataComponent) {
+    const queue: { ref: string; depth: number }[] = [{ ref: metadataComponent, depth: 0 }];
+    const visited = new Set<string>();
+    visited.add(metadataComponent);
+    
+    while (queue.length > 0) {
+      const { ref, depth } = queue.shift()!;
+      depthMap.set(ref, depth);
+      
+      const children = adjList.get(ref) || [];
+      for (const childRef of children) {
+        if (!visited.has(childRef)) {
+          visited.add(childRef);
+          queue.push({ ref: childRef, depth: depth + 1 });
+        }
+      }
+    }
+  }
+
+  // 5. Calculate dependents (in-degree) for distribution
+  const inDegreeMap = new Map<string, number>();
+  // Initialize all components with 0 dependents
+  for (const component of components) {
+    const ref = component.bomRef?.value || component.bomRef || component["bom-ref"];
+    if (ref) inDegreeMap.set(ref, 0);
+  }
+
+  // Count dependents
+  for (const [, children] of adjList.entries()) {
+    for (const childRef of children) {
+      if (inDegreeMap.has(childRef)) {
+        inDegreeMap.set(childRef, (inDegreeMap.get(childRef) || 0) + 1);
+      }
+    }
+  }
+
+  // Populate dependents distributions
+  for (const [ref, count] of inDegreeMap.entries()) {
+    // High-level "Direct" vs "Transitive" still uses depth 1 from BFS if matched
+    // components not in depthMap are either root or disconnected
+    
+    stats.dependentsDistribution[count] = (stats.dependentsDistribution[count] || 0) + 1;
+    
+    const compVulns = compVulnMap.get(ref);
+    if (compVulns) {
+      stats.vulnerabilityImpactDistribution[count] = (stats.vulnerabilityImpactDistribution[count] || 0) + compVulns.total;
+    }
+  }
+
+  // High-level summary (depth-based is more accurate for "direct" vs "transitive")
+  const depth1Count = Array.from(depthMap.values()).filter(d => d === 1).length;
+  stats.dependencyStats.direct = depth1Count;
+  stats.dependencyStats.transitive = Math.max(0, stats.totalComponents - depth1Count);
+
+  // Fallback for distributions if no graph
+  if (Object.keys(stats.dependentsDistribution).length === 0) {
+    stats.dependentsDistribution[0] = stats.totalComponents;
+    stats.vulnerabilityImpactDistribution[0] = stats.totalVulnerabilities;
   }
 
   stats.allVulnerabilities = Array.from(vulnSummaryMap.values())

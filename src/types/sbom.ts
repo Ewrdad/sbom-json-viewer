@@ -60,8 +60,13 @@ export interface SbomStats {
     licenses: { id: string; name: string; category: string }[];
   }[];
   uniqueVulnerabilityCount: number;
-  exposureRate: number;
   avgVulnerabilitiesPerComponent: number;
+  dependencyStats: {
+    direct: number;
+    transitive: number;
+  };
+  dependentsDistribution: Record<number, number>;
+  vulnerabilityImpactDistribution: Record<number, number>;
 }
 
 export interface WorkerProgressUpdate {
@@ -121,6 +126,10 @@ export type formattedSBOM = {
    * Adjacency list representing the dependency graph: bomRef -> string[] of dependency bomRefs
    */
   dependencyGraph: Map<string, string[]>;
+  /**
+   * Reverse dependency graph: bomRef -> string[] of component bomRefs that depend on this one
+   */
+  dependentsGraph: Map<string, string[]>;
   /**
    * Top level component refs (roots of the tree)
    */

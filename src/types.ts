@@ -1,1 +1,1 @@
-export type ViewType = 'dashboard' | 'vulnerabilities' | 'licenses' | 'explorer' | 'graph' | 'tree' | 'metadata';
+export type ViewType = 'dashboard' | 'vulnerabilities' | 'licenses' | 'explorer' | 'graph' | 'tree' | 'reverse-tree' | 'metadata';

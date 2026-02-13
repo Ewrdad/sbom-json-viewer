@@ -1,6 +1,8 @@
 import { convertJsonToBom } from "../lib/bomConverter";
 import { Formatter } from "../renderer/Formatter/Formatter";
 import { calculateSbomStats } from "../lib/statsUtils";
+import { calculateDependents } from "../lib/dependencyUtils";
+import { deepToPlain } from "../lib/cloneUtils";
 
 /**
  * SBOM Worker
@@ -104,6 +106,14 @@ self.onmessage = async (e: MessageEvent) => {
     });
     if (import.meta.env.DEV) console.log(`[Worker] Tree formatted`);
 
+    // 5b. Calculate Reverse Dependency Graph
+    // Formatter returns dependencyGraph as a Map
+    if (formatted.dependencyGraph) {
+        formatted.dependentsGraph = calculateDependents(formatted.dependencyGraph);
+    } else {
+        formatted.dependentsGraph = new Map();
+    }
+
     // 6. Serialize and Send
     self.postMessage({ type: "progress", message: "Finalizing...", progress: 95 });
     
@@ -132,71 +142,4 @@ self.onmessage = async (e: MessageEvent) => {
   }
 };
 
-/**
- * Recursively converts class instances (like CycloneDX models) to plain objects.
- * This ensures the data can be reliably sent via postMessage in all environments.
- *
- * NOTE: We intentionally do NOT use a global "seen" set for cycle detection,
- * because the stats object contains shared references (e.g. vulnerableComponents
- * shares elements with allVulnerableComponents). A global "seen" set would
- * incorrectly treat these shared references as circular and return undefined.
- * Instead, we track ancestors on the current recursion path only.
- */
-function deepToPlain(obj: any, ancestors = new WeakSet()): any {
-  if (obj === null || typeof obj !== "object") {
-    return obj;
-  }
 
-  // Only detect actual cycles (same object on the current recursion path)
-  if (ancestors.has(obj)) {
-    return undefined;
-  }
-
-  // Handle Sets — convert to arrays before recursing
-  if (obj instanceof Set) {
-    const arr = Array.from(obj);
-    ancestors.add(obj);
-    const result = arr.map(v => deepToPlain(v, ancestors));
-    ancestors.delete(obj);
-    return result;
-  }
-
-  // Handle Maps — convert to plain objects
-  if (obj instanceof Map) {
-    ancestors.add(obj);
-    const plainMap: any = {};
-    for (const [key, value] of obj) {
-      plainMap[key] = deepToPlain(value, ancestors);
-    }
-    ancestors.delete(obj);
-    return plainMap;
-  }
-
-  // Handle Arrays
-  if (Array.isArray(obj)) {
-    ancestors.add(obj);
-    const result = obj.map(v => deepToPlain(v, ancestors));
-    ancestors.delete(obj);
-    return result;
-  }
-
-  // Track this object as an ancestor for child recursion
-  ancestors.add(obj);
-
-  // Special handling for BomRef and similar classes with a 'value' property
-  if (obj.value !== undefined && Object.keys(obj).length <= 2) {
-    ancestors.delete(obj);
-    return { value: obj.value };
-  }
-
-  // Handle plain objects and class instances
-  const plain: Record<string, unknown> = {};
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] !== 'function') {
-      plain[key] = deepToPlain(obj[key], ancestors);
-    }
-  }
-
-  ancestors.delete(obj);
-  return plain;
-}

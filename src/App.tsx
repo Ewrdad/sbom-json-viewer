@@ -47,6 +47,11 @@ const MetadataView = lazy(() =>
     default: module.MetadataView,
   })),
 );
+const ReverseDependencyTree = lazy(() =>
+  import("./components/views/ReverseDependencyTree").then((module) => ({
+    default: module.ReverseDependencyTree,
+  })),
+);
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { Upload } from "lucide-react";
 import {
@@ -168,6 +173,10 @@ function AppContent({
             <DependencyGraph sbom={sbom} formattedSbom={formattedSbom} />
           </KeepAliveView>
 
+          <KeepAliveView activeView={activeView} viewKey="reverse-tree">
+            <ReverseDependencyTree sbom={sbom} formattedSbom={formattedSbom} />
+          </KeepAliveView>
+
           <KeepAliveView activeView={activeView} viewKey="metadata">
             <MetadataView sbom={sbom} />
           </KeepAliveView>
@@ -259,6 +268,11 @@ export function App() {
                 formatted.dependencyGraph = new Map(Object.entries(formatted.dependencyGraph));
               } else {
                 formatted.dependencyGraph = new Map();
+              }
+              if (formatted.dependentsGraph) {
+                formatted.dependentsGraph = new Map(Object.entries(formatted.dependentsGraph));
+              } else {
+                formatted.dependentsGraph = new Map();
               }
             } catch (err) {
               console.error("Map revival failed", err);

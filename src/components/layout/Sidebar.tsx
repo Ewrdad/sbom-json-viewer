@@ -1,6 +1,6 @@
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../types";
-import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info } from "lucide-react";
+import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info, GitGraph } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 
@@ -38,6 +38,11 @@ export function Sidebar() {
       id: "graph",
       label: "Visual Graph",
       icon: <Network className="h-4 w-4 mr-2" />,
+    },
+    {
+      id: "reverse-tree",
+      label: "Reverse Tree",
+      icon: <GitGraph className="h-4 w-4 mr-2" />,
     },
     {
       id: "metadata",

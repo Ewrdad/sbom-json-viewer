@@ -40,8 +40,10 @@ const mockStats: SbomStats = {
         { name: 'express', version: '4.17.1', ref: 'ref-express', licenses: [{ id: 'MIT', name: 'MIT', category: 'permissive' }] },
     ],
     uniqueVulnerabilityCount: 0,
-    exposureRate: 0,
     avgVulnerabilitiesPerComponent: 0,
+    dependencyStats: { direct: 50, transitive: 50 },
+    dependentsDistribution: { 0: 50, 1: 50 },
+    vulnerabilityImpactDistribution: {},
 };
 
 

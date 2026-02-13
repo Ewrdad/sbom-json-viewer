@@ -22,15 +22,9 @@ import {
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { useDebounce } from "../../hooks/useDebounce";
+import { flattenTree, type FlatNode } from "../../lib/treeUtils";
 
-interface FlatNode {
-  node: EnhancedComponent;
-  ref: string;
-  level: number;
-  path: string;
-  hasChildren: boolean;
-  isExpanded: boolean;
-}
+
 
 interface TreeItemRowProps {
   item: FlatNode;
@@ -267,55 +261,7 @@ function HighlightedText({ text, highlight }: { text: string; highlight: string 
   );
 }
 
-const flattenTree = (
-  componentRefs: string[],
-  componentMap: Map<string, EnhancedComponent>,
-  dependencyGraph: Map<string, string[]>,
-  expandedPaths: Set<string>,
-  visibleRefs: Set<string> | null = null,
-  level = 0,
-  path = "",
-  result: FlatNode[] = [],
-) => {
-  for (const ref of componentRefs) {
-    const node = componentMap.get(ref);
-    if (!node) continue;
-    
-    if (visibleRefs && !visibleRefs.has(ref)) continue;
 
-    const nodePath = path ? `${path}/${ref}` : ref;
-    const deps = dependencyGraph.get(ref) || [];
-    const hasChildren = deps.length > 0;
-    
-    // In search mode, we expand if it's an ancestor of a match
-    const isExpanded = visibleRefs 
-      ? hasChildren // Expand all ancestors in search mode
-      : expandedPaths.has(nodePath);
-
-    result.push({
-      node,
-      ref,
-      level,
-      path: nodePath,
-      hasChildren,
-      isExpanded,
-    });
-
-    if (isExpanded && hasChildren) {
-      flattenTree(
-        deps,
-        componentMap,
-        dependencyGraph,
-        expandedPaths,
-        visibleRefs,
-        level + 1,
-        nodePath,
-        result,
-      );
-    }
-  }
-  return result;
-};
 
 export function DependencyTree({
   sbom,
