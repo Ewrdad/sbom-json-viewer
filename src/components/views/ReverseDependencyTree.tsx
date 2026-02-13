@@ -5,7 +5,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
-import { GitGraph, Search, ArrowRight, Layers } from "lucide-react";
+import { GitGraph, Search, ArrowRight, Layers, ShieldAlert, ShieldCheck, Scale } from "lucide-react";
+import { getLicenseCategory } from "../../lib/licenseUtils";
 
 interface ReverseDependencyTreeProps {
   sbom: Bom | null;
@@ -21,6 +22,20 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
 
   const dependentsGraph = formattedSbom?.dependentsGraph;
   const componentMap = formattedSbom?.componentMap;
+
+  // Helper to count vulns
+  const getVulnCount = (vulns: EnhancedComponent["vulnerabilities"]["inherent"] | undefined) => {
+    if (!vulns) return { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
+    // Re-check typo or access
+    const cVal = (v: any) => Array.isArray(v) ? v.length : 0;
+    const finalCounts = {
+      critical: cVal(vulns.Critical),
+      high: cVal(vulns.High),
+      medium: cVal(vulns.Medium),
+      low: cVal(vulns.Low),
+    };
+    return { ...finalCounts, total: finalCounts.critical + finalCounts.high + finalCounts.medium + finalCounts.low };
+  };
 
   // Calculate dependent counts for all components
   const sortedComponents = useMemo(() => {
@@ -99,9 +114,21 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                         {component.version}
                     </div>
                   </div>
-                  <Badge variant="secondary" className="ml-2 shrink-0">
-                    {directDependentsCount} deps
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+                    <Badge variant="secondary" className="text-[10px]">
+                      {directDependentsCount} deps
+                    </Badge>
+                    {getVulnCount(component.vulnerabilities?.inherent).total > 0 && (
+                      <div className="flex gap-1">
+                        {getVulnCount(component.vulnerabilities?.inherent).critical > 0 && (
+                          <div className="h-2 w-2 rounded-full bg-destructive" title="Critical Vulnerabilities" />
+                        )}
+                        {getVulnCount(component.vulnerabilities?.inherent).high > 0 && (
+                          <div className="h-2 w-2 rounded-full bg-orange-500" title="High Vulnerabilities" />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </button>
               ))}
               {sortedComponents.length === 0 && (
@@ -129,28 +156,82 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                         <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
                             {selectedComponent.name?.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                            <h3 className="text-xl font-bold">{selectedComponent.name}</h3>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="text-xl font-bold truncate">{selectedComponent.name}</h3>
+                                {Array.from(selectedComponent.licenses || []).map((l, i) => {
+                                    const licenseId = (l as any).id || (l as any).name || "Unknown";
+                                    return (
+                                    <Badge key={i} variant="outline" className="text-[10px] font-mono">
+                                        {licenseId}
+                                    </Badge>
+                                    );
+                                })}
+                            </div>
                             <p className="text-sm text-muted-foreground">Version: {selectedComponent.version}</p>
-                            <p className="text-sm text-muted-foreground">PURL: {selectedComponent.purl?.toString()}</p>
+                            <div className="flex items-center gap-4 mt-2">
+                                <div className="flex items-center gap-1 text-xs">
+                                    <Scale className="h-3 w-3 text-muted-foreground" />
+                                    <span className="capitalize">
+                                        {(() => {
+                                            const firstLicense = Array.from(selectedComponent.licenses || [])[0];
+                                            const id = firstLicense ? ((firstLicense as any).id || (firstLicense as any).name) : null;
+                                            return getLicenseCategory(id);
+                                        })()}
+                                    </span>
+                                </div>
+                                {getVulnCount(selectedComponent.vulnerabilities?.inherent).total > 0 && (
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <ShieldAlert className="h-3 w-3 text-destructive" />
+                                        <span className="text-destructive font-semibold">
+                                            {getVulnCount(selectedComponent.vulnerabilities?.inherent).critical}C, 
+                                            {getVulnCount(selectedComponent.vulnerabilities?.inherent).high}H
+                                        </span>
+                                    </div>
+                                )}
+                                {getVulnCount(selectedComponent.vulnerabilities?.inherent).total === 0 && (
+                                    <div className="flex items-center gap-1 text-xs text-green-600">
+                                        <ShieldCheck className="h-3 w-3" />
+                                        <span>No known vulnerabilities</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <h4 className="text-lg font-semibold mb-3">Used By ({selectedDependents.length})</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {selectedDependents.map((dep, idx) => (
-                                <div key={dep.bomRef?.value || idx} className="p-3 border rounded-md hover:border-primary transition-colors cursor-pointer" 
+                            {selectedDependents.map((dep, idx) => {
+                                const v = getVulnCount(dep.vulnerabilities?.inherent);
+                                const l = Array.from(dep.licenses || [])[0];
+                                const licenseId = l ? ((l as any).id || (l as any).name) : null;
+                                const category = getLicenseCategory(licenseId);
+                                
+                                return (
+                                <div key={dep.bomRef?.value || idx} className="p-3 border rounded-md hover:border-primary transition-colors cursor-pointer group" 
                                      onClick={() => setSelectedComponentId(dep.bomRef?.value || null)}>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                                        <span className="font-medium truncate">{dep.name}</span>
+                                    <div className="flex items-center justify-between gap-2 mb-1">
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <ArrowRight className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                                            <span className="font-medium truncate">{dep.name}</span>
+                                        </div>
+                                        <div className="flex gap-1 shrink-0">
+                                            {v.total > 0 && (
+                                                <ShieldAlert className={`h-3 w-3 ${v.critical > 0 ? "text-destructive" : "text-orange-500"}`} />
+                                            )}
+                                            {category !== "unknown" && (
+                                                <Scale className={`h-3 w-3 ${category === "copyleft" ? "text-destructive" : "text-blue-500"}`} />
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="text-xs text-muted-foreground pl-5">
-                                        v{dep.version}
+                                    <div className="text-[10px] text-muted-foreground pl-5 flex justify-between items-center">
+                                        <span>v{dep.version}</span>
+                                        {licenseId && <span className="text-[9px] opacity-70 px-1 border rounded bg-muted/50 truncate max-w-[60px]">{licenseId}</span>}
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                             {selectedDependents.length === 0 && (
                                 <div className="col-span-full p-8 text-center border border-dashed rounded-lg text-muted-foreground">
                                     <p>No components depend on this component directly.</p>
