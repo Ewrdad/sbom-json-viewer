@@ -16,6 +16,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "../ui/select";
+import { ErrorBoundary } from "../common/ErrorBoundary";
 import { HelpTooltip } from "../common/HelpTooltip";
 
 interface ReverseDependencyTreeProps {
@@ -230,61 +231,64 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
           )}
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">
-          {sortedComponents.length === 0 ? (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              No components found
-            </div>
-          ) : (
-            <Virtuoso
-              style={{ height: "100%" }}
-              data={sortedComponents}
-              initialItemCount={20}
-              itemContent={(index, item) => {
-                const { component, directDependentsCount, blastRadius: itemBlastRadius } = item;
-                const v = getVulnCount(component.vulnerabilities?.inherent);
-                
-                return (
-                  <button
-                    key={component.bomRef?.value || index}
-                    onClick={() => setSelectedComponentId(component.bomRef?.value || null)}
-                    className={`flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors border-b group w-full ${
-                      selectedComponentId === component.bomRef?.value ? "bg-muted" : ""
-                    } ${
-                      v.critical > 0 
-                        ? "border-l-4 border-l-destructive" 
-                        : v.high > 0 
-                        ? "border-l-4 border-l-orange-500" 
-                        : ""
-                    }`}
-                  >
-                    <div className="overflow-hidden">
-                        <div className="font-medium truncate group-hover:text-primary transition-colors" title={component.name}>
-                            {component.name}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                            {component.version}
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
-                        <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
-                        {directDependentsCount} / {itemBlastRadius}
-                        </Badge>
-                        {v.total > 0 && (
-                        <div className="flex gap-1">
-                            {v.critical > 0 && (
-                            <div className="h-2 w-2 rounded-full bg-destructive" title="Critical Vulnerabilities" />
-                            )}
-                            {v.high > 0 && (
-                            <div className="h-2 w-2 rounded-full bg-orange-500" title="High Vulnerabilities" />
-                            )}
-                        </div>
-                        )}
-                    </div>
-                  </button>
-                );
-              }}
-            />
-          )}
+          <ErrorBoundary fallback={<div className="p-4 text-center text-sm text-muted-foreground">Component list unavailable.</div>}>
+            {sortedComponents.length === 0 ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                No components found
+              </div>
+            ) : (
+              <Virtuoso
+                style={{ height: "100%" }}
+                data={sortedComponents}
+                initialItemCount={20}
+                itemContent={(index, item) => {
+                  if (!item) return null;
+                  const { component, directDependentsCount, blastRadius: itemBlastRadius } = item;
+                  const v = getVulnCount(component.vulnerabilities?.inherent);
+                  
+                  return (
+                    <button
+                      key={component.bomRef?.value || index}
+                      onClick={() => setSelectedComponentId(component.bomRef?.value || null)}
+                      className={`flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors border-b group w-full ${
+                        selectedComponentId === component.bomRef?.value ? "bg-muted" : ""
+                      } ${
+                        v.critical > 0 
+                          ? "border-l-4 border-l-destructive" 
+                          : v.high > 0 
+                          ? "border-l-4 border-l-orange-500" 
+                          : ""
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                          <div className="font-medium truncate group-hover:text-primary transition-colors" title={component.name}>
+                              {component.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">
+                              {component.version}
+                          </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+                          <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                          {directDependentsCount} / {itemBlastRadius}
+                          </Badge>
+                          {v.total > 0 && (
+                          <div className="flex gap-1">
+                              {v.critical > 0 && (
+                              <div className="h-2 w-2 rounded-full bg-destructive" title="Critical Vulnerabilities" />
+                              )}
+                              {v.high > 0 && (
+                              <div className="h-2 w-2 rounded-full bg-orange-500" title="High Vulnerabilities" />
+                              )}
+                          </div>
+                          )}
+                      </div>
+                    </button>
+                  );
+                }}
+              />
+            )}
+          </ErrorBoundary>
         </CardContent>
       </Card>
 
@@ -297,137 +301,142 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
             </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 overflow-auto p-6">
-            {selectedComponent ? (
-                <div className="space-y-6">
-                    <div className="flex items-center gap-4 p-4 border rounded-lg bg-card/50">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
-                            {selectedComponent.name?.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <h3 className="text-xl font-bold truncate">{selectedComponent.name}</h3>
-                                {Array.from(selectedComponent.licenses || []).map((l, i) => {
-                                    const licenseId = (l as {id?: string, name?: string}).id || (l as {id?: string, name?: string}).name || "Unknown";
-                                    return (
-                                    <Badge key={i} variant="outline" className="text-[10px] font-mono">
-                                        {licenseId}
-                                    </Badge>
-                                    );
-                                })}
+            <ErrorBoundary 
+                resetKeys={[selectedComponentId]} 
+                fallback={<div className="h-full flex items-center justify-center text-muted-foreground text-sm">Visualization failed to load.</div>}
+            >
+                {selectedComponent ? (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-4 p-4 border rounded-lg bg-card/50">
+                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+                                {selectedComponent.name?.charAt(0).toUpperCase()}
                             </div>
-                            <div className="flex items-center gap-4 mt-2">
-                                <div className="flex items-center gap-1 text-xs">
-                                    <Scale className="h-3 w-3 text-muted-foreground" />
-                                    <span className="capitalize">
-                                        {(() => {
-                                            const firstLicense = Array.from(selectedComponent.licenses || [])[0] as {id?: string, name?: string} | undefined;
-                                            const id = firstLicense ? (firstLicense.id || firstLicense.name) : null;
-                                            return getLicenseCategory(id);
-                                        })()}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-1 text-xs">
-                                    <GitGraph className="h-3 w-3 text-muted-foreground" />
-                                    <span>Blast Radius: <strong>{blastRadius?.get(selectedComponentId || "") || 0}</strong> components</span>
-                                    <HelpTooltip 
-                                        text="Total number of components upstream that depend on this library (direct + transitive). If this library breaks or has a vulnerability, all these components could be affected." 
-                                        size={12}
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="mt-3 flex flex-wrap gap-2 items-center">
-                                {(() => {
-                                    const v = getVulnCount(selectedComponent.vulnerabilities?.inherent);
-                                    if (v.total === 0) return (
-                                        <Badge variant="outline" className="text-green-600 bg-green-50 dark:bg-green-900/10 border-green-200">
-                                            <ShieldCheck className="h-3 w-3 mr-1" />
-                                            No known vulnerabilities
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <h3 className="text-xl font-bold truncate">{selectedComponent.name}</h3>
+                                    {Array.from(selectedComponent.licenses || []).map((l, i) => {
+                                        const licenseId = (l as {id?: string, name?: string}).id || (l as {id?: string, name?: string}).name || "Unknown";
+                                        return (
+                                        <Badge key={i} variant="outline" className="text-[10px] font-mono">
+                                            {licenseId}
                                         </Badge>
-                                    );
+                                        );
+                                    })}
+                                </div>
+                                <div className="flex items-center gap-4 mt-2">
+                                    <div className="flex items-center gap-1 text-xs">
+                                        <Scale className="h-3 w-3 text-muted-foreground" />
+                                        <span className="capitalize">
+                                            {(() => {
+                                                const firstLicense = Array.from(selectedComponent.licenses || [])[0] as {id?: string, name?: string} | undefined;
+                                                const id = firstLicense ? (firstLicense.id || firstLicense.name) : null;
+                                                return getLicenseCategory(id);
+                                            })()}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-xs">
+                                        <GitGraph className="h-3 w-3 text-muted-foreground" />
+                                        <span>Blast Radius: <strong>{blastRadius?.get(selectedComponentId || "") || 0}</strong> components</span>
+                                        <HelpTooltip 
+                                            text="Total number of components upstream that depend on this library (direct + transitive). If this library breaks or has a vulnerability, all these components could be affected." 
+                                            size={12}
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className="mt-3 flex flex-wrap gap-2 items-center">
+                                    {(() => {
+                                        const v = getVulnCount(selectedComponent.vulnerabilities?.inherent);
+                                        if (v.total === 0) return (
+                                            <Badge variant="outline" className="text-green-600 bg-green-50 dark:bg-green-900/10 border-green-200">
+                                                <ShieldCheck className="h-3 w-3 mr-1" />
+                                                No known vulnerabilities
+                                            </Badge>
+                                        );
+                                        
+                                        return (
+                                            <div className="flex items-center gap-2">
+                                                {v.critical > 0 && (
+                                                    <Badge variant="destructive" className="animate-pulse">
+                                                        {v.critical} Critical Risk
+                                                    </Badge>
+                                                )}
+                                                {v.high > 0 && (
+                                                    <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+                                                        {v.high} High Severity
+                                                    </Badge>
+                                                )}
+                                                {v.medium > 0 && (
+                                                    <Badge variant="secondary">
+                                                        {v.medium} Medium
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                Used By ({selectedDependents.length})
+                                <HelpTooltip 
+                                    text="Direct dependents Only. These are the components that explicitly import or declare formattedSbom.dependentsGraph dependency on the selected component." 
+                                />
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {selectedDependents.map((dep, idx) => {
+                                    const v = getVulnCount(dep.vulnerabilities?.inherent);
+                                    const l = Array.from(dep.licenses || [])[0];
+                                    const licenseId = l ? ((l as {id?: string, name?: string}).id || (l as {id?: string, name?: string}).name) : null;
                                     
                                     return (
-                                        <div className="flex items-center gap-2">
-                                            {v.critical > 0 && (
-                                                <Badge variant="destructive" className="animate-pulse">
-                                                    {v.critical} Critical Risk
-                                                </Badge>
-                                            )}
-                                            {v.high > 0 && (
-                                                <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
-                                                    {v.high} High Severity
-                                                </Badge>
-                                            )}
-                                            {v.medium > 0 && (
-                                                <Badge variant="secondary">
-                                                    {v.medium} Medium
-                                                </Badge>
-                                            )}
+                                    <div key={dep.bomRef?.value || idx} 
+                                         className={`p-3 border rounded-md hover:border-primary transition-colors cursor-pointer group ${
+                                             v.critical > 0 ? "border-l-4 border-l-destructive" : v.high > 0 ? "border-l-4 border-l-orange-500" : ""
+                                         }`}
+                                         onClick={() => setSelectedComponentId(dep.bomRef?.value || null)}>
+                                        <div className="flex items-center justify-between gap-2 mb-1">
+                                            <div className="flex items-center gap-2 overflow-hidden">
+                                                <ArrowRight className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                                                <span className="font-medium truncate">{dep.name}</span>
+                                            </div>
+                                            <div className="flex gap-1 shrink-0">
+                                                {v.total > 0 && (
+                                                    <ShieldAlert className={`h-3 w-3 ${v.critical > 0 ? "text-destructive" : "text-orange-500"}`} />
+                                                )}
+                                            </div>
                                         </div>
+                                        <div className="text-[10px] text-muted-foreground pl-5 flex justify-between items-center">
+                                            <div className="flex items-center gap-2">
+                                                <span>v{dep.version}</span>
+                                                {licenseId && <span className="text-[9px] opacity-70 px-1 border rounded bg-muted/50 truncate max-w-[60px]">{licenseId}</span>}
+                                            </div>
+                                            <div className="text-[9px] font-mono opacity-60">
+                                                Impact: {blastRadius?.get(dep.bomRef?.value || "") || 0}
+                                            </div>
+                                        </div>
+                                    </div>
                                     );
-                                })()}
+                                })}
+                                {selectedDependents.length === 0 && (
+                                    <div className="col-span-full p-8 text-center border border-dashed rounded-lg text-muted-foreground">
+                                        <p>No components depend on this component directly.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
-
-                    <div>
-                        <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                            Used By ({selectedDependents.length})
-                            <HelpTooltip 
-                                text="Direct dependents Only. These are the components that explicitly import or declare formattedSbom.dependentsGraph dependency on the selected component." 
-                            />
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {selectedDependents.map((dep, idx) => {
-                                const v = getVulnCount(dep.vulnerabilities?.inherent);
-                                const l = Array.from(dep.licenses || [])[0];
-                                const licenseId = l ? ((l as {id?: string, name?: string}).id || (l as {id?: string, name?: string}).name) : null;
-                                
-                                return (
-                                <div key={dep.bomRef?.value || idx} 
-                                     className={`p-3 border rounded-md hover:border-primary transition-colors cursor-pointer group ${
-                                         v.critical > 0 ? "border-l-4 border-l-destructive" : v.high > 0 ? "border-l-4 border-l-orange-500" : ""
-                                     }`}
-                                     onClick={() => setSelectedComponentId(dep.bomRef?.value || null)}>
-                                    <div className="flex items-center justify-between gap-2 mb-1">
-                                        <div className="flex items-center gap-2 overflow-hidden">
-                                            <ArrowRight className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
-                                            <span className="font-medium truncate">{dep.name}</span>
-                                        </div>
-                                        <div className="flex gap-1 shrink-0">
-                                            {v.total > 0 && (
-                                                <ShieldAlert className={`h-3 w-3 ${v.critical > 0 ? "text-destructive" : "text-orange-500"}`} />
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="text-[10px] text-muted-foreground pl-5 flex justify-between items-center">
-                                        <div className="flex items-center gap-2">
-                                            <span>v{dep.version}</span>
-                                            {licenseId && <span className="text-[9px] opacity-70 px-1 border rounded bg-muted/50 truncate max-w-[60px]">{licenseId}</span>}
-                                        </div>
-                                        <div className="text-[9px] font-mono opacity-60">
-                                            Impact: {blastRadius?.get(dep.bomRef?.value || "") || 0}
-                                        </div>
-                                    </div>
-                                </div>
-                                );
-                            })}
-                            {selectedDependents.length === 0 && (
-                                <div className="col-span-full p-8 text-center border border-dashed rounded-lg text-muted-foreground">
-                                    <p>No components depend on this component directly.</p>
-                                </div>
-                            )}
+                ) : (
+                    <div className="flex h-full items-center justify-center text-muted-foreground">
+                        <div className="text-center">
+                            <Layers className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                            <p>Select a component to view its reverse dependency tree</p>
                         </div>
                     </div>
-                </div>
-            ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
-                    <div className="text-center">
-                        <Layers className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                        <p>Select a component to view its reverse dependency tree</p>
-                    </div>
-                </div>
-            )}
+                )}
+            </ErrorBoundary>
         </CardContent>
       </Card>
     </div>
