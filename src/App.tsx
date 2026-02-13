@@ -274,6 +274,11 @@ export function App() {
               } else {
                 formatted.dependentsGraph = new Map();
               }
+              if (formatted.blastRadius) {
+                formatted.blastRadius = new Map(Object.entries(formatted.blastRadius));
+              } else {
+                formatted.blastRadius = new Map();
+              }
             } catch (err) {
               console.error("Map revival failed", err);
               // Continue anyway, UI will handle partial data

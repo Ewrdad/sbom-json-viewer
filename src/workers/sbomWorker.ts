@@ -1,7 +1,7 @@
 import { convertJsonToBom } from "../lib/bomConverter";
 import { Formatter } from "../renderer/Formatter/Formatter";
 import { calculateSbomStats } from "../lib/statsUtils";
-import { calculateDependents } from "../lib/dependencyUtils";
+import { calculateDependents, calculateTransitiveDependents } from "../lib/dependencyUtils";
 import { deepToPlain } from "../lib/cloneUtils";
 
 /**
@@ -110,8 +110,10 @@ self.onmessage = async (e: MessageEvent) => {
     // Formatter returns dependencyGraph as a Map
     if (formatted.dependencyGraph) {
         formatted.dependentsGraph = calculateDependents(formatted.dependencyGraph);
+        formatted.blastRadius = calculateTransitiveDependents(formatted.dependentsGraph);
     } else {
         formatted.dependentsGraph = new Map();
+        formatted.blastRadius = new Map();
     }
 
     // 6. Serialize and Send

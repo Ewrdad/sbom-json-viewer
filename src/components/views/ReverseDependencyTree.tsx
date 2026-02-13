@@ -5,8 +5,17 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
-import { GitGraph, Search, ArrowRight, Layers, ShieldAlert, ShieldCheck, Scale } from "lucide-react";
+import { GitGraph, Search, ArrowRight, Layers, ShieldAlert, ShieldCheck, Scale, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { getLicenseCategory } from "../../lib/licenseUtils";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "../ui/select";
 
 interface ReverseDependencyTreeProps {
   sbom: Bom | null;
@@ -19,15 +28,23 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
 }) => {
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Advanced Filter States
+  const [onlyVulnerable, setOnlyVulnerable] = useState(false);
+  const [minDirectDeps, setMinDirectDeps] = useState<number>(0);
+  const [minBlastRadius, setMinBlastRadius] = useState<number>(0);
+  const [licenseFilter, setLicenseFilter] = useState<string>("all");
 
   const dependentsGraph = formattedSbom?.dependentsGraph;
   const componentMap = formattedSbom?.componentMap;
+  const blastRadius = formattedSbom?.blastRadius;
 
   // Helper to count vulns
   const getVulnCount = (vulns: EnhancedComponent["vulnerabilities"]["inherent"] | undefined) => {
     if (!vulns) return { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
     // Re-check typo or access
-    const cVal = (v: any) => Array.isArray(v) ? v.length : 0;
+    const cVal = (v: unknown) => Array.isArray(v) ? v.length : 0;
     const finalCounts = {
       critical: cVal(vulns.Critical),
       high: cVal(vulns.High),
@@ -44,20 +61,50 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
     const components = Array.from(componentMap.values()).map((comp) => {
       const ref = comp.bomRef?.value || (comp.bomRef as unknown as string) || "";
       const dependents = dependentsGraph.get(ref) || [];
+      const totalBlastRadius = blastRadius?.get(ref) || 0;
+      const v = getVulnCount(comp.vulnerabilities?.inherent);
+      
+      // Calculate a simple Risk Score
+      const riskScore = (v.critical * 10) + (v.high * 5) + (v.medium * 2) + (v.low * 0.5);
+      
       return {
         component: comp,
         directDependentsCount: dependents.length,
-        // TODO: Calculate transitive dependents count if needed for sorting
+        blastRadius: totalBlastRadius,
+        riskScore,
+        v
       };
     });
 
-    // Sort by direct dependents count desc
+    // Apply Advanced Filters
     return components
-      .sort((a, b) => b.directDependentsCount - a.directDependentsCount)
-      .filter((item) => 
-        item.component.name?.toLowerCase().includes(filter.toLowerCase())
-      );
-  }, [dependentsGraph, componentMap, filter]);
+      .filter((item) => {
+        // Text Search
+        const matchesName = item.component.name?.toLowerCase().includes(filter.toLowerCase());
+        if (!matchesName) return false;
+
+        // Vulnerability Filter
+        if (onlyVulnerable && item.v.total === 0) return false;
+
+        // Dependency Thresholds
+        if (minDirectDeps > 0 && item.directDependentsCount < minDirectDeps) return false;
+        if (minBlastRadius > 0 && item.blastRadius < minBlastRadius) return false;
+
+        // License Filter
+        if (licenseFilter !== "all") {
+            const firstLicense = Array.from(item.component.licenses || [])[0] as {id?: string, name?: string} | undefined;
+            const id = firstLicense ? (firstLicense.id || firstLicense.name) : null;
+            const category = getLicenseCategory(id);
+            if (category !== licenseFilter) return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (b.riskScore !== a.riskScore) return b.riskScore - a.riskScore;
+        return b.blastRadius - a.blastRadius;
+      });
+  }, [dependentsGraph, componentMap, blastRadius, filter, onlyVulnerable, minDirectDeps, minBlastRadius, licenseFilter]);
 
   const selectedComponent = useMemo(() => {
     if (!selectedComponentId || !componentMap) return null;
@@ -94,6 +141,87 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
               onChange={(e) => setFilter(e.target.value)}
             />
           </div>
+          <div className="flex items-center justify-between mt-2">
+            <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-8 gap-1 px-2"
+                onClick={() => setShowFilters(!showFilters)}
+            >
+                <Filter className="h-3 w-3" />
+                Advanced Filters
+                {showFilters ? <ChevronUp className="h-3 w-3 ml-auto" /> : <ChevronDown className="h-3 w-3 ml-auto" />}
+            </Button>
+            {(onlyVulnerable || minDirectDeps > 0 || minBlastRadius > 0 || licenseFilter !== "all") && (
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-[10px] h-7 text-destructive hover:text-destructive"
+                    onClick={() => {
+                        setOnlyVulnerable(false);
+                        setMinDirectDeps(0);
+                        setMinBlastRadius(0);
+                        setLicenseFilter("all");
+                    }}
+                >
+                    Clear
+                </Button>
+            )}
+          </div>
+
+          {showFilters && (
+            <div className="mt-3 p-3 bg-muted/30 rounded-md border space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div className="flex items-center gap-2">
+                    <input 
+                        type="checkbox" 
+                        id="only-vulnerable" 
+                        checked={onlyVulnerable}
+                        onChange={(e) => setOnlyVulnerable(e.target.checked)}
+                        className="rounded border-input bg-background"
+                    />
+                    <Label htmlFor="only-vulnerable" className="text-xs cursor-pointer">Only vulnerable</Label>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                        <Label className="text-[10px] text-muted-foreground uppercase font-semibold">Min Direct Deps</Label>
+                        <Input 
+                            type="number" 
+                            min="0"
+                            value={minDirectDeps}
+                            onChange={(e) => setMinDirectDeps(parseInt(e.target.value) || 0)}
+                            className="h-8 text-xs"
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label className="text-[10px] text-muted-foreground uppercase font-semibold">Min Blast Radius</Label>
+                        <Input 
+                            type="number" 
+                            min="0"
+                            value={minBlastRadius}
+                            onChange={(e) => setMinBlastRadius(parseInt(e.target.value) || 0)}
+                            className="h-8 text-xs"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <Label className="text-[10px] text-muted-foreground uppercase font-semibold">License Category</Label>
+                    <Select value={licenseFilter} onValueChange={setLicenseFilter}>
+                        <SelectTrigger size="sm" className="w-full h-8">
+                            <SelectValue placeholder="All categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All categories</SelectItem>
+                            <SelectItem value="permissive">Permissive</SelectItem>
+                            <SelectItem value="weak-copyleft">Weak Copyleft</SelectItem>
+                            <SelectItem value="copyleft">Copyleft</SelectItem>
+                            <SelectItem value="unknown">Unknown</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">
           <ScrollArea className="h-full">
@@ -102,12 +230,18 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                 <button
                   key={component.bomRef?.value || index}
                   onClick={() => setSelectedComponentId(component.bomRef?.value || null)}
-                  className={`flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors border-b ${
+                  className={`flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors border-b group ${
                     selectedComponentId === component.bomRef?.value ? "bg-muted" : ""
+                  } ${
+                    getVulnCount(component.vulnerabilities?.inherent).critical > 0 
+                      ? "border-l-4 border-l-destructive" 
+                      : getVulnCount(component.vulnerabilities?.inherent).high > 0 
+                      ? "border-l-4 border-l-orange-500" 
+                      : ""
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <div className="font-medium truncate" title={component.name}>
+                    <div className="font-medium truncate group-hover:text-primary transition-colors" title={component.name}>
                         {component.name}
                     </div>
                     <div className="text-xs text-muted-foreground truncate">
@@ -115,8 +249,8 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
-                    <Badge variant="secondary" className="text-[10px]">
-                      {directDependentsCount} deps
+                    <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                      {directDependentsCount} / {blastRadius?.get(component.bomRef?.value || "") || 0}
                     </Badge>
                     {getVulnCount(component.vulnerabilities?.inherent).total > 0 && (
                       <div className="flex gap-1">
@@ -160,7 +294,7 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                             <div className="flex items-center gap-2 flex-wrap">
                                 <h3 className="text-xl font-bold truncate">{selectedComponent.name}</h3>
                                 {Array.from(selectedComponent.licenses || []).map((l, i) => {
-                                    const licenseId = (l as any).id || (l as any).name || "Unknown";
+                                    const licenseId = (l as {id?: string, name?: string}).id || (l as {id?: string, name?: string}).name || "Unknown";
                                     return (
                                     <Badge key={i} variant="outline" className="text-[10px] font-mono">
                                         {licenseId}
@@ -168,33 +302,53 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                                     );
                                 })}
                             </div>
-                            <p className="text-sm text-muted-foreground">Version: {selectedComponent.version}</p>
                             <div className="flex items-center gap-4 mt-2">
                                 <div className="flex items-center gap-1 text-xs">
                                     <Scale className="h-3 w-3 text-muted-foreground" />
                                     <span className="capitalize">
                                         {(() => {
-                                            const firstLicense = Array.from(selectedComponent.licenses || [])[0];
-                                            const id = firstLicense ? ((firstLicense as any).id || (firstLicense as any).name) : null;
+                                            const firstLicense = Array.from(selectedComponent.licenses || [])[0] as {id?: string, name?: string} | undefined;
+                                            const id = firstLicense ? (firstLicense.id || firstLicense.name) : null;
                                             return getLicenseCategory(id);
                                         })()}
                                     </span>
                                 </div>
-                                {getVulnCount(selectedComponent.vulnerabilities?.inherent).total > 0 && (
-                                    <div className="flex items-center gap-2 text-xs">
-                                        <ShieldAlert className="h-3 w-3 text-destructive" />
-                                        <span className="text-destructive font-semibold">
-                                            {getVulnCount(selectedComponent.vulnerabilities?.inherent).critical}C, 
-                                            {getVulnCount(selectedComponent.vulnerabilities?.inherent).high}H
-                                        </span>
-                                    </div>
-                                )}
-                                {getVulnCount(selectedComponent.vulnerabilities?.inherent).total === 0 && (
-                                    <div className="flex items-center gap-1 text-xs text-green-600">
-                                        <ShieldCheck className="h-3 w-3" />
-                                        <span>No known vulnerabilities</span>
-                                    </div>
-                                )}
+                                <div className="flex items-center gap-1 text-xs">
+                                    <GitGraph className="h-3 w-3 text-muted-foreground" />
+                                    <span>Blast Radius: <strong>{blastRadius?.get(selectedComponentId || "") || 0}</strong> components</span>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {(() => {
+                                    const v = getVulnCount(selectedComponent.vulnerabilities?.inherent);
+                                    if (v.total === 0) return (
+                                        <Badge variant="outline" className="text-green-600 bg-green-50 dark:bg-green-900/10 border-green-200">
+                                            <ShieldCheck className="h-3 w-3 mr-1" />
+                                            No known vulnerabilities
+                                        </Badge>
+                                    );
+                                    
+                                    return (
+                                        <div className="flex items-center gap-2">
+                                            {v.critical > 0 && (
+                                                <Badge variant="destructive" className="animate-pulse">
+                                                    {v.critical} Critical Risk
+                                                </Badge>
+                                            )}
+                                            {v.high > 0 && (
+                                                <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+                                                    {v.high} High Severity
+                                                </Badge>
+                                            )}
+                                            {v.medium > 0 && (
+                                                <Badge variant="secondary">
+                                                    {v.medium} Medium
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
@@ -205,11 +359,13 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                             {selectedDependents.map((dep, idx) => {
                                 const v = getVulnCount(dep.vulnerabilities?.inherent);
                                 const l = Array.from(dep.licenses || [])[0];
-                                const licenseId = l ? ((l as any).id || (l as any).name) : null;
-                                const category = getLicenseCategory(licenseId);
+                                const licenseId = l ? ((l as {id?: string, name?: string}).id || (l as {id?: string, name?: string}).name) : null;
                                 
                                 return (
-                                <div key={dep.bomRef?.value || idx} className="p-3 border rounded-md hover:border-primary transition-colors cursor-pointer group" 
+                                <div key={dep.bomRef?.value || idx} 
+                                     className={`p-3 border rounded-md hover:border-primary transition-colors cursor-pointer group ${
+                                         v.critical > 0 ? "border-l-4 border-l-destructive" : v.high > 0 ? "border-l-4 border-l-orange-500" : ""
+                                     }`}
                                      onClick={() => setSelectedComponentId(dep.bomRef?.value || null)}>
                                     <div className="flex items-center justify-between gap-2 mb-1">
                                         <div className="flex items-center gap-2 overflow-hidden">
@@ -220,14 +376,16 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                                             {v.total > 0 && (
                                                 <ShieldAlert className={`h-3 w-3 ${v.critical > 0 ? "text-destructive" : "text-orange-500"}`} />
                                             )}
-                                            {category !== "unknown" && (
-                                                <Scale className={`h-3 w-3 ${category === "copyleft" ? "text-destructive" : "text-blue-500"}`} />
-                                            )}
                                         </div>
                                     </div>
                                     <div className="text-[10px] text-muted-foreground pl-5 flex justify-between items-center">
-                                        <span>v{dep.version}</span>
-                                        {licenseId && <span className="text-[9px] opacity-70 px-1 border rounded bg-muted/50 truncate max-w-[60px]">{licenseId}</span>}
+                                        <div className="flex items-center gap-2">
+                                            <span>v{dep.version}</span>
+                                            {licenseId && <span className="text-[9px] opacity-70 px-1 border rounded bg-muted/50 truncate max-w-[60px]">{licenseId}</span>}
+                                        </div>
+                                        <div className="text-[9px] font-mono opacity-60">
+                                            Impact: {blastRadius?.get(dep.bomRef?.value || "") || 0}
+                                        </div>
                                     </div>
                                 </div>
                                 );

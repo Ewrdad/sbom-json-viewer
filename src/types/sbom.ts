@@ -131,6 +131,10 @@ export type formattedSBOM = {
    */
   dependentsGraph: Map<string, string[]>;
   /**
+   * Blast radius: bomRef -> total count of transitive dependents
+   */
+  blastRadius: Map<string, number>;
+  /**
    * Top level component refs (roots of the tree)
    */
   topLevelRefs: string[];
