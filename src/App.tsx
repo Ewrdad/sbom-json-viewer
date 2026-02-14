@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ViewProvider, useView } from "./context/ViewContext";
+import { SettingsProvider } from "./context/SettingsContext";
 import { Layout } from "./components/layout/Layout";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { HelpGuide } from "./components/common/HelpGuide";
@@ -53,7 +54,7 @@ const ReverseDependencyTree = lazy(() =>
   })),
 );
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
-import { Upload } from "lucide-react";
+import { Upload, Download } from "lucide-react";
 import {
   type SbomStats,
   type formattedSBOM,
@@ -123,6 +124,32 @@ function AppContent({
             <Upload className="h-4 w-4 mr-2" />
             Upload SBOM
           </Button>
+          {sbom && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const blob = new Blob([JSON.stringify(sbom, null, 2)], {
+                  type: "application/json",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                // Sanitize currentFile for filename
+                const safeName = currentFile
+                  .replace("Local: ", "")
+                  .replace(/\//g, "_");
+                a.download = `${safeName}.sbom.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+          )}
           <div className="w-px h-8 bg-border mx-2" />
           {manifest?.files.map((file) => (
             <Button
@@ -510,9 +537,11 @@ export function App() {
 
   return (
     <ErrorBoundary>
-      <ViewProvider>
-        <Layout>{mainContent}</Layout>
-      </ViewProvider>
+      <SettingsProvider>
+        <ViewProvider>
+          <Layout>{mainContent}</Layout>
+        </ViewProvider>
+      </SettingsProvider>
     </ErrorBoundary>
   );
 }
