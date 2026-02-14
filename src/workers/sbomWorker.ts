@@ -106,6 +106,11 @@ self.onmessage = async (e: MessageEvent) => {
     });
     if (import.meta.env.DEV) console.log(`[Worker] Tree formatted`);
 
+    // Add signature to formatted object if it exists on bom
+    if ((bom as any).signature) {
+      formatted.signature = (bom as any).signature;
+    }
+
     // 5b. Calculate Reverse Dependency Graph
     // Formatter returns dependencyGraph as a Map
     if (formatted.dependencyGraph) {

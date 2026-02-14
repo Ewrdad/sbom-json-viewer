@@ -107,6 +107,7 @@ export interface EnhancedComponent extends Component {
 }
 
 export type formattedSBOM = {
+  signature?: Signature;
   statistics: {
     licenses: License[];
     vulnerabilities: {
@@ -139,3 +140,16 @@ export type formattedSBOM = {
    */
   topLevelRefs: string[];
 };
+
+export interface Signature {
+  algorithm: string;
+  certificate?: string;
+  publicKey?: {
+    kty?: string;
+    crv?: string;
+    x?: string;
+    y?: string;
+  };
+  value?: string;
+  keyId?: string;
+}

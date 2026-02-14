@@ -10,6 +10,11 @@ export const convertJsonToBom = async (
     metadata: rawJson.metadata as any,
   });
 
+  // Extract signature if present
+  if (rawJson.signature) {
+    (bom as any).signature = rawJson.signature;
+  }
+
   // Adding the root component from metadata if it exists
   if (rawJson.metadata?.component) {
     const metaComp = rawJson.metadata.component;
@@ -24,6 +29,7 @@ export const convertJsonToBom = async (
         purl: metaComp.purl,
       },
     );
+    bom.metadata.component = rootComponent;
     bom.components.add(rootComponent);
   }
 

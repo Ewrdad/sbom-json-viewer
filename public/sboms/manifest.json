@@ -20,6 +20,11 @@
       "name": "Self Scan (Latest)",
       "path": "sboms/self/latest.sbom.json",
       "id": "self/latest"
+    },
+    {
+      "name": "Signed SBOM Demo",
+      "path": "sboms/examples/signed-sample.sbom.json",
+      "id": "examples/signed-sample"
     }
   ]
 }
