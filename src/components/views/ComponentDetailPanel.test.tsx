@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { type EnhancedComponent } from "../../types/sbom";
+import { SettingsProvider } from "../../context/SettingsContext";
 
 // Mock handles
 vi.stubGlobal('navigator', {
@@ -45,11 +46,13 @@ describe("ComponentDetailPanel", () => {
 
   it("renders basic component information", () => {
     render(
-      <ComponentDetailPanel
-        component={mockComponent}
-        analysis={null}
-        onClose={mockOnClose}
-      />
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
     );
 
     expect(screen.getByText("test-package")).toBeDefined();
@@ -59,11 +62,13 @@ describe("ComponentDetailPanel", () => {
 
   it("renders vulnerability breakdown", () => {
     render(
-      <ComponentDetailPanel
-        component={mockComponent}
-        analysis={null}
-        onClose={mockOnClose}
-      />
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
     );
 
     expect(screen.getByText("Critical (1)")).toBeDefined();
@@ -74,11 +79,13 @@ describe("ComponentDetailPanel", () => {
 
   it("renders license badge", () => {
     render(
-      <ComponentDetailPanel
-        component={mockComponent}
-        analysis={null}
-        onClose={mockOnClose}
-      />
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
     );
 
     const licenseBadge = screen.getByText("MIT");
@@ -89,11 +96,13 @@ describe("ComponentDetailPanel", () => {
 
   it("copies JSON to clipboard", async () => {
     render(
-      <ComponentDetailPanel
-        component={mockComponent}
-        analysis={null}
-        onClose={mockOnClose}
-      />
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
     );
 
     // Use getByRole for better accessibility matching
@@ -110,11 +119,13 @@ describe("ComponentDetailPanel", () => {
 
   it("renders additional details (properties)", () => {
     render(
-      <ComponentDetailPanel
-        component={mockComponent}
-        analysis={null}
-        onClose={mockOnClose}
-      />
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
     );
 
     // We look for "Properties (1)" text

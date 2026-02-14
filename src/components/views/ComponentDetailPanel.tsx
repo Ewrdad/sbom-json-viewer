@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { SearchButton } from "@/components/common/SearchButton";
 
 interface ComponentDetailPanelProps {
   component: Component | EnhancedComponent;
@@ -76,7 +77,7 @@ export function ComponentDetailPanel({
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="p-4 space-y-6">
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
@@ -84,6 +85,9 @@ export function ComponentDetailPanel({
             </h4>
             <div className="text-xl font-bold break-all leading-tight">
               {component.name}
+            </div>
+            <div className="mt-2">
+              <SearchButton query={`${component.name} ${component.version || ''} vulnerability`} className="w-full justify-start" />
             </div>
           </div>
 

@@ -212,7 +212,7 @@ export function ComponentExplorer({
               )}
             </div>
 
-            <div className="rounded-md border flex-1 overflow-auto bg-card scrollbar-thin min-w-0">
+            <div className="rounded-md border flex-1 min-h-0 overflow-auto bg-card scrollbar-thin min-w-0">
               <Table className="w-full">
                 <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
                   {table.getHeaderGroups().map((headerGroup) => (

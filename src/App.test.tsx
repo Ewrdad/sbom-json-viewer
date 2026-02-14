@@ -90,6 +90,7 @@ vi.mock("lucide-react", () => ({
   GitGraph: () => <div />,
   Layers: () => <div />,
   ArrowRight: () => <div />,
+  Download: () => <div />,
 }));
 
 // Polyfill Worker
@@ -274,5 +275,53 @@ describe("App Integration", () => {
 
     // Assert content in explorer without relying on table role
     expect(await screen.findByText(/comp1/i)).toBeInTheDocument();
+  });
+  
+  it("should show download button and trigger download when clicked", async () => {
+    // Mock URL methods on the existing global URL object
+    const createObjectURLMock = vi.fn().mockReturnValue("blob:mock-url");
+    const revokeObjectURLMock = vi.fn();
+    
+    const originalCreateObjectURL = window.URL.createObjectURL;
+    const originalRevokeObjectURL = window.URL.revokeObjectURL;
+    window.URL.createObjectURL = createObjectURLMock;
+    window.URL.revokeObjectURL = revokeObjectURLMock;
+    
+    // Use a real element but mock its click
+    const realCreateElement = document.createElement.bind(document);
+    const anchorMock = realCreateElement("a");
+    const clickSpy = vi.spyOn(anchorMock, "click").mockImplementation(() => {});
+    
+    vi.spyOn(document, "createElement").mockImplementation((tagName) => {
+      if (tagName === "a") return anchorMock;
+      return realCreateElement(tagName);
+    });
+
+    const appendSpy = vi.spyOn(document.body, "appendChild");
+    const removeSpy = vi.spyOn(document.body, "removeChild");
+
+    render(<App />);
+
+    // Wait for initial load
+    await waitFor(() => {
+        expect(screen.queryByText(/Preparing/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: /Download/i })).toBeInTheDocument();
+    }, { timeout: 5000 });
+
+    const downloadButton = screen.getByRole("button", { name: /Download/i });
+    fireEvent.click(downloadButton);
+    
+    // Check if the business logic was executed
+    expect(createObjectURLMock).toHaveBeenCalled();
+    expect(appendSpy).toHaveBeenCalled();
+    
+    // Check if the anchor mock was used and clicked
+    expect(anchorMock.download).toContain(".sbom.json");
+    expect(clickSpy).toHaveBeenCalled();
+    expect(removeSpy).toHaveBeenCalled();
+    
+    vi.restoreAllMocks();
+    window.URL.createObjectURL = originalCreateObjectURL;
+    window.URL.revokeObjectURL = originalRevokeObjectURL;
   });
 });

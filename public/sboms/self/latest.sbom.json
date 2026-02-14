@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:df11e780-129b-43be-be9d-34d014583bd5",
+  "serialNumber": "urn:uuid:09c0e384-7aa0-493c-a1ed-eb640788f578",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-13T08:53:23+00:00",
+    "timestamp": "2026-02-14T16:00:02+00:00",
     "tools": {
       "components": [
         {
@@ -20,7 +20,7 @@
       ]
     },
     "component": {
-      "bom-ref": "96ec329b-0768-4c0a-bdae-dee33e842762",
+      "bom-ref": "6c8b7678-c87e-407c-89fa-6ff401da5eb8",
       "type": "application",
       "name": ".",
       "properties": [
@@ -33,7 +33,7 @@
   },
   "components": [
     {
-      "bom-ref": "2af3dc18-19de-4fe3-8527-26214d5764cd",
+      "bom-ref": "8e908e9a-101e-47cc-93bc-19bccecf9de9",
       "type": "application",
       "name": "package-lock.json",
       "properties": [
@@ -20473,7 +20473,13 @@
   ],
   "dependencies": [
     {
-      "ref": "2af3dc18-19de-4fe3-8527-26214d5764cd",
+      "ref": "6c8b7678-c87e-407c-89fa-6ff401da5eb8",
+      "dependsOn": [
+        "8e908e9a-101e-47cc-93bc-19bccecf9de9"
+      ]
+    },
+    {
+      "ref": "8e908e9a-101e-47cc-93bc-19bccecf9de9",
       "dependsOn": [
         "pkg:npm/%40base-ui/react@1.1.0",
         "pkg:npm/%40cyclonedx/cyclonedx-library@9.4.1",
@@ -20520,12 +20526,6 @@
         "pkg:npm/typescript@5.9.3",
         "pkg:npm/vite@7.3.1",
         "pkg:npm/vitest@4.0.18"
-      ]
-    },
-    {
-      "ref": "96ec329b-0768-4c0a-bdae-dee33e842762",
-      "dependsOn": [
-        "2af3dc18-19de-4fe3-8527-26214d5764cd"
       ]
     },
     {
@@ -25644,6 +25644,15 @@
           "severity": "low",
           "method": "CVSSv31",
           "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L"
+        },
+        {
+          "source": {
+            "name": "redhat"
+          },
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
         }
       ],
       "cwes": [
@@ -25656,6 +25665,9 @@
           "url": "https://avd.aquasec.com/nvd/cve-2026-2391"
         },
         {
+          "url": "https://access.redhat.com/security/cve/CVE-2026-2391"
+        },
+        {
           "url": "https://github.com/ljharb/qs"
         },
         {
@@ -25666,6 +25678,9 @@
         },
         {
           "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2391"
+        },
+        {
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-2391"
         }
       ],
       "published": "2026-02-12T05:17:11+00:00",

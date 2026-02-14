@@ -202,7 +202,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
         defaultSize={selectedComponent || selectedLicense ? 60 : 100}
         minSize={30}
       >
-        <ScrollArea className="h-full pr-2">
+        <ScrollArea className="h-full min-h-0 pr-2">
       <div className="pb-6 space-y-6 animate-in fade-in duration-500">
         <div className="flex items-center gap-3">
           <ScrollText className="h-7 w-7 text-primary" />
@@ -637,7 +637,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    <ScrollArea className="flex-1">
+                    <ScrollArea className="flex-1 min-h-0">
                       <div className="p-4 space-y-6">
                         <div>
                           <h4 className="text-sm font-medium text-muted-foreground mb-1">License ID</h4>

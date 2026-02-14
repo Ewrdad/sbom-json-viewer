@@ -3,6 +3,7 @@ import { VulnerabilitiesView } from './VulnerabilitiesView';
 import { describe, it, expect, vi } from 'vitest';
 import type { SbomStats } from '@/types/sbom';
 import userEvent from '@testing-library/user-event';
+import { SettingsProvider } from "../../context/SettingsContext";
 
 // Mock Recharts to avoid responsive container issues in jsdom
 vi.mock('recharts', async () => {
@@ -64,7 +65,11 @@ const emptyStats: SbomStats = {
 
 describe('VulnerabilitiesView', () => {
     it('should render KPI cards with correct counts', () => {
-        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
 
         expect(screen.getByText('Total Findings')).toBeInTheDocument();
         expect(screen.getByText('50')).toBeInTheDocument();
@@ -85,14 +90,22 @@ describe('VulnerabilitiesView', () => {
     });
 
     it('should show empty state when no vulnerabilities', () => {
-        render(<VulnerabilitiesView sbom={null} preComputedStats={emptyStats} />);
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={emptyStats} />
+            </SettingsProvider>
+        );
 
         expect(screen.getByText('No vulnerabilities detected!')).toBeInTheDocument();
         expect(screen.getByText(/all components are secure/)).toBeInTheDocument();
     });
 
     it('should render vulnerable components table', () => {
-        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
 
         expect(screen.getByText('lodash')).toBeInTheDocument();
         expect(screen.getByText('express')).toBeInTheDocument();
@@ -101,7 +114,11 @@ describe('VulnerabilitiesView', () => {
 
     it('should filter table when searching', async () => {
         const user = userEvent.setup();
-        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
 
         const searchInput = screen.getByPlaceholderText('Search components...');
         await user.type(searchInput, 'lodash');
@@ -113,7 +130,11 @@ describe('VulnerabilitiesView', () => {
 
     it('should switch to vulnerability view and show CVEs', async () => {
         const user = userEvent.setup();
-        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
 
         const switchBtn = screen.getByText('By Vulnerability');
         await user.click(switchBtn);
@@ -128,7 +149,11 @@ describe('VulnerabilitiesView', () => {
 
     it('should filter CVEs when searching in vulnerability view', async () => {
         const user = userEvent.setup();
-        render(<VulnerabilitiesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
 
         const switchBtn = screen.getByText('By Vulnerability');
         await user.click(switchBtn);
