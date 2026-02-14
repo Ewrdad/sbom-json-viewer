@@ -29,6 +29,13 @@ import {
   ArrowUpDown,
   X,
   Network,
+  ExternalLink,
+  Clock,
+  BookOpen,
+  Info,
+  Database,
+  Calendar,
+  Layers,
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import {
@@ -782,32 +789,222 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                       </Button>
                     </div>
                     <ScrollArea className="flex-1 min-h-0">
-                      <div className="p-4 space-y-6">
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-1">ID</h4>
-                          <div className="text-xl font-bold font-mono text-destructive">{(selectedVulnerability as any).id}</div>
-                          <div className="mt-2">
-                             <SearchButton query={(selectedVulnerability as any).id} className="w-full justify-start" />
-                          </div>
-                        </div>
+                      {(() => {
+                        const v = selectedVulnerability as any;
+                        if (!v) return null;
+                        return (
+                          <div className="p-4 space-y-6">
+                            <div>
+                              <h4 className="text-sm font-medium text-muted-foreground mb-1">ID</h4>
+                              <div className="text-xl font-bold font-mono text-destructive">{v.id}</div>
+                              <div className="mt-2">
+                                 <SearchButton query={v.id} className="w-full justify-start" />
+                              </div>
+                            </div>
                         
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Severity</h4>
-                          <Badge 
-                            variant="secondary" 
-                            className="text-white border-0"
-                            style={{ 
-                              backgroundColor: SEVERITY_COLORS[(selectedVulnerability as any).severity.charAt(0).toUpperCase() + (selectedVulnerability as any).severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
-                            }}
-                          >
-                            {(selectedVulnerability as any).severity}
-                          </Badge>
-                        </div>
+                            <div>
+                              <h4 className="text-sm font-medium text-muted-foreground mb-1">Severity</h4>
+                              <Badge 
+                                variant="secondary" 
+                                className="text-white border-0"
+                                style={{ 
+                                  backgroundColor: SEVERITY_COLORS[v.severity.charAt(0).toUpperCase() + v.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
+                                }}
+                              >
+                                {v.severity}
+                              </Badge>
+                            </div>
 
-                        {((selectedVulnerability as any).title) && (
+                        {v.description && (
                           <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
-                            <p className="text-sm leading-relaxed">{(selectedVulnerability as any).title}</p>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
+                              <Info className="h-4 w-4" /> Description
+                            </h4>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{v.description}</p>
+                          </div>
+                        )}
+
+                        {v.detail && v.detail !== v.description && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
+                              <BookOpen className="h-4 w-4" /> Details
+                            </h4>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{v.detail}</p>
+                          </div>
+                        )}
+
+                        {v.recommendation && (
+                          <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-md">
+                            <h4 className="text-sm font-semibold text-blue-500 mb-1 flex items-center gap-2">
+                              <ShieldCheck className="h-4 w-4" /> Recommendation
+                            </h4>
+                            <p className="text-sm leading-relaxed">{v.recommendation}</p>
+                          </div>
+                        )}
+
+                        {v.cwes && v.cwes.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                               <Layers className="h-4 w-4" /> CWEs
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {v.cwes.map((cwe: number) => (
+                                <Badge key={cwe} variant="outline" className="text-[10px] hover:bg-muted cursor-default">
+                                  CWE-{cwe}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {v.analysis && (
+                          <div className="space-y-3 p-3 bg-muted/40 rounded-lg border">
+                            <h4 className="text-sm font-semibold flex items-center gap-2">
+                              <Search className="h-4 w-4" /> Vulnerability Analysis
+                            </h4>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                              {v.analysis.state && (
+                                <div>
+                                  <span className="text-muted-foreground">State: </span>
+                                  <span className="font-medium uppercase">{v.analysis.state}</span>
+                                </div>
+                              )}
+                              {v.analysis.justification && (
+                                <div>
+                                  <span className="text-muted-foreground">Justification: </span>
+                                  <span className="font-medium">{v.analysis.justification}</span>
+                                </div>
+                              )}
+                            </div>
+                            {v.analysis.response && v.analysis.response.length > 0 && (
+                              <div className="text-xs">
+                                <span className="text-muted-foreground">Responses: </span>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {v.analysis.response.map((r: string) => (
+                                    <Badge key={r} variant="outline" className="text-[9px] py-0">{r}</Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {v.analysis.detail && (
+                              <div className="text-xs mt-1">
+                                <span className="text-muted-foreground">Analysis Detail: </span>
+                                <p className="mt-1 italic">{v.analysis.detail}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {(v.created || v.published || v.updated || v.rejected) && (
+                          <div className="grid grid-cols-1 gap-2 p-3 bg-muted/20 rounded-lg">
+                            <h4 className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider mb-1">Timeline</h4>
+                            {v.created && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <Calendar className="h-3 w-3" /> Created
+                                </span>
+                                <span>{new Date(v.created).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                            {v.published && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <Clock className="h-3 w-3" /> Published
+                                </span>
+                                <span>{new Date(v.published).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                            {v.updated && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <Clock className="h-3 w-3" /> Modified
+                                </span>
+                                <span>{new Date(v.updated).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                            {v.rejected && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <X className="h-3 w-3" /> Rejected
+                                </span>
+                                <span>{new Date(v.rejected).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {v.ratings && v.ratings.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                               <Database className="h-4 w-4" /> Ratings
+                            </h4>
+                            <div className="space-y-2">
+                              {v.ratings.map((rate: any, idx: number) => (
+                                <div key={idx} className="text-xs border rounded p-2 space-y-1">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-bold">{rate.method || 'CVSS'}</span>
+                                    <Badge variant="outline" className="h-4 text-[9px]">{rate.score || 'N/A'}</Badge>
+                                  </div>
+                                  {rate.vector && <div className="text-[10px] text-muted-foreground break-all">{rate.vector}</div>}
+                                  {rate.severity && <div className="text-[10px] uppercase font-semibold">{rate.severity}</div>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {v.advisories && v.advisories.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                               <ExternalLink className="h-4 w-4" /> Advisories
+                            </h4>
+                            <ul className="space-y-1">
+                              {v.advisories.map((adv: any, idx: number) => (
+                                <li key={idx} className="text-xs truncate">
+                                  <a href={adv.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+                                    {adv.title || adv.url}
+                                    <ExternalLink className="h-2 w-2" />
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {v.references && v.references.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                               <BookOpen className="h-4 w-4" /> References
+                            </h4>
+                            <ul className="space-y-1">
+                              {v.references.map((ref: any, idx: number) => (
+                                <li key={idx} className="text-xs truncate" title={ref.comment}>
+                                  <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center gap-1">
+                                    {ref.url}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {v.proofOfConcept && (
+                          <div className="bg-orange-500/5 border border-orange-500/20 p-3 rounded-md">
+                            <h4 className="text-sm font-semibold text-orange-600 mb-1 flex items-center gap-2">
+                               <ShieldAlert className="h-4 w-4" /> Proof of Concept
+                            </h4>
+                            {v.proofOfConcept.reproductionSteps && (
+                              <div className="mt-2">
+                                <span className="text-[10px] font-bold uppercase text-muted-foreground">Steps</span>
+                                <p className="text-xs mt-1 whitespace-pre-wrap">{v.proofOfConcept.reproductionSteps}</p>
+                              </div>
+                            )}
+                            {v.proofOfConcept.environment && (
+                              <div className="mt-2">
+                                <span className="text-[10px] font-bold uppercase text-muted-foreground">Environment</span>
+                                <p className="text-xs mt-1 italic">{v.proofOfConcept.environment}</p>
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -815,31 +1012,31 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
 
                         <div>
                           <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                            <Network className="h-4 w-4" /> Affected Components ({(selectedVulnerability as any).affectedCount})
+                            <Network className="h-4 w-4" /> Affected Components ({v.affectedCount})
                           </h4>
                           <div className="space-y-2">
                             {displayStats.allVulnerableComponents
-                              .filter(c => {
-                                 // This is a bit complex as we need to know if this specific vuln affects this component
-                                 return true; // Placeholder
-                              })
+                              .filter(c => v.affectedComponentRefs?.includes(c.ref))
                               .slice(0, 10).map((comp: any, i: number) => (
                                 <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
-                                  <span className="font-medium truncate mr-2">{comp.name}</span>
+                                  <div className="flex flex-col truncate">
+                                    <span className="font-medium truncate">{comp.name}</span>
+                                    <span className="text-[10px] text-muted-foreground truncate">{comp.ref}</span>
+                                  </div>
                                   <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
                                 </div>
                               ))
                             }
-                            {(selectedVulnerability as any).affectedCount > 10 && (
-                              <p className="text-[10px] text-muted-foreground text-center">+ {(selectedVulnerability as any).affectedCount - 10} more components</p>
+                            {v.affectedCount > 10 && (
+                              <p className="text-[10px] text-muted-foreground text-center">+ {v.affectedCount - 10} more components</p>
                             )}
                           </div>
                         </div>
 
-                        {(selectedVulnerability as any).id.startsWith('CVE-') && (
+                        {v.id.startsWith('CVE-') && (
                           <div className="pt-4 mt-auto">
                               <a 
-                                href={`https://nvd.nist.gov/vuln/detail/${(selectedVulnerability as any).id}`} 
+                                href={`https://nvd.nist.gov/vuln/detail/${v.id}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-9 px-4 text-sm font-medium hover:bg-primary/90 transition-colors"
@@ -849,6 +1046,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           </div>
                         )}
                       </div>
+                        );
+                      })()}
                     </ScrollArea>
                   </div>
                 )}

@@ -46,6 +46,32 @@ export interface SbomStats {
     severity: string;
     affectedCount: number;
     title?: string;
+    description?: string;
+    detail?: string;
+    recommendation?: string;
+    advisories?: { title?: string; url: string }[];
+    cwes?: number[];
+    source?: { name?: string; url?: string };
+    references?: { url: string; comment?: string }[];
+    ratings?: any[];
+    analysis?: {
+      state?: string;
+      justification?: string;
+      response?: string[];
+      detail?: string;
+      firstAppearance?: string;
+      lastAppearance?: string;
+    };
+    created?: string;
+    published?: string;
+    updated?: string;
+    rejected?: string;
+    proofOfConcept?: {
+      reproductionSteps?: string;
+      environment?: string;
+      screenshots?: { image: { attachment: string; contentType: string } }[];
+    };
+    affectedComponentRefs: string[];
   }[];
   allLicenses: {
     id: string;

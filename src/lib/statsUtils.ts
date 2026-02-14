@@ -33,7 +33,37 @@ export function calculateSbomStats(bom: any): SbomStats {
   const componentLicenseMap = new Map<string, { id: string; name: string; category: string }[]>();
 
   const compVulnMap = new Map<string, { critical: number; high: number; medium: number; low: number; total: number }>();
-  const vulnSummaryMap = new Map<string, { id: string; severity: string; affectedRefs: Set<string>; title?: string }>();
+  const vulnSummaryMap = new Map<string, { 
+    id: string; 
+    severity: string; 
+    affectedRefs: Set<string>; 
+    title?: string;
+    description?: string;
+    detail?: string;
+    recommendation?: string;
+    advisories?: { title?: string; url: string }[];
+    cwes?: number[];
+    source?: { name?: string; url?: string };
+    references?: { url: string; comment?: string }[];
+    ratings?: any[];
+    analysis?: {
+      state?: string;
+      justification?: string;
+      response?: string[];
+      detail?: string;
+      firstAppearance?: string;
+      lastAppearance?: string;
+    };
+    created?: string;
+    published?: string;
+    updated?: string;
+    rejected?: string;
+    proofOfConcept?: {
+      reproductionSteps?: string;
+      environment?: string;
+      screenshots?: { image: { attachment: string; contentType: string } }[];
+    };
+  }>();
 
   // Helper to normalize severity string
   const normalizeSeverity = (responseSeverity?: string) => {
@@ -60,7 +90,21 @@ export function calculateSbomStats(bom: any): SbomStats {
       id: vulnId,
       severity: maxSeverity,
       affectedRefs: new Set<string>(),
-      title: vuln.description || vuln.detail
+      title: vuln.description || vuln.detail, // Fallback for simple title
+      description: vuln.description,
+      detail: vuln.detail,
+      recommendation: vuln.recommendation,
+      advisories: vuln.advisories,
+      cwes: vuln.cwes,
+      source: vuln.source,
+      references: vuln.references,
+      ratings: vuln.ratings,
+      analysis: vuln.analysis,
+      created: vuln.created,
+      published: vuln.published,
+      updated: vuln.updated,
+      rejected: vuln.rejected,
+      proofOfConcept: vuln.proofOfConcept,
     };
 
     if (maxSeverity !== "none" && (existingSummary.severity === "none" || severityOrder.indexOf(maxSeverity as any) < severityOrder.indexOf(existingSummary.severity as any))) {
@@ -310,7 +354,22 @@ export function calculateSbomStats(bom: any): SbomStats {
       id: v.id,
       severity: v.severity,
       affectedCount: v.affectedRefs.size,
-      title: v.title
+      affectedComponentRefs: Array.from(v.affectedRefs),
+      title: v.title,
+      description: v.description,
+      detail: v.detail,
+      recommendation: v.recommendation,
+      advisories: v.advisories,
+      cwes: v.cwes,
+      source: v.source,
+      references: v.references,
+      ratings: v.ratings,
+      analysis: v.analysis,
+      created: v.created,
+      published: v.published,
+      updated: v.updated,
+      rejected: v.rejected,
+      proofOfConcept: v.proofOfConcept,
     }))
     .sort((a, b) => b.affectedCount - a.affectedCount || a.id.localeCompare(b.id));
 

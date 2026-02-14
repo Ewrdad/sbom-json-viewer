@@ -76,8 +76,6 @@ describe('VulnerabilitiesView', () => {
         expect(screen.getByText('Unique CVEs')).toBeInTheDocument();
         expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
 
-        // Use a more resilient way to find severity counts: find the label and ensure the count is nearby
-        // or just check that they exist in the document.
         expect(screen.getAllByText('Critical').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('High').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('Medium').length).toBeGreaterThanOrEqual(1);
@@ -142,7 +140,6 @@ describe('VulnerabilitiesView', () => {
         expect(screen.getByText('CVE-2024-001')).toBeInTheDocument();
         expect(screen.getByText('CVE-2024-002')).toBeInTheDocument();
         expect(screen.getByText('GHSA-xxx')).toBeInTheDocument();
-        // There might be multiple '10's (KPI card for High vulns is also 10)
         const tens = screen.getAllByText('10');
         expect(tens.length).toBeGreaterThanOrEqual(1);
     });
@@ -163,5 +160,56 @@ describe('VulnerabilitiesView', () => {
 
         expect(screen.getByText('CVE-2024-001')).toBeInTheDocument();
         expect(screen.queryByText('CVE-2024-002')).not.toBeInTheDocument();
+    });
+
+    it('should render comprehensive vulnerability details when selected', async () => {
+        const user = userEvent.setup();
+        const detailedStats: SbomStats = {
+            ...mockStats,
+            allVulnerabilities: [
+                {
+                    id: 'CVE-9999-DETAILED',
+                    severity: 'high',
+                    affectedCount: 1,
+                    affectedComponentRefs: ['ref-lodash'],
+                    title: 'Detailed Title',
+                    description: 'Detailed Description',
+                    detail: 'Detailed long text',
+                    recommendation: 'Fix it now',
+                    cwes: [79],
+                    analysis: {
+                        state: 'not_affected',
+                        justification: 'code_not_reachable'
+                    },
+                    created: '2024-01-01T00:00:00Z',
+                    proofOfConcept: {
+                        reproductionSteps: 'Step 1: Run it'
+                    }
+                }
+            ]
+        };
+
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={detailedStats} />
+            </SettingsProvider>
+        );
+
+        const switchBtn = screen.getByText('By Vulnerability');
+        await user.click(switchBtn);
+
+        const detailsBtn = screen.getByText('Details');
+        await user.click(detailsBtn);
+
+        expect(screen.getByText('Detailed Title')).toBeInTheDocument();
+        expect(screen.getByText('Detailed Description')).toBeInTheDocument();
+        expect(screen.getByText('Detailed long text')).toBeInTheDocument();
+        expect(screen.getByText('Fix it now')).toBeInTheDocument();
+        expect(screen.getByText('CWE-79')).toBeInTheDocument();
+        expect(screen.getByText(/not_affected/i)).toBeInTheDocument();
+        expect(screen.getByText(/code_not_reachable/i)).toBeInTheDocument();
+        expect(screen.getByText('Step 1: Run it')).toBeInTheDocument();
+        // Check for "Timeline" header to ensure we are in the right section
+        expect(screen.getByText('Timeline')).toBeInTheDocument();
     });
 });
