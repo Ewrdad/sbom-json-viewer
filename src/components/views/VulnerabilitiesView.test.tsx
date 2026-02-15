@@ -31,9 +31,9 @@ const mockStats: SbomStats = {
     ],
     totalVulnerabilities: 50,
     allVulnerabilities: [
-        { id: 'CVE-2024-001', severity: 'critical', affectedCount: 10, title: 'Critical Vuln' },
-        { id: 'CVE-2024-002', severity: 'high', affectedCount: 5, title: 'High Vuln' },
-        { id: 'GHSA-xxx', severity: 'medium', affectedCount: 2, title: 'Medium Vuln' },
+        { id: 'CVE-2024-001', severity: 'critical', affectedCount: 10, title: 'Critical Vuln', affectedComponentRefs: ['ref-lodash'] },
+        { id: 'CVE-2024-002', severity: 'high', affectedCount: 5, title: 'High Vuln', affectedComponentRefs: ['ref-express'] },
+        { id: 'GHSA-xxx', severity: 'medium', affectedCount: 2, title: 'Medium Vuln', affectedComponentRefs: ['ref-axios'] },
     ],
     allLicenses: [],
     allLicenseComponents: [],
@@ -211,5 +211,69 @@ describe('VulnerabilitiesView', () => {
         expect(screen.getByText('Step 1: Run it')).toBeInTheDocument();
         // Check for "Timeline" header to ensure we are in the right section
         expect(screen.getByText('Timeline')).toBeInTheDocument();
+    });
+    it('should render all extended vulnerability fields', async () => {
+        const user = userEvent.setup();
+        const extendedStats: SbomStats = {
+            ...mockStats,
+            allVulnerabilities: [
+                {
+                    id: 'CVE-EXTENDED',
+                    severity: 'critical',
+                    affectedCount: 1,
+                    affectedComponentRefs: ['ref-lodash'],
+                    title: 'Extended Title',
+                    description: 'Extended Description',
+                    recommendation: 'Fix it',
+                    workaround: 'Do this instead',
+                    credits: {
+                        organizations: [{ name: 'Security Org', url: 'https://security.org' }],
+                        individuals: [{ name: 'Jane Doe', email: 'jane@doe.com' }]
+                    },
+                    tools: [{ name: 'VulnScanner', version: '1.0' }],
+                    properties: [{ name: 'custom-prop', value: 'custom-val' }],
+                    affects: [
+                        {
+                            ref: 'ref-lodash',
+                            versions: [{ version: '4.17.20', status: 'affected' }]
+                        }
+                    ],
+                    ratings: [
+                        {
+                            source: { name: 'NVD' },
+                            score: 9.8,
+                            severity: 'critical',
+                            method: 'CVSSv3',
+                            vector: 'CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H'
+                        }
+                    ]
+                }
+            ]
+        };
+
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={null} preComputedStats={extendedStats} />
+            </SettingsProvider>
+        );
+
+        const switchBtn = screen.getByText('By Vulnerability');
+        await user.click(switchBtn);
+
+        const detailsBtn = screen.getByText('Details');
+        await user.click(detailsBtn);
+
+        expect(screen.getByText('Workaround')).toBeInTheDocument();
+        expect(screen.getByText('Do this instead')).toBeInTheDocument();
+        expect(screen.getByText('Credits')).toBeInTheDocument();
+        expect(screen.getByText('Security Org')).toBeInTheDocument();
+        expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+        expect(screen.getByText('Detection Tools')).toBeInTheDocument();
+        expect(screen.getByText('VulnScanner 1.0')).toBeInTheDocument();
+        expect(screen.getByText('Additional Properties')).toBeInTheDocument();
+        expect(screen.getByText('custom-prop')).toBeInTheDocument();
+        expect(screen.getByText('custom-val')).toBeInTheDocument();
+        expect(screen.getByText('CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H')).toBeInTheDocument();
+        expect(screen.getAllByText(/affected/i).length).toBeGreaterThanOrEqual(1);
     });
 });

@@ -71,6 +71,17 @@ export interface SbomStats {
       environment?: string;
       screenshots?: { image: { attachment: string; contentType: string } }[];
     };
+    workaround?: string;
+    credits?: {
+      organizations?: { name: string; url?: string }[];
+      individuals?: { name: string; email?: string; url?: string }[];
+    };
+    tools?: any[];
+    properties?: any[];
+    affects?: {
+      ref: string;
+      versions?: { version: string; status: string }[];
+    }[];
     affectedComponentRefs: string[];
   }[];
   allLicenses: {

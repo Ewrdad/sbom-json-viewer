@@ -834,11 +834,20 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         )}
 
                         {v.recommendation && (
-                          <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-md">
-                            <h4 className="text-sm font-semibold text-blue-500 mb-1 flex items-center gap-2">
+                          <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-md">
+                            <h4 className="text-sm font-semibold text-emerald-600 mb-1 flex items-center gap-2">
                               <ShieldCheck className="h-4 w-4" /> Recommendation
                             </h4>
                             <p className="text-sm leading-relaxed">{v.recommendation}</p>
+                          </div>
+                        )}
+
+                        {v.workaround && (
+                          <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-md">
+                            <h4 className="text-sm font-semibold text-amber-600 mb-1 flex items-center gap-2">
+                              <AlertTriangle className="h-4 w-4" /> Workaround
+                            </h4>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{v.workaround}</p>
                           </div>
                         )}
 
@@ -933,20 +942,125 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           </div>
                         )}
 
+                        {v.source && (v.source.name || v.source.url) && (
+                          <div className="flex items-center gap-2 p-2 bg-muted/20 rounded border border-dashed">
+                             <Database className="h-3 w-3 text-muted-foreground" />
+                             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight">Report Source:</span>
+                             <span className="text-xs font-semibold">
+                               {v.source.name || (v.source.url && new URL(v.source.url).hostname) || 'Unknown Source'}
+                             </span>
+                             {v.source.url && (
+                               <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="ml-auto">
+                                 <ExternalLink className="h-3 w-3 text-primary hover:text-primary/80" />
+                               </a>
+                             )}
+                          </div>
+                        )}
+
                         {v.ratings && v.ratings.length > 0 && (
                           <div>
                             <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <Database className="h-4 w-4" /> Ratings
+                               <ShieldAlert className="h-4 w-4" /> Ratings & Scores
                             </h4>
                             <div className="space-y-2">
                               {v.ratings.map((rate: any, idx: number) => (
-                                <div key={idx} className="text-xs border rounded p-2 space-y-1">
-                                  <div className="flex justify-between items-center">
-                                    <span className="font-bold">{rate.method || 'CVSS'}</span>
-                                    <Badge variant="outline" className="h-4 text-[9px]">{rate.score || 'N/A'}</Badge>
+                                <div key={idx} className="text-xs border rounded p-3 space-y-2 bg-muted/10 relative overflow-hidden">
+                                  {rate.severity && (
+                                    <div 
+                                      className="absolute top-0 right-0 w-1 h-full" 
+                                      style={{ 
+                                        backgroundColor: SEVERITY_COLORS[rate.severity.charAt(0).toUpperCase() + rate.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
+                                      }} 
+                                    />
+                                  )}
+                                  <div className="flex justify-between items-start">
+                                    <div className="space-y-0.5">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-bold text-sm">{rate.method || 'Score'}</span>
+                                        {rate.source?.name && (
+                                          <Badge variant="outline" className="text-[9px] py-0 px-1 font-normal opacity-70">
+                                            via {rate.source.name}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      {rate.severity && (
+                                        <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80" 
+                                             style={{ color: SEVERITY_COLORS[rate.severity.charAt(0).toUpperCase() + rate.severity.slice(1) as keyof typeof SEVERITY_COLORS] }}>
+                                          {rate.severity}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-right flex flex-col items-end">
+                                      <div className="text-lg font-black leading-none">{rate.score || '—'}</div>
+                                      <span className="text-[9px] text-muted-foreground uppercase font-medium">Value</span>
+                                    </div>
                                   </div>
-                                  {rate.vector && <div className="text-[10px] text-muted-foreground break-all">{rate.vector}</div>}
-                                  {rate.severity && <div className="text-[10px] uppercase font-semibold">{rate.severity}</div>}
+                                  {rate.vector && (
+                                    <div className="pt-1">
+                                      <span className="text-[9px] font-bold text-muted-foreground uppercase block mb-1">Vector String</span>
+                                      <div className="text-[10px] bg-muted/50 p-1.5 rounded font-mono break-all leading-tight border border-muted-foreground/10">
+                                        {rate.vector}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {v.credits && (v.credits.organizations?.length || v.credits.individuals?.length) && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                              <Fingerprint className="h-4 w-4" /> Credits
+                            </h4>
+                            <div className="space-y-2">
+                              {v.credits.organizations?.map((org: any, idx: number) => (
+                                <div key={`org-${idx}`} className="text-xs flex items-center gap-2 bg-muted/30 p-2 rounded">
+                                  <Database className="h-3 w-3 text-muted-foreground" />
+                                  <span className="font-medium">{org.name}</span>
+                                  {org.url && (
+                                    <a href={org.url} target="_blank" rel="noopener noreferrer" className="ml-auto">
+                                      <ExternalLink className="h-3 w-3 text-primary" />
+                                    </a>
+                                  )}
+                                </div>
+                              ))}
+                              {v.credits.individuals?.map((ind: any, idx: number) => (
+                                <div key={`ind-${idx}`} className="text-xs flex flex-col bg-muted/30 p-2 rounded">
+                                  <span className="font-medium">{ind.name}</span>
+                                  {ind.email && <span className="text-muted-foreground text-[10px]">{ind.email}</span>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {v.tools && v.tools.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                              <Search className="h-4 w-4" /> Detection Tools
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {v.tools.map((tool: any, idx: number) => (
+                                <Badge key={idx} variant="outline" className="text-[10px]">
+                                  {tool.name || tool.vendor || 'Unknown Tool'} {tool.version}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {v.properties && v.properties.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                               <Info className="h-4 w-4" /> Additional Properties
+                            </h4>
+                            <div className="grid grid-cols-1 gap-1">
+                              {v.properties.map((prop: any, idx: number) => (
+                                <div key={idx} className="flex items-center justify-between text-[10px] p-1.5 bg-muted/20 rounded border border-transparent hover:border-muted-foreground/20 transition-colors">
+                                  <span className="font-semibold text-muted-foreground uppercase tracking-tight">{prop.name}</span>
+                                  <span className="font-mono text-foreground">{prop.value}</span>
                                 </div>
                               ))}
                             </div>
@@ -956,18 +1070,29 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         {v.advisories && v.advisories.length > 0 && (
                           <div>
                             <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <ExternalLink className="h-4 w-4" /> Advisories
+                               <ExternalLink className="h-4 w-4" /> Security Advisories
                             </h4>
-                            <ul className="space-y-1">
+                            <div className="grid grid-cols-1 gap-2">
                               {v.advisories.map((adv: any, idx: number) => (
-                                <li key={idx} className="text-xs truncate">
-                                  <a href={adv.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                                    {adv.title || adv.url}
-                                    <ExternalLink className="h-2 w-2" />
-                                  </a>
-                                </li>
+                                <a 
+                                  key={idx} 
+                                  href={adv.url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="group flex flex-col p-2.5 border rounded-md hover:bg-muted/50 transition-all no-underline"
+                                >
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <span className="text-xs font-semibold text-primary group-hover:underline truncate">
+                                      {adv.title || (adv.url && new URL(adv.url).hostname) || 'View Advisory'}
+                                    </span>
+                                    <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
+                                  </div>
+                                  <span className="text-[10px] text-muted-foreground truncate opacity-70">
+                                    {adv.url}
+                                  </span>
+                                </a>
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         )}
 
@@ -976,15 +1101,16 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                             <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
                                <BookOpen className="h-4 w-4" /> References
                             </h4>
-                            <ul className="space-y-1">
+                            <div className="space-y-1.5 line-clamp-2">
                               {v.references.map((ref: any, idx: number) => (
-                                <li key={idx} className="text-xs truncate" title={ref.comment}>
-                                  <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center gap-1">
+                                <div key={idx} className="flex flex-col border-l-2 border-muted pl-2 py-0.5">
+                                  <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline truncate flex items-center gap-1">
                                     {ref.url}
                                   </a>
-                                </li>
+                                  {ref.comment && <span className="text-[10px] text-muted-foreground italic truncate">{ref.comment}</span>}
+                                </div>
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         )}
 
@@ -1017,15 +1143,41 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           <div className="space-y-2">
                             {displayStats.allVulnerableComponents
                               .filter(c => v.affectedComponentRefs?.includes(c.ref))
-                              .slice(0, 10).map((comp: any, i: number) => (
-                                <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
-                                  <div className="flex flex-col truncate">
-                                    <span className="font-medium truncate">{comp.name}</span>
-                                    <span className="text-[10px] text-muted-foreground truncate">{comp.ref}</span>
+                              .slice(0, 10).map((comp: any, i: number) => {
+                                const affect = v.affects?.find((a: any) => (a.ref?.value || a.ref) === comp.ref);
+                                const status = affect?.versions?.[0]?.status;
+                                
+                                return (
+                                  <div key={i} className="flex flex-col p-2 rounded-md bg-muted/30 border text-sm gap-2">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex flex-col truncate">
+                                        <span className="font-medium truncate">{comp.name}</span>
+                                        <span className="text-[10px] text-muted-foreground truncate">{comp.ref}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        {status && (
+                                          <Badge 
+                                            variant={status === 'affected' ? 'destructive' : 'outline'} 
+                                            className="text-[9px] py-0 h-4 uppercase"
+                                          >
+                                            {status}
+                                          </Badge>
+                                        )}
+                                        <Badge variant="outline" className="text-[10px] shrink-0 font-mono">{comp.version}</Badge>
+                                      </div>
+                                    </div>
+                                    {affect?.versions && affect.versions.length > 1 && (
+                                      <div className="flex flex-wrap gap-1">
+                                        {affect.versions.slice(1).map((ver: any, vi: number) => (
+                                          <Badge key={vi} variant="outline" className="text-[8px] py-0 opacity-60">
+                                            {ver.version}: {ver.status}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    )}
                                   </div>
-                                  <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
-                                </div>
-                              ))
+                                );
+                              })
                             }
                             {v.affectedCount > 10 && (
                               <p className="text-[10px] text-muted-foreground text-center">+ {v.affectedCount - 10} more components</p>

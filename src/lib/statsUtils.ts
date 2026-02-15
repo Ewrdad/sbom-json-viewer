@@ -63,6 +63,14 @@ export function calculateSbomStats(bom: any): SbomStats {
       environment?: string;
       screenshots?: { image: { attachment: string; contentType: string } }[];
     };
+    workaround?: string;
+    credits?: {
+      organizations?: { name: string; url?: string }[];
+      individuals?: { name: string; email?: string; url?: string }[];
+    };
+    tools?: any[];
+    properties?: any[];
+    affects?: any[];
   }>();
 
   // Helper to normalize severity string
@@ -105,6 +113,11 @@ export function calculateSbomStats(bom: any): SbomStats {
       updated: vuln.updated,
       rejected: vuln.rejected,
       proofOfConcept: vuln.proofOfConcept,
+      workaround: vuln.workaround,
+      credits: vuln.credits,
+      tools: vuln.tools,
+      properties: vuln.properties,
+      affects: vuln.affects,
     };
 
     if (maxSeverity !== "none" && (existingSummary.severity === "none" || severityOrder.indexOf(maxSeverity as any) < severityOrder.indexOf(existingSummary.severity as any))) {
