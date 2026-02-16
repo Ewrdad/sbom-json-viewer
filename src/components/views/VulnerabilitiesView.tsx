@@ -334,6 +334,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
   };
 
   const handleExport = (platform: ExportPlatform) => {
+    // We export activeList because it respects the current UI filter and search state,
+    // ensuring the export matches exactly what the user sees in the table.
     const csv = generateTicketCSV(activeList, viewMode, platform);
     const filename = `sbom-tickets-${platform.toLowerCase()}-${viewMode}-${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csv, filename);

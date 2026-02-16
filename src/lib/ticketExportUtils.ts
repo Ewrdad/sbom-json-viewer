@@ -16,11 +16,33 @@ function escapeCSV(str: string): string {
   return `"${escaped}"`;
 }
 
+interface VulnerabilityItem {
+  id: string;
+  severity: string;
+  title?: string;
+  description?: string;
+  recommendation?: string;
+  source?: { name?: string };
+  ratings?: { score: number }[];
+}
+
+interface ComponentItem {
+  name: string;
+  version?: string;
+  total?: number;
+  critical?: number;
+  high?: number;
+  medium?: number;
+  low?: number;
+}
+
 /**
  * Generates a Ticket CSV string from the provided data and mode.
+ * We use a union type for data to remain flexible as the item structure 
+ * differs between component and vulnerability view modes.
  */
 export function generateTicketCSV(
-  data: Record<string, any>[],
+  data: (VulnerabilityItem | ComponentItem)[],
   mode: "components" | "vulnerabilities",
   platform: ExportPlatform
 ): string {
@@ -30,18 +52,21 @@ export function generateTicketCSV(
     let description = "";
 
     if (mode === "vulnerabilities") {
-      const score = item.ratings?.[0]?.score || "N/A";
-      title = `Fix ${item.id} (${item.severity} - ${score})`;
+      const v = item as VulnerabilityItem;
+      const score = v.ratings?.[0]?.score || "N/A";
+      title = `Fix ${v.id} (${v.severity} - ${score})`;
       description = [
-        item.recommendation ? `## Remediation\n${item.recommendation}` : "",
-        item.title || item.description ? `## Description\n${item.title || item.description}` : "",
-        item.source?.name ? `## Source\n${item.source.name}` : "",
+        v.recommendation ? `## Remediation\n${v.recommendation}` : "",
+        v.title || v.description ? `## Description\n${v.title || v.description}` : "",
+        v.source?.name ? `## Source\n${v.source.name}` : "",
       ]
+        // Filter out empty sections to maintain a clean ticket description
         .filter(Boolean)
         .join("\n\n");
     } else {
       // Component mode
-      title = `Fix ${item.name} (${item.critical || 0}Critical, ${item.high || 0}High, ${item.medium || 0}Medium, ${item.low || 0}Low)`;
+      const c = item as ComponentItem;
+      title = `Fix ${c.name} (${c.critical || 0}Critical, ${c.high || 0}High, ${c.medium || 0}Medium, ${c.low || 0}Low)`;
       
       // For components, we might not have all vulnerabilities in the item itself depending on how filteredAndSorted is populated.
       // However, the displayStats.allVulnerableComponents items used in filteredAndSorted usually contain summary counts.
@@ -53,12 +78,13 @@ export function generateTicketCSV(
       // which DON'T have the full list of vulnerabilities, only counts.
       // We may need to pass displayStats or the sbom to generateTicketCSV to get full details.
       
-      description = `Component: ${item.name}\nVersion: ${item.version || "N/A"}\nTotal Vulnerabilities: ${item.total || 0}`;
+      description = `Component: ${c.name}\nVersion: ${c.version || "N/A"}\nTotal Vulnerabilities: ${c.total || 0}`;
     }
 
     return `${escapeCSV(title)},${escapeCSV(description)}`;
   });
 
+  // Combine headers and rows into a single CSV string
   return `${escapeCSV(headers.title)},${escapeCSV(headers.description)}\n${rows.join("\n")}`;
 }
 
