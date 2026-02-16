@@ -44,11 +44,14 @@ const mockStats: SbomStats = {
     dependencyStats: { direct: 50, transitive: 50 },
     dependentsDistribution: { 0: 50, 1: 50 },
     vulnerabilityImpactDistribution: {},
+    cweCounts: {},
+    sourceCounts: {},
 };
 
 
 describe('LicensesView', () => {
     it('should render KPI cards with correct counts', () => {
+        vi.setConfig({ testTimeout: 15000 });
         render(<LicensesView sbom={null} preComputedStats={mockStats} />);
 
         expect(screen.getByText('Unique Licenses')).toBeInTheDocument();

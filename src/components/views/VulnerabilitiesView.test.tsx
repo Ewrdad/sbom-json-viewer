@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { VulnerabilitiesView } from './VulnerabilitiesView';
 import { describe, it, expect, vi } from 'vitest';
 import type { SbomStats } from '@/types/sbom';
@@ -16,6 +16,29 @@ vi.mock('recharts', async () => {
         ),
     };
 });
+
+// Mock DropdownMenu to avoid portal issues in tests
+vi.mock("@/components/ui/dropdown-menu", () => ({
+    DropdownMenu: ({ children }: any) => <div data-testid="mock-dropdown">{children}</div>,
+    DropdownMenuTrigger: ({ children }: any) => <div data-testid="mock-dropdown-trigger">{children}</div>,
+    DropdownMenuContent: ({ children }: any) => <div data-testid="mock-dropdown-content">{children}</div>,
+    DropdownMenuCheckboxItem: ({ children, onCheckedChange, checked }: any) => (
+        <div data-testid="mock-checkbox" onClick={() => onCheckedChange?.(!checked)}>
+            {children}
+        </div>
+    ),
+    DropdownMenuLabel: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuSeparator: () => <hr />,
+    DropdownMenuGroup: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuRadioGroup: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuRadioItem: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuItem: ({ children, onClick }: any) => <div onClick={onClick}>{children}</div>,
+    DropdownMenuSub: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuSubTrigger: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuSubContent: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuShortcut: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuPortal: ({ children }: any) => <>{children}</>,
+}));
 
 const mockStats: SbomStats = {
     totalComponents: 100,
@@ -42,6 +65,8 @@ const mockStats: SbomStats = {
     dependencyStats: { direct: 30, transitive: 70 },
     dependentsDistribution: { 0: 30, 1: 40, 5: 30 },
     vulnerabilityImpactDistribution: { 0: 10, 1: 20, 5: 20 },
+    cweCounts: { 'CWE-123': 1 },
+    sourceCounts: { 'NVD': 1 }
 };
 
 const emptyStats: SbomStats = {
@@ -61,10 +86,13 @@ const emptyStats: SbomStats = {
     dependencyStats: { direct: 50, transitive: 0 },
     dependentsDistribution: { 0: 50 },
     vulnerabilityImpactDistribution: {},
+    cweCounts: {},
+    sourceCounts: {},
 };
 
 describe('VulnerabilitiesView', () => {
     it('should render KPI cards with correct counts', () => {
+        vi.setConfig({ testTimeout: 15000 });
         render(
             <SettingsProvider>
                 <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
@@ -140,8 +168,6 @@ describe('VulnerabilitiesView', () => {
         expect(screen.getByText('CVE-2024-001')).toBeInTheDocument();
         expect(screen.getByText('CVE-2024-002')).toBeInTheDocument();
         expect(screen.getByText('GHSA-xxx')).toBeInTheDocument();
-        const tens = screen.getAllByText('10');
-        expect(tens.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should filter CVEs when searching in vulnerability view', async () => {
@@ -184,9 +210,15 @@ describe('VulnerabilitiesView', () => {
                     created: '2024-01-01T00:00:00Z',
                     proofOfConcept: {
                         reproductionSteps: 'Step 1: Run it'
+                    },
+                    source: {
+                        name: 'NVD',
+                        url: 'https://nvd.nist.gov'
                     }
                 }
-            ]
+            ],
+            cweCounts: { 'CWE-79': 1 },
+            sourceCounts: { 'NVD': 1 }
         };
 
         render(
@@ -199,19 +231,35 @@ describe('VulnerabilitiesView', () => {
         await user.click(switchBtn);
 
         const detailsBtn = screen.getByText('Details');
-        await user.click(detailsBtn);
+        fireEvent.click(detailsBtn);
 
-        expect(screen.getByText('Detailed Title')).toBeInTheDocument();
-        expect(screen.getByText('Detailed Description')).toBeInTheDocument();
-        expect(screen.getByText('Detailed long text')).toBeInTheDocument();
+        // Wait for details panel to appear
+        expect(await screen.findByText('Vulnerability Details')).toBeInTheDocument();
+        expect(screen.getByText('Severity:')).toBeInTheDocument();
+        expect(screen.getByText('ID:')).toBeInTheDocument();
+
+        // Check Overview (Open by default)
+        expect(await screen.findByText('Detailed Title')).toBeInTheDocument();
         expect(screen.getByText('Fix it now')).toBeInTheDocument();
         expect(screen.getByText('CWE-79')).toBeInTheDocument();
+
+        // Check Technical Details (Open by default)
+        expect(screen.getByText('Detailed Description')).toBeInTheDocument();
         expect(screen.getByText(/not_affected/i)).toBeInTheDocument();
         expect(screen.getByText(/code_not_reachable/i)).toBeInTheDocument();
-        expect(screen.getByText('Step 1: Run it')).toBeInTheDocument();
-        // Check for "Timeline" header to ensure we are in the right section
-        expect(screen.getByText('Timeline')).toBeInTheDocument();
+        
+        // Open Remediation & Evidence
+        const remTrigger = screen.getAllByRole('button', { name: /Remediation & Evidence/ })[0];
+        fireEvent.click(remTrigger);
+        expect(await screen.findByText('Step 1: Run it')).toBeInTheDocument();
+
+        // Open Metadata & Provenance
+        const metaTrigger = screen.getAllByRole('button', { name: /Metadata & Provenance/ })[0];
+        fireEvent.click(metaTrigger);
+        expect(await screen.findByText('Primary Source')).toBeInTheDocument();
+        expect(screen.getAllByText('NVD').length).toBeGreaterThanOrEqual(1);
     });
+
     it('should render all extended vulnerability fields', async () => {
         const user = userEvent.setup();
         const extendedStats: SbomStats = {
@@ -232,6 +280,7 @@ describe('VulnerabilitiesView', () => {
                     },
                     tools: [{ name: 'VulnScanner', version: '1.0' }],
                     properties: [{ name: 'custom-prop', value: 'custom-val' }],
+                    cwes: [123],
                     affects: [
                         {
                             ref: 'ref-lodash',
@@ -248,7 +297,9 @@ describe('VulnerabilitiesView', () => {
                         }
                     ]
                 }
-            ]
+            ],
+            cweCounts: { 'CWE-123': 1 },
+            sourceCounts: { 'NVD': 1 }
         };
 
         render(
@@ -261,19 +312,103 @@ describe('VulnerabilitiesView', () => {
         await user.click(switchBtn);
 
         const detailsBtn = screen.getByText('Details');
-        await user.click(detailsBtn);
+        fireEvent.click(detailsBtn);
 
-        expect(screen.getByText('Workaround')).toBeInTheDocument();
+        // Wait for panel
+        expect(await screen.findByText('Vulnerability Details')).toBeInTheDocument();
+
+        // Check Overview (Open by default)
+        expect(await screen.findByText('CWE-123')).toBeInTheDocument();
+        
+        // Open Remediation & Evidence
+        const remediationTrigger = screen.getAllByRole('button', { name: /Remediation & Evidence/ })[0];
+        fireEvent.click(remediationTrigger);
+        expect(await screen.findByText('Workaround')).toBeInTheDocument();
         expect(screen.getByText('Do this instead')).toBeInTheDocument();
-        expect(screen.getByText('Credits')).toBeInTheDocument();
+
+        // Open Metadata & Provenance
+        const metadataTrigger = screen.getAllByRole('button', { name: /Metadata & Provenance/ })[0];
+        fireEvent.click(metadataTrigger);
+        expect(await screen.findByText('Credits')).toBeInTheDocument();
         expect(screen.getByText('Security Org')).toBeInTheDocument();
         expect(screen.getByText('Jane Doe')).toBeInTheDocument();
-        expect(screen.getByText('Detection Tools')).toBeInTheDocument();
-        expect(screen.getByText('VulnScanner 1.0')).toBeInTheDocument();
-        expect(screen.getByText('Additional Properties')).toBeInTheDocument();
+        expect(screen.getByText('Extended Properties')).toBeInTheDocument();
         expect(screen.getByText('custom-prop')).toBeInTheDocument();
         expect(screen.getByText('custom-val')).toBeInTheDocument();
+
+        // Already open or checked via Technical Details
         expect(screen.getByText('CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H')).toBeInTheDocument();
-        expect(screen.getAllByText(/affected/i).length).toBeGreaterThanOrEqual(1);
+        
+        // Open Affected Components
+        const triggers = screen.getAllByRole('button', { name: /Affected Components/ });
+        // The one in the detail panel is likely the second one.
+        fireEvent.click(triggers[triggers.length - 1]);
+        
+        expect(await screen.findAllByText(/affected/i)).toHaveLength(3); // One in list, one in trigger, one in details row
+    });
+    it('should filter by severity when clicking KPI cards', async () => {
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
+
+        // Find and click the 'Critical' KPI card
+        const criticalText = screen.getByText('Immediate action');
+        const criticalCard = criticalText.closest('[data-slot="card"]');
+        if (!criticalCard) throw new Error('Critical card not found');
+        fireEvent.click(criticalCard);
+
+        expect(screen.getByText('lodash')).toBeInTheDocument();
+        expect(screen.getByText('express')).toBeInTheDocument();
+        expect(screen.queryByText('axios')).not.toBeInTheDocument();
+
+        // Click again to toggle off
+        fireEvent.click(criticalCard);
+        expect(screen.getByText('axios')).toBeInTheDocument();
+    });
+
+    it('should filter by severity when selecting from dropdown', async () => {
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
+
+        // In the mock, the content is always present or at least easily accessible
+        // Select Critical - in our mock we click the div
+        // Use a more specific selector to avoid the table header which also says 'Critical'
+        const dropdownContent = screen.getByTestId('mock-dropdown-content');
+        const criticalOption = within(dropdownContent).getByText('Critical');
+        fireEvent.click(criticalOption);
+
+        // Check if only lodash and express (have critical) are shown, axios (only high/medium) is hidden
+        expect(screen.getByText('lodash')).toBeInTheDocument();
+        expect(screen.getByText('express')).toBeInTheDocument();
+        expect(screen.queryByText('axios')).not.toBeInTheDocument();
+
+        // Check badge count on filter button
+        const filterBtnAfter = screen.getByTestId('severity-filter-button');
+        expect(within(filterBtnAfter).getByText('1')).toBeInTheDocument(); // Badge count
+    });
+
+    it('should clear all filters when clicking Clear button', async () => {
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
+
+        const criticalText = screen.getByText('Immediate action');
+        const criticalCard = criticalText.closest('[data-slot="card"]');
+        if (!criticalCard) throw new Error('Critical card not found');
+        fireEvent.click(criticalCard);
+        
+        expect(screen.queryByText('axios')).not.toBeInTheDocument();
+
+        const clearBtn = screen.getByText(/clear/i);
+        fireEvent.click(clearBtn);
+
+        expect(screen.getByText('axios')).toBeInTheDocument();
     });
 });

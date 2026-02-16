@@ -61,6 +61,7 @@ import {
 } from "./types/sbom";
 import { getSbomSizeProfile } from "./lib/sbomSizing";
 import { KeepAliveView } from "./components/common/KeepAliveView";
+import { SbomSelector } from "./components/common/SbomSelector";
 
 function AppContent({
   sbom,
@@ -151,18 +152,13 @@ function AppContent({
             </Button>
           )}
           <div className="w-px h-8 bg-border mx-2" />
-          {manifest?.files.map((file) => (
-            <Button
-              key={file.id}
-              variant={currentFile === file.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                window.location.hash = `#/${file.id}`;
-              }}
-            >
-              {file.name}
-            </Button>
-          ))}
+          <SbomSelector
+            manifest={manifest}
+            currentFile={currentFile}
+            onSelect={(fileId) => {
+              window.location.hash = `#/${fileId}`;
+            }}
+          />
           <div className="w-px h-8 bg-border mx-2" />
           <HelpGuide />
         </div>
@@ -241,6 +237,7 @@ interface ManifestFile {
   name: string;
   path: string;
   id: string;
+  group?: string;
 }
 
 interface Manifest {

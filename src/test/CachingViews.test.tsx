@@ -68,7 +68,12 @@ class MockWorker {
               licenseDistribution: { permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 1 },
               vulnerableComponents: [],
               allVulnerableComponents: [],
-              totalVulnerabilities: 0
+              totalVulnerabilities: 0,
+              allVulnerabilities: [],
+              allLicenses: [],
+              allLicenseComponents: [],
+              cweCounts: {},
+              sourceCounts: {}
             }
           }
         }

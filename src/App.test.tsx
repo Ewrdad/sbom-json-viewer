@@ -133,8 +133,11 @@ class MockWorker {
             vulnerableComponents: [],
             allVulnerableComponents: [],
             totalVulnerabilities: 0,
+            allVulnerabilities: [],
             allLicenses: [],
-            allLicenseComponents: []
+            allLicenseComponents: [],
+            cweCounts: {},
+            sourceCounts: {}
           }
         };
         this.onmessage({ data: { type: "complete", result: mockResult } });

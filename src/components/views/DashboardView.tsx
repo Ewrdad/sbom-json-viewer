@@ -30,7 +30,7 @@ export function DashboardView({
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
   const displayStats: SbomStats = preComputedStats ?? stats ?? {
-    totalComponents: Array.isArray(sbom.components) ? sbom.components.length : (sbom.components?.size ?? 0),
+    totalComponents: sbom ? (Array.isArray(sbom.components) ? sbom.components.length : (sbom.components?.size ?? 0)) : 0,
     vulnerabilityCounts: {
       critical: 0,
       high: 0,
@@ -58,6 +58,8 @@ export function DashboardView({
     dependencyStats: { direct: 0, transitive: 0 },
     dependentsDistribution: {},
     vulnerabilityImpactDistribution: {},
+    cweCounts: {},
+    sourceCounts: {},
   };
 
   const vulnData = [

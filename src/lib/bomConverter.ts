@@ -98,34 +98,29 @@ export const convertJsonToBom = async (
   await batchProcess(vulnerabilitiesArray, (vulnData: Record<string, any>) => {
     const vuln: Record<string, any> = {
       id: vulnData.id,
+      source: vulnData.source,
+      ratings: new Set(vulnData.ratings || []),
+      cwes: new Set(vulnData.cwes || []),
       description: vulnData.description,
-      ratings: new Set(),
-      affects: new Set(),
-      references: new Set(),
-      cwes: new Set(),
-      advisories: new Set(),
-      tools: { components: new Set(), services: new Set() },
-      properties: new Set(),
+      detail: vulnData.detail,
+      recommendation: vulnData.recommendation,
+      advisories: new Set(vulnData.advisories || []),
+      created: vulnData.created,
+      published: vulnData.published,
+      updated: vulnData.updated,
+      rejected: vulnData.rejected,
+      credits: vulnData.credits,
+      tools: vulnData.tools,
+      analysis: vulnData.analysis,
+      workaround: vulnData.workaround,
+      proofOfConcept: vulnData.proofOfConcept,
+      references: new Set(vulnData.references || []),
+      properties: new Set(vulnData.properties || []),
+      affects: new Set((vulnData.affects || []).map((affect: any) => ({
+        ref: new BomRef(affect.ref?.value || affect.ref),
+        versions: new Set(affect.versions || []),
+      }))),
     };
-
-    if (Array.isArray(vulnData.ratings)) {
-      vulnData.ratings.forEach((rating: Record<string, any>) => {
-        vuln.ratings.add({
-          severity: rating.severity?.toLowerCase(),
-          score: rating.score || 0,
-          method: rating.method,
-        });
-      });
-    }
-
-    if (Array.isArray(vulnData.affects)) {
-      vulnData.affects.forEach((affect: Record<string, any>) => {
-        vuln.affects.add({
-          ref: new BomRef(affect.ref),
-          versions: new Set(affect.versions || []),
-        });
-      });
-    }
 
     bom.vulnerabilities.add(vuln as any);
   });

@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { DashboardView } from './DashboardView';
 import { describe, it, expect, vi } from 'vitest';
 import { Bom, Component } from '@cyclonedx/cyclonedx-library/Models';
+import type { SbomStats } from '@/types/sbom';
 
 // Mock Recharts to avoid responsive container issues in jsdom
 vi.mock('recharts', async () => {
@@ -25,7 +26,28 @@ describe('DashboardView', () => {
         sbom.components.add(c1);
         sbom.components.add(c2);
         
-        render(<DashboardView sbom={sbom} />);
+        const mockStats: SbomStats = {
+            totalComponents: 2,
+            vulnerabilityCounts: { critical: 0, high: 0, medium: 0, low: 0, none: 2 },
+            licenseCounts: {},
+            topLicenses: [],
+            licenseDistribution: { permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 2 },
+            vulnerableComponents: [],
+            allVulnerableComponents: [],
+            totalVulnerabilities: 0,
+            allVulnerabilities: [],
+            allLicenses: [],
+            allLicenseComponents: [],
+            uniqueVulnerabilityCount: 0,
+            avgVulnerabilitiesPerComponent: 0,
+            dependencyStats: { direct: 2, transitive: 0 },
+            dependentsDistribution: {},
+            vulnerabilityImpactDistribution: {},
+            cweCounts: {},
+            sourceCounts: {}
+        };
+
+        render(<DashboardView sbom={sbom} preComputedStats={mockStats} />);
 
         // Check for 'Total Components' card value
         const titleElement = screen.getByText('Total Components');

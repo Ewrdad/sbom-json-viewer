@@ -3,6 +3,14 @@ import { getLicenseCategory } from "./licenseUtils";
 
 const severityOrder = ["critical", "high", "medium", "low"] as const;
 
+function ensureArray<T>(maybeCollection: any): T[] {
+  if (!maybeCollection) return [];
+  if (Array.isArray(maybeCollection)) return maybeCollection;
+  if (typeof maybeCollection.values === "function") return Array.from(maybeCollection.values());
+  if (typeof maybeCollection[Symbol.iterator] === "function") return Array.from(maybeCollection);
+  return [];
+}
+
 export function calculateSbomStats(bom: any): SbomStats {
   const stats: SbomStats = {
     totalComponents: bom.components?.size || (Array.isArray(bom.components) ? bom.components.length : 0),
@@ -27,6 +35,8 @@ export function calculateSbomStats(bom: any): SbomStats {
     dependencyStats: { direct: 0, transitive: 0 },
     dependentsDistribution: {},
     vulnerabilityImpactDistribution: {},
+    cweCounts: {},
+    sourceCounts: {},
   };
 
   const licenseSummaryMap = new Map<string, { id: string; name: string; category: string; affectedRefs: Set<string> }>();
@@ -86,7 +96,7 @@ export function calculateSbomStats(bom: any): SbomStats {
   for (const vuln of vulnerabilities) {
     let maxSeverity = "none";
     
-    for (const rating of (vuln.ratings || [])) {
+    for (const rating of ensureArray<any>(vuln.ratings)) {
       const severity = normalizeSeverity(rating.severity?.toString());
       if (severity !== "none" && (maxSeverity === "none" || severityOrder.indexOf(severity as any) < severityOrder.indexOf(maxSeverity as any))) {
         maxSeverity = severity;
@@ -124,7 +134,7 @@ export function calculateSbomStats(bom: any): SbomStats {
       existingSummary.severity = maxSeverity;
     }
 
-    for (const affect of (vuln.affects || [])) {
+    for (const affect of ensureArray<any>(vuln.affects)) {
       const ref = affect.ref?.value || affect.ref;
       if (!ref) continue;
       
@@ -148,6 +158,24 @@ export function calculateSbomStats(bom: any): SbomStats {
     }
     
     vulnSummaryMap.set(vulnId, existingSummary);
+
+    // Aggregate CWEs
+    if (vuln.cwes) {
+      for (const cwe of ensureArray<number>(vuln.cwes)) {
+        const cweStr = `CWE-${cwe}`;
+        stats.cweCounts[cweStr] = (stats.cweCounts[cweStr] || 0) + 1;
+      }
+    }
+
+    // Aggregate Sources
+    if (vuln.source?.name) {
+      const sourceName = vuln.source.name.toUpperCase();
+      stats.sourceCounts[sourceName] = (stats.sourceCounts[sourceName] || 0) + 1;
+    } else if (vuln.id?.startsWith('CVE-')) {
+      stats.sourceCounts['NVD'] = (stats.sourceCounts['NVD'] || 0) + 1;
+    } else if (vuln.id?.startsWith('GHSA-')) {
+      stats.sourceCounts['GHSA'] = (stats.sourceCounts['GHSA'] || 0) + 1;
+    }
   }
 
   // 2. Process licenses
@@ -363,7 +391,7 @@ export function calculateSbomStats(bom: any): SbomStats {
   }
 
   stats.allVulnerabilities = Array.from(vulnSummaryMap.values())
-    .map(v => ({
+    .map((v) => ({
       id: v.id,
       severity: v.severity,
       affectedCount: v.affectedRefs.size,
@@ -372,17 +400,22 @@ export function calculateSbomStats(bom: any): SbomStats {
       description: v.description,
       detail: v.detail,
       recommendation: v.recommendation,
-      advisories: v.advisories,
-      cwes: v.cwes,
+      advisories: v.advisories || [],
+      cwes: v.cwes || [],
       source: v.source,
-      references: v.references,
-      ratings: v.ratings,
+      references: v.references || [],
+      ratings: v.ratings || [],
       analysis: v.analysis,
       created: v.created,
       published: v.published,
       updated: v.updated,
       rejected: v.rejected,
       proofOfConcept: v.proofOfConcept,
+      workaround: v.workaround,
+      credits: v.credits,
+      tools: v.tools || [],
+      properties: v.properties || [],
+      affects: v.affects || [],
     }))
     .sort((a, b) => b.affectedCount - a.affectedCount || a.id.localeCompare(b.id));
 

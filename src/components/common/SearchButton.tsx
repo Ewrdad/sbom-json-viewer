@@ -23,13 +23,17 @@ import { useSettings, SEARCH_ENGINES, type SearchEngineId } from "../../context/
 interface SearchButtonProps {
   query: string;
   className?: string;
+  label?: string;
+  useAI?: boolean;
   size?: "default" | "sm" | "lg" | "icon" | "xs";
 }
 
-export function SearchButton({ query, className, size = "sm" }: SearchButtonProps) {
+export function SearchButton({ query, className, label, useAI, size = "sm" }: SearchButtonProps) {
   const { defaultSearchEngine, setDefaultSearchEngine, performSearch } = useSettings();
   
-  const currentEngine = SEARCH_ENGINES.find(e => e.id === defaultSearchEngine) || SEARCH_ENGINES[0];
+  const currentEngine = useAI 
+    ? (SEARCH_ENGINES.find(e => e.isAi) || SEARCH_ENGINES[0])
+    : (SEARCH_ENGINES.find(e => e.id === defaultSearchEngine) || SEARCH_ENGINES[0]);
 
   const handleSearch = () => {
     performSearch(query);

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import { useSbomStats } from "../../hooks/useSbomStats";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
@@ -22,6 +23,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   AlertTriangle,
+  AlertCircle,
+  Filter,
   Fingerprint,
   Search,
   ChevronLeft,
@@ -30,12 +33,11 @@ import {
   X,
   Network,
   ExternalLink,
-  Clock,
   BookOpen,
   Info,
-  Database,
-  Calendar,
   Layers,
+  User,
+  Building,
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import {
@@ -45,9 +47,22 @@ import {
 } from "@/components/ui/resizable";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
-import { Separator } from "@/components/ui/separator";
 import { SearchButton } from "@/components/common/SearchButton";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -61,6 +76,16 @@ const SEVERITY_COLORS = {
   Medium: "#ca8a04",
   Low: "#2563eb",
   None: "#16a34a",
+};
+
+const getSeverityColor = (sev?: string) => {
+  if (!sev) return SEVERITY_COLORS.None;
+  try {
+    const normalized = sev.charAt(0).toUpperCase() + sev.slice(1).toLowerCase();
+    return SEVERITY_COLORS[normalized as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.None;
+  } catch {
+    return SEVERITY_COLORS.None;
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,6 +111,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     dependencyStats: { direct: 0, transitive: 0 },
     dependentsDistribution: {},
     vulnerabilityImpactDistribution: {},
+    cweCounts: {},
+    sourceCounts: {},
   };
 
   const displayStats: SbomStats = {
@@ -112,7 +139,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
   const [cveSortDir, setCveSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [selectedComponent, setSelectedComponent] = useState<unknown | null>(null);
-  const [selectedVulnerability, setSelectedVulnerability] = useState<unknown | null>(null);
+  const [selectedVulnerability, setSelectedVulnerability] = useState<any>(null);
+  const [selectedSeverities, setSelectedSeverities] = useState<string[]>([]);
 
   const { analysis } = useDependencyAnalysis(sbom);
 
@@ -135,6 +163,21 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     setPage(0);
   };
 
+  const toggleSeverity = (severity: string) => {
+    setSelectedSeverities(prev => 
+      prev.includes(severity) 
+        ? prev.filter(s => s !== severity) 
+        : [...prev, severity]
+    );
+    setPage(0);
+  };
+
+  const clearFilters = () => {
+    setSelectedSeverities([]);
+    setSearchQuery("");
+    setPage(0);
+  };
+
   const filteredAndSorted = useMemo(() => {
     let list = displayStats.allVulnerableComponents;
 
@@ -145,6 +188,16 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           c.name.toLowerCase().includes(q) ||
           c.version.toLowerCase().includes(q),
       );
+    }
+
+    if (selectedSeverities.length > 0) {
+      list = list.filter(c => {
+        // Check if any of the component's severities are in the selected list
+        return selectedSeverities.some(s => {
+          const key = s.toLowerCase() as "critical" | "high" | "medium" | "low";
+          return (c as any)[key] > 0;
+        });
+      });
     }
 
     const sorted = [...list].sort((a, b) => {
@@ -159,7 +212,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     });
 
     return sorted;
-  }, [displayStats.allVulnerableComponents, searchQuery, sortKey, sortDir]);
+  }, [displayStats.allVulnerableComponents, searchQuery, sortKey, sortDir, selectedSeverities]);
 
   const filteredAndSortedVulnerabilities = useMemo(() => {
     let list = displayStats.allVulnerabilities;
@@ -170,6 +223,10 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         v.id.toLowerCase().includes(q) || 
         (v.title && v.title.toLowerCase().includes(q))
       );
+    }
+
+    if (selectedSeverities.length > 0) {
+      list = list.filter(v => selectedSeverities.includes(v.severity.charAt(0).toUpperCase() + v.severity.slice(1).toLowerCase()));
     }
 
     const sorted = [...list].sort((a, b) => {
@@ -184,7 +241,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     });
 
     return sorted;
-  }, [displayStats.allVulnerabilities, searchQuery, cveSortKey, cveSortDir]);
+  }, [displayStats.allVulnerabilities, searchQuery, cveSortKey, cveSortDir, selectedSeverities]);
 
   const activeList = viewMode === "components" ? filteredAndSorted : filteredAndSortedVulnerabilities;
 
@@ -193,6 +250,22 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     page * ITEMS_PER_PAGE,
     (page + 1) * ITEMS_PER_PAGE,
   );
+
+  // 2. Top CWEs
+  const topCwes = useMemo(() => {
+    return Object.entries(displayStats.cweCounts || {})
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [displayStats.cweCounts]);
+
+  // 3. Top Sources
+  const topSources = useMemo(() => {
+    return Object.entries(displayStats.sourceCounts || {})
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [displayStats.sourceCounts]);
 
   const { critical, high, medium, low } = displayStats.vulnerabilityCounts;
   const totalVulns = displayStats.totalVulnerabilities;
@@ -289,20 +362,24 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-orange-500">
+          <Card className="border-l-4 border-l-blue-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Unique CVEs
-              </CardTitle>
-              <Fingerprint className="h-4 w-4 text-orange-500" />
+              <CardTitle className="text-sm font-medium">Unique CVEs</CardTitle>
+              <ShieldCheck className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{displayStats.uniqueVulnerabilityCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">Distinct definitions</p>
+              <p className="text-xs text-muted-foreground mt-1">Distinct IDs</p>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: SEVERITY_COLORS.Critical }}>
+          <Card 
+            className={cn(
+              "border-l-4 cursor-pointer transition-all hover:bg-muted/50",
+              selectedSeverities.includes("Critical") ? "ring-2 ring-red-600 ring-inset bg-red-600/5" : "border-l-red-600"
+            )}
+            onClick={() => toggleSeverity("Critical")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Critical</CardTitle>
               <AlertTriangle className="h-4 w-4 text-red-600" />
@@ -313,10 +390,16 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: SEVERITY_COLORS.High }}>
+          <Card 
+            className={cn(
+              "border-l-4 cursor-pointer transition-all hover:bg-muted/50",
+              selectedSeverities.includes("High") ? "ring-2 ring-orange-600 ring-inset bg-orange-600/5" : "border-l-orange-600"
+            )}
+            onClick={() => toggleSeverity("High")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">High</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-orange-600" />
+              <AlertCircle className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-orange-600">{high}</div>
@@ -324,7 +407,13 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: SEVERITY_COLORS.Medium }}>
+          <Card 
+            className={cn(
+              "border-l-4 cursor-pointer transition-all hover:bg-muted/50",
+              selectedSeverities.includes("Medium") ? "ring-2 ring-yellow-600 ring-inset bg-yellow-600/5" : "border-l-yellow-600"
+            )}
+            onClick={() => toggleSeverity("Medium")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Medium</CardTitle>
               <ShieldAlert className="h-4 w-4 text-yellow-600" />
@@ -335,7 +424,13 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: SEVERITY_COLORS.Low }}>
+          <Card 
+            className={cn(
+              "border-l-4 cursor-pointer transition-all hover:bg-muted/50",
+              selectedSeverities.includes("Low") ? "ring-2 ring-blue-600 ring-inset bg-blue-600/5" : "border-l-blue-600"
+            )}
+            onClick={() => toggleSeverity("Low")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Low</CardTitle>
               <ShieldCheck className="h-4 w-4 text-blue-600" />
@@ -405,47 +500,76 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardContent>
           </Card>
 
-          {/* Bar Chart */}
-          <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Vulnerability Distribution
-                <HelpTooltip text="Count of findings per severity level." />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <div className="h-[260px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barData}>
-                    <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
-                    <YAxis {...CHART_AXIS_PROPS} />
-                    <Tooltip
-                      cursor={CHART_CURSOR}
-                      contentStyle={CHART_TOOLTIP_STYLE}
-                      labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                      itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                    />
-                    <Bar dataKey="count" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Vulnerability Distribution / CWEs */}
+            <Card className="shadow-sm border-muted-foreground/10 overflow-hidden relative">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                   {viewMode === "vulnerabilities" ? <Layers className="h-4 w-4" /> : <ChevronRight className="h-5 w-5" />}
+                   {viewMode === "vulnerabilities" ? "Top CWE Types" : "Vulnerability Distribution"}
+                   <HelpTooltip text={viewMode === "vulnerabilities" ? "Most common vulnerability types (CWEs) detected." : "Count of findings per severity level."} />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[260px] w-full">
+                  {viewMode === "vulnerabilities" ? (
+                    topCwes.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={topCwes} layout="vertical" margin={{ left: 30, right: 30, top: 10, bottom: 10 }}>
+                          <XAxis type="number" hide />
+                          <YAxis 
+                            dataKey="name" 
+                            type="category" 
+                            stroke="#888888" 
+                            fontSize={10} 
+                            tickLine={false} 
+                            axisLine={false}
+                            width={100}
+                          />
+                          <Tooltip
+                            contentStyle={CHART_TOOLTIP_STYLE}
+                            labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                            itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                          />
+                          <Bar dataKey="value" fill="#ca8a04" radius={[0, 4, 4, 0]} barSize={20} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-xs text-muted-foreground italic">No CWE data available</div>
+                    )
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={barData}>
+                        <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
+                        <YAxis {...CHART_AXIS_PROPS} />
+                        <Tooltip
+                          cursor={CHART_CURSOR}
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                          itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                        />
+                        <Bar dataKey="count" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
           <Card className="shadow-sm border-muted-foreground/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
-                Vulnerability Impact
-                <HelpTooltip text="Shows the blast radius of vulnerabilities based on how many other components depend on the affected package." />
+                <Fingerprint className="h-4 w-4" />
+                {viewMode === "vulnerabilities" ? "Primary Sources" : "Vulnerability Impact"}
+                <HelpTooltip text={viewMode === "vulnerabilities" ? "Distribution of vulnerability data sources." : "Shows the blast radius of vulnerabilities based on how many other components depend on the affected package."} />
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[200px]">
-                {originData.length > 0 ? (
+                {(viewMode === "vulnerabilities" ? topSources : originData).length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={originData}
+                        data={viewMode === "vulnerabilities" ? topSources : originData}
                         cx="50%"
                         cy="50%"
                         innerRadius={55}
@@ -453,8 +577,13 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         paddingAngle={4}
                         dataKey="value"
                       >
-                        {originData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        {(viewMode === "vulnerabilities" ? topSources : originData).map((entry: any, index: number) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={viewMode === "vulnerabilities" 
+                              ? ["#2563eb", "#ea580c", "#dc2626", "#ca8a04", "#7c3aed"][index % 5]
+                              : entry.color} 
+                          />
                         ))}
                       </Pie>
                       <Tooltip
@@ -467,17 +596,24 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 ) : (
                   <div className="h-full flex items-center justify-center">
                     <p className="text-sm text-muted-foreground italic text-center px-4">
-                      No dependency graph data available to track impact.
+                      {viewMode === "vulnerabilities" ? "No source data available." : "No dependency graph data available to track impact."}
                     </p>
                   </div>
                 )}
               </div>
-              <div className="space-y-2 mt-4">
-                {originData.map((entry) => (
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                {(viewMode === "vulnerabilities" ? topSources : originData).map((entry: any, index: number) => (
                   <div key={entry.name} className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-[10px] font-medium">{entry.name}</span>
-                    <span className="text-[10px] font-bold ml-auto">{entry.value}</span>
+                    <div 
+                      className="w-2.5 h-2.5 rounded-full" 
+                      style={{ 
+                        backgroundColor: viewMode === "vulnerabilities" 
+                          ? ["#2563eb", "#ea580c", "#dc2626", "#ca8a04", "#7c3aed"][index % 5] 
+                          : entry.color 
+                      }} 
+                    />
+                    <span className="text-[10px] font-medium truncate max-w-[80px]" title={entry.name}>{entry.name}</span>
+                    <span className="text-[10px] text-muted-foreground ml-auto">{entry.value}</span>
                   </div>
                 ))}
               </div>
@@ -530,17 +666,56 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 </Button>
               </div>
               
-              <div className="relative w-full max-w-xs ml-auto">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={viewMode === "components" ? "Search components..." : "Search CVEs..."}
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setPage(0);
-                  }}
-                  className="pl-9"
-                />
+              <div className="flex items-center gap-2 ml-auto">
+                {(selectedSeverities.length > 0 || searchQuery) && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-8 text-muted-foreground hover:text-foreground">
+                    <X className="h-3 w-3 mr-1" />
+                    Clear
+                  </Button>
+                )}
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 text-xs gap-2" data-testid="severity-filter-button">
+                      <Filter className="h-3.5 w-3.5" />
+                      Filter
+                      {selectedSeverities.length > 0 && (
+                        <Badge variant="secondary" className="ml-1 h-4 px-1 text-[10px]">
+                          {selectedSeverities.length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel>Severity</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {["Critical", "High", "Medium", "Low"].map((sev) => (
+                      <DropdownMenuCheckboxItem
+                        key={sev}
+                        checked={selectedSeverities.includes(sev)}
+                        onCheckedChange={() => toggleSeverity(sev)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: SEVERITY_COLORS[sev as keyof typeof SEVERITY_COLORS] }} />
+                          {sev}
+                        </div>
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={viewMode === "components" ? "Search components..." : "Search CVEs..."}
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setPage(0);
+                    }}
+                    className="pl-9 h-8 text-xs"
+                  />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -779,10 +954,10 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   />
                 ) : (
                   <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
-                    <div className="flex items-center justify-between p-4 border-b flex-none">
+                    <div className="flex items-center justify-between p-4 border-b flex-none bg-background sticky top-0 z-20">
                       <div className="flex items-center gap-2">
                         <ShieldAlert className="h-5 w-5 text-destructive" />
-                        <h3 className="font-semibold text-lg breadcrumb">Vulnerability Details</h3>
+                        <h3 className="font-semibold text-lg">Vulnerability Details</h3>
                       </div>
                       <Button aria-label="Close" variant="ghost" size="icon" onClick={() => setSelectedVulnerability(null)}>
                         <X className="h-4 w-4" />
@@ -794,409 +969,446 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         if (!v) return null;
                         return (
                           <div className="p-4 space-y-6">
-                            <div>
-                              <h4 className="text-sm font-medium text-muted-foreground mb-1">ID</h4>
-                              <div className="text-xl font-bold font-mono text-destructive">{v.id}</div>
-                              <div className="mt-2">
-                                 <SearchButton query={v.id} className="w-full justify-start" />
+                            {/* Sticky Header with ID and Severity */}
+                            <div className="flex items-center justify-between p-4 bg-muted/40 rounded-xl border border-primary/10 sticky top-0 z-10 backdrop-blur-md">
+                              <div>
+                                <div data-testid="vuln-id-label" className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">ID:</div>
+                                <div className="text-2xl font-black font-mono text-destructive flex items-center gap-2">
+                                  {v.id}
+                                  {v.source?.url && (
+                                    <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="inline-flex p-1 hover:bg-muted rounded text-muted-foreground transition-colors">
+                                      <ExternalLink className="h-4 w-4" />
+                                    </a>
+                                  )}
+                                </div>
+                                <div className="flex gap-2 mt-2">
+                                  <SearchButton query={v.id} size="sm" />
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Severity:</div>
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-white border-none py-1.5 px-3 text-sm font-bold shadow-sm"
+                                  style={{ backgroundColor: getSeverityColor(v.severity) }}
+                                >
+                                  {v.severity}
+                                </Badge>
                               </div>
                             </div>
-                        
-                            <div>
-                              <h4 className="text-sm font-medium text-muted-foreground mb-1">Severity</h4>
-                              <Badge 
-                                variant="secondary" 
-                                className="text-white border-0"
-                                style={{ 
-                                  backgroundColor: SEVERITY_COLORS[v.severity.charAt(0).toUpperCase() + v.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
-                                }}
-                              >
-                                {v.severity}
-                              </Badge>
-                            </div>
 
-                        {v.description && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
-                              <Info className="h-4 w-4" /> Description
-                            </h4>
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{v.description}</p>
-                          </div>
-                        )}
+                            <Accordion multiple defaultValue={["overview", "technical"]} className="w-full space-y-4">
 
-                        {v.detail && v.detail !== v.description && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
-                              <BookOpen className="h-4 w-4" /> Details
-                            </h4>
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{v.detail}</p>
-                          </div>
-                        )}
+                              {/* 1. Overview Section */}
+                              <AccordionItem value="overview" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                      <Layers className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span className="font-bold">Overview</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4 space-y-6 pt-2">
+                                  {v.recommendation && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <ShieldCheck className="h-3 w-3 text-emerald-500" /> Recommendation
+                                      </h4>
+                                      <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-sm leading-relaxed text-foreground/90 font-medium">
+                                        {v.recommendation}
+                                      </div>
+                                    </div>
+                                  )}
 
-                        {v.recommendation && (
-                          <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-md">
-                            <h4 className="text-sm font-semibold text-emerald-600 mb-1 flex items-center gap-2">
-                              <ShieldCheck className="h-4 w-4" /> Recommendation
-                            </h4>
-                            <p className="text-sm leading-relaxed">{v.recommendation}</p>
-                          </div>
-                        )}
+                                  {v.cwes && v.cwes.length > 0 && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">CWE Classification</h4>
+                                      <div className="flex flex-wrap gap-2">
+                                        {v.cwes.map((cwe: number) => (
+                                          <Badge key={cwe} variant="secondary" className="font-mono text-[10px] py-0 px-2 h-6 border-primary/10 bg-muted/60">
+                                            CWE-{cwe}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
 
-                        {v.workaround && (
-                          <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-md">
-                            <h4 className="text-sm font-semibold text-amber-600 mb-1 flex items-center gap-2">
-                              <AlertTriangle className="h-4 w-4" /> Workaround
-                            </h4>
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{v.workaround}</p>
-                          </div>
-                        )}
+                                  {v.advisories && v.advisories.length > 0 && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Primary Advisories</h4>
+                                      <div className="grid grid-cols-1 gap-2">
+                                        {v.advisories.map((adv: any, i: number) => (
+                                          <a 
+                                            key={i}
+                                            href={adv.url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="flex flex-col p-3 bg-muted/40 hover:bg-muted/80 rounded-lg text-xs transition-colors border border-transparent hover:border-primary/20 group"
+                                          >
+                                            <div className="flex items-center justify-between mb-1">
+                                              <span className="font-bold text-primary group-hover:underline line-clamp-1">{adv.title || (adv.url ? new URL(adv.url).hostname : 'Advisory')}</span>
+                                              <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </div>
+                                            <span className="text-[10px] text-muted-foreground line-clamp-1 opacity-70">{adv.url}</span>
+                                          </a>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </AccordionContent>
+                              </AccordionItem>
 
-                        {v.cwes && v.cwes.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <Layers className="h-4 w-4" /> CWEs
-                            </h4>
-                            <div className="flex flex-wrap gap-2">
-                              {v.cwes.map((cwe: number) => (
-                                <Badge key={cwe} variant="outline" className="text-[10px] hover:bg-muted cursor-default">
-                                  CWE-{cwe}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                              {/* 2. Technical Details Section */}
+                              <AccordionItem value="technical" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                      <Info className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span className="font-bold">Technical Details</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4 space-y-6 pt-2">
+                                  {v.description && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Description</h4>
+                                      <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
+                                        {v.description}
+                                      </div>
+                                    </div>
+                                  )}
 
-                        {v.analysis && (
-                          <div className="space-y-3 p-3 bg-muted/40 rounded-lg border">
-                            <h4 className="text-sm font-semibold flex items-center gap-2">
-                              <Search className="h-4 w-4" /> Vulnerability Analysis
-                            </h4>
-                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                              {v.analysis.state && (
-                                <div>
-                                  <span className="text-muted-foreground">State: </span>
-                                  <span className="font-medium uppercase">{v.analysis.state}</span>
-                                </div>
-                              )}
-                              {v.analysis.justification && (
-                                <div>
-                                  <span className="text-muted-foreground">Justification: </span>
-                                  <span className="font-medium">{v.analysis.justification}</span>
-                                </div>
-                              )}
-                            </div>
-                            {v.analysis.response && v.analysis.response.length > 0 && (
-                              <div className="text-xs">
-                                <span className="text-muted-foreground">Responses: </span>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {v.analysis.response.map((r: string) => (
-                                    <Badge key={r} variant="outline" className="text-[9px] py-0">{r}</Badge>
+                                  {v.detail && v.description !== v.detail && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">In-Depth Analysis</h4>
+                                      <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80 p-4 bg-muted/30 rounded-lg border border-primary/5">
+                                        {v.detail}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.ratings && v.ratings.length > 0 && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Scoring & System Ratings</h4>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {v.ratings.map((rating: any, i: number) => (
+                                          <div key={i} className="p-3 bg-muted/40 rounded-lg border border-primary/10 shadow-sm">
+                                            <div className="flex items-center justify-between mb-2">
+                                              <span className="text-[10px] font-black uppercase text-muted-foreground">{rating.method || 'Score'}</span>
+                                              <Badge 
+                                                variant="outline" 
+                                                className="text-[9px] font-bold py-0 h-4"
+                                                style={{ borderColor: SEVERITY_COLORS[rating.severity as keyof typeof SEVERITY_COLORS] || '#666', color: SEVERITY_COLORS[rating.severity as keyof typeof SEVERITY_COLORS] || '#666' }}
+                                              >
+                                                {rating.severity}
+                                              </Badge>
+                                            </div>
+                                            <div className="text-2xl font-black text-primary">{rating.score}</div>
+                                            {rating.vector && <div className="text-[9px] font-mono text-muted-foreground mt-2 break-all opacity-80" title={rating.vector}>{rating.vector}</div>}
+                                            {rating.source?.name && <div className="text-[9px] text-muted-foreground mt-2 text-right italic font-medium">Source: {rating.source.name}</div>}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.analysis && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <Search className="h-3 w-3" /> Status Analysis
+                                      </h4>
+                                      <div className="p-4 bg-muted/30 rounded-lg border border-primary/10 grid grid-cols-2 gap-4">
+                                        {v.analysis.state && (
+                                          <div>
+                                            <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">State</div>
+                                            <Badge variant="outline" className="uppercase font-bold text-[10px] border-primary/30">{v.analysis.state}</Badge>
+                                          </div>
+                                        )}
+                                        {v.analysis.justification && (
+                                          <div className="col-span-2 sm:col-span-1">
+                                            <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Justification</div>
+                                            <div className="text-xs font-medium">{v.analysis.justification}</div>
+                                          </div>
+                                        )}
+                                        {v.analysis.response && (
+                                          <div className="col-span-2">
+                                            <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Response</div>
+                                            <div className="flex flex-wrap gap-1">
+                                              {v.analysis.response.map((r: string, i: number) => (
+                                                <Badge key={i} variant="secondary" className="text-[9px] py-0">{r}</Badge>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.tools && v.tools.length > 0 && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Detection Tools</h4>
+                                      <div className="flex flex-wrap gap-2">
+                                        {v.tools.map((tool: any, i: number) => (
+                                          <Badge key={i} variant="outline" className="text-[10px] bg-muted/20">
+                                            {tool.name || tool.vendor} {tool.version}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </AccordionContent>
+                              </AccordionItem>
+
+                              {/* 3. Remediation & Evidence */}
+                              <AccordionItem value="remediation" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                      <ShieldAlert className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span className="font-bold">Remediation & Evidence</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4 space-y-6 pt-2">
+                                  {v.recommendation && (
+                                    <div>
+                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <ShieldCheck className="h-3 w-3 text-emerald-500" /> Recommendation
+                                      </h4>
+                                      <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-sm leading-relaxed text-foreground/90 font-medium">
+                                        {v.recommendation}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.workaround && (
+                                    <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-lg">
+                                      <h4 className="text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <AlertTriangle className="h-3 w-3" /> Workaround
+                                      </h4>
+                                      <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
+                                        {v.workaround}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.proofOfConcept && (
+                                    <div className="bg-orange-500/5 border border-orange-500/20 p-4 rounded-lg">
+                                      <h4 className="text-xs font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <ShieldAlert className="h-3 w-3" /> Proof of Concept
+                                      </h4>
+                                      {v.proofOfConcept.reproductionSteps && (
+                                        <div className="mt-2">
+                                          <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Reproduction Steps</div>
+                                          <div className="text-xs p-3 bg-muted/40 rounded border border-primary/5 whitespace-pre-wrap font-mono leading-tight">
+                                            {v.proofOfConcept.reproductionSteps}
+                                          </div>
+                                        </div>
+                                      )}
+                                      {v.proofOfConcept.environment && (
+                                        <div className="mt-3">
+                                          <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Target Environment</div>
+                                          <p className="text-xs italic text-foreground/80">{v.proofOfConcept.environment}</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {!v.recommendation && !v.workaround && !v.proofOfConcept && (
+                                    <div className="text-xs text-muted-foreground italic text-center py-4 bg-muted/20 rounded-lg">
+                                      No specific recommendation, workaround or proof of concept evidence provided.
+                                    </div>
+                                  )}
+                                </AccordionContent>
+                              </AccordionItem>
+
+                              {/* 4. Affected Components */}
+                              <AccordionItem value="affected" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                      <Network className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span className="font-bold">Affected Components ({v.affectedCount})</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4 space-y-3 pt-2">
+                                  {displayStats.allVulnerableComponents
+                                    .filter(c => v.affectedComponentRefs?.includes(c.ref))
+                                    .slice(0, 15).map((comp: any, i: number) => {
+                                      const affect = v.affects?.find((a: any) => (a.ref?.value || a.ref) === comp.ref);
+                                      const status = affect?.versions?.[0]?.status || 'affected';
+                                      
+                                      return (
+                                        <div key={i} className="flex flex-col p-3 rounded-xl bg-muted/30 border border-primary/5 hover:border-primary/20 transition-all text-sm gap-2">
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex flex-col truncate pr-2">
+                                              <span className="font-bold truncate text-foreground/90">{comp.name}</span>
+                                              <span className="text-[9px] text-muted-foreground truncate opacity-70 font-mono" title={comp.ref}>{comp.ref}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 shrink-0">
+                                              <Badge 
+                                                variant={status === 'affected' ? 'destructive' : 'outline'} 
+                                                className="text-[9px] py-0 h-5 px-2 uppercase font-black"
+                                              >
+                                                {status}
+                                              </Badge>
+                                              <Badge variant="secondary" className="text-[10px] shrink-0 font-mono h-5 font-bold border-primary/10">{comp.version}</Badge>
+                                            </div>
+                                          </div>
+                                          {affect?.versions && affect.versions.length > 1 && (
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                              {affect.versions.slice(1).map((ver: any, vi: number) => (
+                                                <Badge key={vi} variant="outline" className="text-[8px] py-0 opacity-60 font-mono">
+                                                  {ver.version}: {ver.status}
+                                                </Badge>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })
+                                  }
+                                  {v.affectedCount > 15 && (
+                                    <div className="text-center pt-2">
+                                      <Badge variant="ghost" className="text-[10px] text-muted-foreground italic">
+                                        + {v.affectedCount - 15} more components affected
+                                      </Badge>
+                                    </div>
+                                  )}
+                                </AccordionContent>
+                              </AccordionItem>
+
+                              {/* 5. Metadata & Provenance */}
+                              <AccordionItem value="metadata" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                      <Fingerprint className="h-4 w-4 text-primary" />
+                                    </div>
+                                    <span className="font-bold">Metadata & Provenance</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4 space-y-6 pt-2">
+                                  <div className="grid grid-cols-2 gap-4">
+                                    {v.created && (
+                                      <div>
+                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Created</div>
+                                        <div className="text-xs font-medium">{new Date(v.created).toLocaleDateString()}</div>
+                                      </div>
+                                    )}
+                                    {v.published && (
+                                      <div>
+                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Published</div>
+                                        <div className="text-xs font-medium">{new Date(v.published).toLocaleDateString()}</div>
+                                      </div>
+                                    )}
+                                    {v.updated && (
+                                      <div>
+                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Last Updated</div>
+                                        <div className="text-xs font-medium">{new Date(v.updated).toLocaleDateString()}</div>
+                                      </div>
+                                    )}
+                                    {v.rejected && (
+                                      <div>
+                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Rejected</div>
+                                        <div className="text-xs font-medium text-destructive">{new Date(v.rejected).toLocaleDateString()}</div>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {v.source && (
+                                    <div className="pt-2 border-t border-primary/5">
+                                      <div className="text-[10px] font-black uppercase text-muted-foreground mb-2">Primary Source</div>
+                                      <div className="flex items-center gap-3 p-3 bg-muted/40 rounded-lg">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary text-xs">
+                                          {v.source.name?.charAt(0) || '?'}
+                                        </div>
+                                        <div className="flex flex-col">
+                                          <span className="text-sm font-bold">{v.source.name || 'Unknown Provider'}</span>
+                                          {v.source.url && <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-500 hover:underline line-clamp-1">{v.source.url}</a>}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.credits && (
+                                    <div className="pt-2 border-t border-primary/5">
+                                      <div className="text-[10px] font-black uppercase text-muted-foreground mb-2">Credits</div>
+                                      <div className="space-y-2">
+                                        {v.credits.individuals?.map((ind: any, i: number) => (
+                                          <div key={i} className="text-xs flex items-center gap-2">
+                                            <User className="h-3 w-3 text-muted-foreground" />
+                                            <span className="font-medium">{ind.name}</span>
+                                            {ind.email && <span className="text-muted-foreground opacity-60">({ind.email})</span>}
+                                          </div>
+                                        ))}
+                                        {v.credits.organizations?.map((org: any, i: number) => (
+                                          <div key={i} className="text-xs flex items-center gap-2">
+                                            <Building className="h-3 w-3 text-muted-foreground" />
+                                            <span className="font-medium">{org.name}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {v.properties && v.properties.length > 0 && (
+                                    <div className="pt-2 border-t border-primary/5">
+                                      <div className="text-[10px] font-black uppercase text-muted-foreground mb-2">Extended Properties</div>
+                                      <div className="grid grid-cols-1 gap-1">
+                                        {v.properties.map((prop: any, i: number) => (
+                                          <div key={i} className="flex items-center justify-between p-2 bg-muted/20 rounded text-[10px]">
+                                            <span className="font-mono text-muted-foreground">{prop.name}</span>
+                                            <span className="font-bold">{prop.value}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+
+                            {v.references && v.references.length > 0 && (
+                              <div className="pt-6 border-t border-primary/10">
+                                <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
+                                  <BookOpen className="h-3 w-3" /> External References
+                                </h4>
+                                <div className="space-y-2">
+                                  {v.references.map((ref: any, i: number) => (
+                                    <a 
+                                      key={i} 
+                                      href={ref.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="block p-3 bg-muted/30 hover:bg-muted/60 rounded-lg text-xs border border-transparent hover:border-primary/10 transition-all group"
+                                    >
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="font-bold text-primary group-hover:underline line-clamp-1">{ref.url}</span>
+                                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                      </div>
+                                      {ref.comment && <p className="text-[10px] text-muted-foreground italic leading-relaxed">{ref.comment}</p>}
+                                    </a>
                                   ))}
                                 </div>
                               </div>
                             )}
-                            {v.analysis.detail && (
-                              <div className="text-xs mt-1">
-                                <span className="text-muted-foreground">Analysis Detail: </span>
-                                <p className="mt-1 italic">{v.analysis.detail}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
 
-                        {(v.created || v.published || v.updated || v.rejected) && (
-                          <div className="grid grid-cols-1 gap-2 p-3 bg-muted/20 rounded-lg">
-                            <h4 className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider mb-1">Timeline</h4>
-                            {v.created && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1 text-muted-foreground">
-                                  <Calendar className="h-3 w-3" /> Created
-                                </span>
-                                <span>{new Date(v.created).toLocaleDateString()}</span>
-                              </div>
-                            )}
-                            {v.published && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1 text-muted-foreground">
-                                  <Clock className="h-3 w-3" /> Published
-                                </span>
-                                <span>{new Date(v.published).toLocaleDateString()}</span>
-                              </div>
-                            )}
-                            {v.updated && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1 text-muted-foreground">
-                                  <Clock className="h-3 w-3" /> Modified
-                                </span>
-                                <span>{new Date(v.updated).toLocaleDateString()}</span>
-                              </div>
-                            )}
-                            {v.rejected && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1 text-muted-foreground">
-                                  <X className="h-3 w-3" /> Rejected
-                                </span>
-                                <span>{new Date(v.rejected).toLocaleDateString()}</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {v.source && (v.source.name || v.source.url) && (
-                          <div className="flex items-center gap-2 p-2 bg-muted/20 rounded border border-dashed">
-                             <Database className="h-3 w-3 text-muted-foreground" />
-                             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tight">Report Source:</span>
-                             <span className="text-xs font-semibold">
-                               {v.source.name || (v.source.url && new URL(v.source.url).hostname) || 'Unknown Source'}
-                             </span>
-                             {v.source.url && (
-                               <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="ml-auto">
-                                 <ExternalLink className="h-3 w-3 text-primary hover:text-primary/80" />
-                               </a>
-                             )}
-                          </div>
-                        )}
-
-                        {v.ratings && v.ratings.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <ShieldAlert className="h-4 w-4" /> Ratings & Scores
-                            </h4>
-                            <div className="space-y-2">
-                              {v.ratings.map((rate: any, idx: number) => (
-                                <div key={idx} className="text-xs border rounded p-3 space-y-2 bg-muted/10 relative overflow-hidden">
-                                  {rate.severity && (
-                                    <div 
-                                      className="absolute top-0 right-0 w-1 h-full" 
-                                      style={{ 
-                                        backgroundColor: SEVERITY_COLORS[rate.severity.charAt(0).toUpperCase() + rate.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
-                                      }} 
-                                    />
-                                  )}
-                                  <div className="flex justify-between items-start">
-                                    <div className="space-y-0.5">
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-bold text-sm">{rate.method || 'Score'}</span>
-                                        {rate.source?.name && (
-                                          <Badge variant="outline" className="text-[9px] py-0 px-1 font-normal opacity-70">
-                                            via {rate.source.name}
-                                          </Badge>
-                                        )}
-                                      </div>
-                                      {rate.severity && (
-                                        <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80" 
-                                             style={{ color: SEVERITY_COLORS[rate.severity.charAt(0).toUpperCase() + rate.severity.slice(1) as keyof typeof SEVERITY_COLORS] }}>
-                                          {rate.severity}
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className="text-right flex flex-col items-end">
-                                      <div className="text-lg font-black leading-none">{rate.score || '—'}</div>
-                                      <span className="text-[9px] text-muted-foreground uppercase font-medium">Value</span>
-                                    </div>
-                                  </div>
-                                  {rate.vector && (
-                                    <div className="pt-1">
-                                      <span className="text-[9px] font-bold text-muted-foreground uppercase block mb-1">Vector String</span>
-                                      <div className="text-[10px] bg-muted/50 p-1.5 rounded font-mono break-all leading-tight border border-muted-foreground/10">
-                                        {rate.vector}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {v.credits && (v.credits.organizations?.length || v.credits.individuals?.length) && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                              <Fingerprint className="h-4 w-4" /> Credits
-                            </h4>
-                            <div className="space-y-2">
-                              {v.credits.organizations?.map((org: any, idx: number) => (
-                                <div key={`org-${idx}`} className="text-xs flex items-center gap-2 bg-muted/30 p-2 rounded">
-                                  <Database className="h-3 w-3 text-muted-foreground" />
-                                  <span className="font-medium">{org.name}</span>
-                                  {org.url && (
-                                    <a href={org.url} target="_blank" rel="noopener noreferrer" className="ml-auto">
-                                      <ExternalLink className="h-3 w-3 text-primary" />
-                                    </a>
-                                  )}
-                                </div>
-                              ))}
-                              {v.credits.individuals?.map((ind: any, idx: number) => (
-                                <div key={`ind-${idx}`} className="text-xs flex flex-col bg-muted/30 p-2 rounded">
-                                  <span className="font-medium">{ind.name}</span>
-                                  {ind.email && <span className="text-muted-foreground text-[10px]">{ind.email}</span>}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {v.tools && v.tools.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                              <Search className="h-4 w-4" /> Detection Tools
-                            </h4>
-                            <div className="flex flex-wrap gap-2">
-                              {v.tools.map((tool: any, idx: number) => (
-                                <Badge key={idx} variant="outline" className="text-[10px]">
-                                  {tool.name || tool.vendor || 'Unknown Tool'} {tool.version}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {v.properties && v.properties.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <Info className="h-4 w-4" /> Additional Properties
-                            </h4>
-                            <div className="grid grid-cols-1 gap-1">
-                              {v.properties.map((prop: any, idx: number) => (
-                                <div key={idx} className="flex items-center justify-between text-[10px] p-1.5 bg-muted/20 rounded border border-transparent hover:border-muted-foreground/20 transition-colors">
-                                  <span className="font-semibold text-muted-foreground uppercase tracking-tight">{prop.name}</span>
-                                  <span className="font-mono text-foreground">{prop.value}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {v.advisories && v.advisories.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <ExternalLink className="h-4 w-4" /> Security Advisories
-                            </h4>
-                            <div className="grid grid-cols-1 gap-2">
-                              {v.advisories.map((adv: any, idx: number) => (
+                            {v.id.startsWith('CVE-') && (
+                              <div className="pt-8">
                                 <a 
-                                  key={idx} 
-                                  href={adv.url} 
+                                  href={`https://nvd.nist.gov/vuln/detail/${v.id}`} 
                                   target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="group flex flex-col p-2.5 border rounded-md hover:bg-muted/50 transition-all no-underline"
+                                  rel="noopener noreferrer"
+                                  className="w-full inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground h-11 px-6 text-sm font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
                                 >
-                                  <div className="flex items-center justify-between gap-2 mb-1">
-                                    <span className="text-xs font-semibold text-primary group-hover:underline truncate">
-                                      {adv.title || (adv.url && new URL(adv.url).hostname) || 'View Advisory'}
-                                    </span>
-                                    <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
-                                  </div>
-                                  <span className="text-[10px] text-muted-foreground truncate opacity-70">
-                                    {adv.url}
-                                  </span>
+                                  Investigate on NVD
+                                  <ExternalLink className="ml-2 h-4 w-4" />
                                 </a>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {v.references && v.references.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                               <BookOpen className="h-4 w-4" /> References
-                            </h4>
-                            <div className="space-y-1.5 line-clamp-2">
-                              {v.references.map((ref: any, idx: number) => (
-                                <div key={idx} className="flex flex-col border-l-2 border-muted pl-2 py-0.5">
-                                  <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline truncate flex items-center gap-1">
-                                    {ref.url}
-                                  </a>
-                                  {ref.comment && <span className="text-[10px] text-muted-foreground italic truncate">{ref.comment}</span>}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {v.proofOfConcept && (
-                          <div className="bg-orange-500/5 border border-orange-500/20 p-3 rounded-md">
-                            <h4 className="text-sm font-semibold text-orange-600 mb-1 flex items-center gap-2">
-                               <ShieldAlert className="h-4 w-4" /> Proof of Concept
-                            </h4>
-                            {v.proofOfConcept.reproductionSteps && (
-                              <div className="mt-2">
-                                <span className="text-[10px] font-bold uppercase text-muted-foreground">Steps</span>
-                                <p className="text-xs mt-1 whitespace-pre-wrap">{v.proofOfConcept.reproductionSteps}</p>
                               </div>
                             )}
-                            {v.proofOfConcept.environment && (
-                              <div className="mt-2">
-                                <span className="text-[10px] font-bold uppercase text-muted-foreground">Environment</span>
-                                <p className="text-xs mt-1 italic">{v.proofOfConcept.environment}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        <Separator />
-
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                            <Network className="h-4 w-4" /> Affected Components ({v.affectedCount})
-                          </h4>
-                          <div className="space-y-2">
-                            {displayStats.allVulnerableComponents
-                              .filter(c => v.affectedComponentRefs?.includes(c.ref))
-                              .slice(0, 10).map((comp: any, i: number) => {
-                                const affect = v.affects?.find((a: any) => (a.ref?.value || a.ref) === comp.ref);
-                                const status = affect?.versions?.[0]?.status;
-                                
-                                return (
-                                  <div key={i} className="flex flex-col p-2 rounded-md bg-muted/30 border text-sm gap-2">
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex flex-col truncate">
-                                        <span className="font-medium truncate">{comp.name}</span>
-                                        <span className="text-[10px] text-muted-foreground truncate">{comp.ref}</span>
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                        {status && (
-                                          <Badge 
-                                            variant={status === 'affected' ? 'destructive' : 'outline'} 
-                                            className="text-[9px] py-0 h-4 uppercase"
-                                          >
-                                            {status}
-                                          </Badge>
-                                        )}
-                                        <Badge variant="outline" className="text-[10px] shrink-0 font-mono">{comp.version}</Badge>
-                                      </div>
-                                    </div>
-                                    {affect?.versions && affect.versions.length > 1 && (
-                                      <div className="flex flex-wrap gap-1">
-                                        {affect.versions.slice(1).map((ver: any, vi: number) => (
-                                          <Badge key={vi} variant="outline" className="text-[8px] py-0 opacity-60">
-                                            {ver.version}: {ver.status}
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })
-                            }
-                            {v.affectedCount > 10 && (
-                              <p className="text-[10px] text-muted-foreground text-center">+ {v.affectedCount - 10} more components</p>
-                            )}
-                          </div>
-                        </div>
-
-                        {v.id.startsWith('CVE-') && (
-                          <div className="pt-4 mt-auto">
-                              <a 
-                                href={`https://nvd.nist.gov/vuln/detail/${v.id}`} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-9 px-4 text-sm font-medium hover:bg-primary/90 transition-colors"
-                              >
-                                View on NVD
-                              </a>
-                          </div>
-                        )}
                       </div>
                         );
                       })()}

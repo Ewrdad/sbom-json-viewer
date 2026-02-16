@@ -104,6 +104,8 @@ export interface SbomStats {
   };
   dependentsDistribution: Record<number, number>;
   vulnerabilityImpactDistribution: Record<number, number>;
+  cweCounts: Record<string, number>;
+  sourceCounts: Record<string, number>;
 }
 
 export interface WorkerProgressUpdate {
