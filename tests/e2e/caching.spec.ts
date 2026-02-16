@@ -54,7 +54,7 @@ test.describe("SBOM View Caching", () => {
     await chevron.click();
 
     // Verify child is visible (e.g., follow-redirects)
-    await expect(page.getByText("follow-redirects").filter({ visible: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("follow-redirects").filter({ visible: true }).first()).toBeVisible({ timeout: 10000 });
 
     // 3. Switch to Dashboard
     await page.getByRole("button", { name: "Dashboard" }).click();
@@ -64,6 +64,6 @@ test.describe("SBOM View Caching", () => {
     await page.getByRole("button", { name: "Dependency Tree" }).click();
 
     // 5. Verify tree is still expanded
-    await expect(page.getByText("follow-redirects").filter({ visible: true })).toBeVisible();
+    await expect(page.getByText("follow-redirects").filter({ visible: true }).first()).toBeVisible();
   });
 });

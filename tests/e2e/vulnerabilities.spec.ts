@@ -3,15 +3,19 @@ import { expect, test } from "@playwright/test";
 test.describe("Vulnerabilities View", () => {
     test.beforeEach(async ({ page }) => {
         // Navigate to the vulnerabilities view directly or via menu
-        test.setTimeout(60000);
-        await page.goto("/");
+        test.setTimeout(90000);
+        await page.goto("/", { waitUntil: "networkidle" });
         
-        // Ensure we are using a file that has vulnerabilities (Simple Example has some)
-        await page.getByRole("button", { name: "Simple Example" }).click();
-        await expect(page.getByText("Viewing: examples/sample-simple")).toBeVisible();
+        // Wait for the manifest to load and buttons to appear
+        // Wait for the manifest to load and buttons to appear
+        const exampleInput = page.getByPlaceholder("Simple Example");
+        await expect(exampleInput).toBeVisible({ timeout: 30000 });
         
-        await page.getByRole("button", { name: "Vulnerabilities", exact: true }).click();
-        await expect(page.getByRole("heading", { name: "Vulnerabilities" }).first()).toBeVisible();
+        await expect(page.getByText("Viewing: examples/sample-simple")).toBeVisible({ timeout: 20000 });
+        
+        const vulnTab = page.getByRole("button", { name: "Vulnerabilities", exact: true });
+        await vulnTab.click();
+        await expect(page.getByRole("heading", { name: "Vulnerabilities" }).first()).toBeVisible({ timeout: 20000 });
     });
 
     test("displays severity summary cards", async ({ page }) => {
@@ -37,7 +41,7 @@ test.describe("Vulnerabilities View", () => {
         await page.getByRole("button", { name: "By Vulnerability" }).click();
         
         // Ensure some rows are visible before filtering
-        await expect(page.locator("tbody tr").first()).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole("row").nth(1)).toBeVisible({ timeout: 10000 });
 
         // 2. Search for a known CVE or part of ID
         const searchInput = page.getByPlaceholder("Search CVEs...");
@@ -45,7 +49,7 @@ test.describe("Vulnerabilities View", () => {
         
         // 3. Verify rows exist
         // Filter might take a moment to apply. Target tbody rows to avoid matching header text.
-        await expect(page.locator("tbody tr").filter({ hasText: "CVE-" }).first()).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole("row", { name: /CVE-/ }).first()).toBeVisible({ timeout: 15000 });
     });
 
     test("opens vulnerability details panel", async ({ page }) => {
@@ -63,8 +67,19 @@ test.describe("Vulnerabilities View", () => {
       await page.getByRole("button", { name: "Details" }).first().click();
 
       // 3. Verify details panel opens
-      await expect(page.getByText("Vulnerability Details")).toBeVisible();
-      await expect(page.getByRole("heading", { name: "Severity" })).toBeVisible();
+      // Check if Error Boundary trapped a crash
+      const errorBoundary = page.getByText("Details panel failed to load.");
+      if (await errorBoundary.isVisible()) {
+          console.error("Details panel crashed!");
+          throw new Error("Details panel crashed during test");
+      }
+      
+      // Target the labels within the panel, allowing for CSS text transformations (e.g. SEVERITY:)
+      await expect(page.getByText(/ID:/i)).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/Severity:/i)).toBeVisible();
+      
+      await expect(page.getByRole("button", { name: "Overview", exact: true })).toBeVisible();
+      await expect(page.getByText("Technical Details")).toBeVisible();
       
       // 4. Close panel
       // 4. Close panel

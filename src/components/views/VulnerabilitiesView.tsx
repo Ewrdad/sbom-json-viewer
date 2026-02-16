@@ -195,7 +195,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         // Check if any of the component's severities are in the selected list
         return selectedSeverities.some(s => {
           const key = s.toLowerCase() as "critical" | "high" | "medium" | "low";
-          return (c as any)[key] > 0;
+          return ((c as any)[key] || 0) > 0;
         });
       });
     }
@@ -226,7 +226,11 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     }
 
     if (selectedSeverities.length > 0) {
-      list = list.filter(v => selectedSeverities.includes(v.severity.charAt(0).toUpperCase() + v.severity.slice(1).toLowerCase()));
+      list = list.filter(v => {
+        if (!v.severity) return false;
+        const normalized = v.severity.charAt(0).toUpperCase() + v.severity.slice(1).toLowerCase();
+        return selectedSeverities.includes(normalized);
+      });
     }
 
     const sorted = [...list].sort((a, b) => {

@@ -22,14 +22,16 @@ test.describe("SBOM Routing", () => {
     await page.goto("/");
     
     // 1. Click a different SBOM button
-    await page.getByRole("button", { name: "Full SBOM" }).click();
+    await page.getByPlaceholder("Simple Example").click();
+    await page.getByRole("option", { name: "Full SBOM" }).click();
     
     // 2. Verify URL and content update
     await expect(page).toHaveURL(/.*#\/examples\/sbom-full/);
     await expect(page.getByText("Viewing: examples/sbom-full")).toBeVisible();
     
     // 3. Click back to simple
-    await page.getByRole("button", { name: "Simple Example" }).click();
+    await page.getByPlaceholder("Full SBOM").click();
+    await page.getByRole("option", { name: "Simple Example" }).click();
     await expect(page).toHaveURL(/.*#\/examples\/sample-simple/);
     await expect(page.getByText("Viewing: examples/sample-simple")).toBeVisible();
   });
@@ -40,7 +42,8 @@ test.describe("SBOM Routing", () => {
     await expect(page.getByText("Viewing: examples/sample-simple")).toBeVisible({ timeout: 45000 });
 
     // 1. Navigate to another file
-    await page.getByRole("button", { name: "Full SBOM" }).click();
+    await page.getByPlaceholder("Simple Example").click();
+    await page.getByRole("option", { name: "Full SBOM" }).click();
     await expect(page.getByText("Viewing: examples/sbom-full")).toBeVisible({ timeout: 45000 });
 
     // 2. Go Back

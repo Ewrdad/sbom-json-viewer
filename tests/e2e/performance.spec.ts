@@ -11,12 +11,14 @@ test.describe("SBOM Performance", () => {
     await expect(page.getByText(/Preparing viewer|Loading analysis/)).not.toBeVisible({ timeout: 20000 });
     
     // Verify we are actually in the app
-    await expect(page.getByRole("button", { name: "Huge Example (20k)" })).toBeVisible();
+    const sbomSelector = page.getByPlaceholder("Simple Example");
+    await expect(sbomSelector).toBeVisible();
     
     // 1. Click on the Huge SBOM button
-    const hugeButton = page.getByRole("button", { name: "Huge Example (20k)" });
-    await expect(hugeButton).toBeVisible();
-    await hugeButton.click();
+    await sbomSelector.click();
+    const hugeOption = page.getByRole("option", { name: "Huge Example (20k)" });
+    await expect(hugeOption).toBeVisible();
+    await hugeOption.click();
 
     // 2. Verify progress indicator appears
     // The worker sends multiple progress updates. We check for the completion of processing.
@@ -50,6 +52,6 @@ test.describe("SBOM Performance", () => {
 
     // 6. Test deep find / scale
     await searchInput.fill("component-19999");
-    await expect(page.getByText("component-19999", { exact: true })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText("component-19999", { exact: true }).first()).toBeVisible({ timeout: 20000 });
   });
 });

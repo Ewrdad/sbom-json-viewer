@@ -8,7 +8,7 @@ const gotoViewer = async (page: Page) => {
 
   // Now the manifest buttons should be visible
   await expect(
-    page.getByRole("button", { name: "Simple Example" }),
+    page.getByPlaceholder("Simple Example"),
   ).toBeVisible();
   await expect(
     page.getByText("Viewing: examples/sample-simple"),
@@ -27,10 +27,17 @@ test.describe("SBOM Viewer", () => {
   test("switches between sample and full SBOM files", async ({ page }) => {
     await gotoViewer(page);
 
-    await page.getByRole("button", { name: "Full SBOM" }).click();
+    // Open the combobox
+    await page.getByPlaceholder("Simple Example").click();
+    // Select the option
+    await page.getByRole("option", { name: "Full SBOM" }).click();
+    
     await expect(page.getByText("Viewing: examples/sbom-full")).toBeVisible();
 
-    await page.getByRole("button", { name: "Simple Example" }).click();
+    // Switch back
+    await page.getByPlaceholder("Full SBOM").click();
+    await page.getByRole("option", { name: "Simple Example" }).click();
+    
     await expect(
       page.getByText("Viewing: examples/sample-simple"),
     ).toBeVisible();
