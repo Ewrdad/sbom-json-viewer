@@ -38,6 +38,7 @@ import {
   Layers,
   User,
   Building,
+  Download,
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import {
@@ -63,7 +64,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuGroup,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { generateTicketCSV, downloadCSV, type ExportPlatform } from "../../lib/ticketExportUtils";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -328,6 +331,12 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         <ArrowUpDown className={`h-3 w-3 transition-opacity ${activeSortKey === sortKeyVal ? "opacity-100" : "opacity-30 group-hover:opacity-60"}`} />
       </button>
     );
+  };
+
+  const handleExport = (platform: ExportPlatform) => {
+    const csv = generateTicketCSV(activeList, viewMode, platform);
+    const filename = `sbom-tickets-${platform.toLowerCase()}-${viewMode}-${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csv, filename);
   };
 
   return (
@@ -707,6 +716,34 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           </div>
                         </DropdownMenuCheckboxItem>
                       ))}
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 text-xs gap-2" data-testid="export-button">
+                      <Download className="h-3.5 w-3.5" />
+                      Export
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>Ticket Systems</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleExport("Jira")}>
+                        Export for Jira
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport("GitLab")}>
+                        Export for GitLab
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport("GitHub")}>
+                        Export for GitHub
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleExport("Generic")}>
+                        Generic CSV
+                      </DropdownMenuItem>
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>

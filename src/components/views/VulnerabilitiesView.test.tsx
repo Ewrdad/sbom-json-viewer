@@ -33,12 +33,16 @@ vi.mock("@/components/ui/dropdown-menu", () => ({
     DropdownMenuRadioGroup: ({ children }: any) => <div>{children}</div>,
     DropdownMenuRadioItem: ({ children }: any) => <div>{children}</div>,
     DropdownMenuItem: ({ children, onClick }: any) => <div onClick={onClick}>{children}</div>,
-    DropdownMenuSub: ({ children }: any) => <div>{children}</div>,
-    DropdownMenuSubTrigger: ({ children }: any) => <div>{children}</div>,
-    DropdownMenuSubContent: ({ children }: any) => <div>{children}</div>,
     DropdownMenuShortcut: ({ children }: any) => <div>{children}</div>,
     DropdownMenuPortal: ({ children }: any) => <>{children}</>,
 }));
+
+vi.mock("../../lib/ticketExportUtils", () => ({
+    generateTicketCSV: vi.fn(() => "mock-csv"),
+    downloadCSV: vi.fn(),
+}));
+
+import { generateTicketCSV, downloadCSV } from "../../lib/ticketExportUtils";
 
 const mockStats: SbomStats = {
     totalComponents: 100,
@@ -378,8 +382,10 @@ describe('VulnerabilitiesView', () => {
         // In the mock, the content is always present or at least easily accessible
         // Select Critical - in our mock we click the div
         // Use a more specific selector to avoid the table header which also says 'Critical'
-        const dropdownContent = screen.getByTestId('mock-dropdown-content');
-        const criticalOption = within(dropdownContent).getByText('Critical');
+        const dropdownContents = screen.getAllByTestId('mock-dropdown-content');
+        const filterDropdown = dropdownContents.find(d => within(d).queryByText('Severity'));
+        if (!filterDropdown) throw new Error('Filter dropdown not found');
+        const criticalOption = within(filterDropdown).getByText('Critical');
         fireEvent.click(criticalOption);
 
         // Check if only lodash and express (have critical) are shown, axios (only high/medium) is hidden
@@ -410,5 +416,27 @@ describe('VulnerabilitiesView', () => {
         fireEvent.click(clearBtn);
 
         expect(screen.getByText('axios')).toBeInTheDocument();
+    });
+
+    it('should trigger export when selecting a platform from dropdown', async () => {
+        render(
+            <SettingsProvider>
+                <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
+            </SettingsProvider>
+        );
+
+        const exportBtn = screen.getByTestId('export-button');
+        expect(exportBtn).toBeInTheDocument();
+
+        // In the mock dropdown, we click the item directly
+        // We have two dropdown contents now (Filter and Export)
+        const dropdownContents = screen.getAllByTestId('mock-dropdown-content');
+        const exportDropdown = dropdownContents.find(d => within(d).queryByText('Ticket Systems'));
+        if (!exportDropdown) throw new Error('Export dropdown not found');
+        const jiraOption = within(exportDropdown).getByText('Export for Jira');
+        fireEvent.click(jiraOption);
+
+        expect(generateTicketCSV).toHaveBeenCalled();
+        expect(downloadCSV).toHaveBeenCalledWith("mock-csv", expect.stringContaining("jira"));
     });
 });

@@ -32,4 +32,61 @@ test.describe("Export Functionality", () => {
         // Verify we are still on the dashboard
         await expect(page.getByRole("heading", { name: "Dashboard" }).first()).toBeVisible();
     });
+
+    test("exports vulnerabilities to Jira CSV", async ({ page }) => {
+        test.setTimeout(90000);
+        await page.goto("/", { waitUntil: "networkidle" });
+        
+        // Wait for example to load
+        await expect(page.getByPlaceholder("Simple Example")).toBeVisible({ timeout: 30000 });
+        
+        // Navigate to Vulnerabilities
+        await page.getByRole("button", { name: "Vulnerabilities", exact: true }).click();
+        await expect(page.getByRole("heading", { name: "Vulnerabilities" }).first()).toBeVisible();
+
+        // 1. Switch to "By Vulnerability" view
+        await page.getByRole("button", { name: "By Vulnerability" }).click();
+        
+        // 2. Ensure data is loaded
+        await expect(page.locator('.text-3xl.font-bold').first()).not.toHaveText("0", { timeout: 20000 });
+
+        // 3. Open Export dropdown
+        const exportBtn = page.getByRole("button", { name: "Export", exact: true }).first();
+        await expect(exportBtn).toBeVisible({ timeout: 10000 });
+        await exportBtn.click();
+        
+        // 4. Click "Export for Jira" and capture download
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole("menuitem", { name: "Export for Jira" }).click();
+        const download = await downloadPromise;
+
+        // 5. Verify download filename
+        expect(download.suggestedFilename()).toContain("jira");
+        expect(download.suggestedFilename()).toContain(".csv");
+    });
+
+    test("exports components to GitLab CSV", async ({ page }) => {
+        test.setTimeout(90000);
+        await page.goto("/", { waitUntil: "networkidle" });
+        
+        // Navigate to Vulnerabilities
+        await page.getByRole("button", { name: "Vulnerabilities", exact: true }).click();
+
+        // 1. Ensure "By Component" view (default)
+        await page.getByRole("button", { name: "By Component" }).click();
+
+        // 2. Open Export dropdown
+        const exportBtn = page.getByRole("button", { name: "Export", exact: true }).first();
+        await expect(exportBtn).toBeVisible({ timeout: 10000 });
+        await exportBtn.click();
+        
+        // 3. Click "Export for GitLab" and capture download
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole("menuitem", { name: "Export for GitLab" }).click();
+        const download = await downloadPromise;
+
+        // 4. Verify download filename
+        expect(download.suggestedFilename()).toContain("gitlab");
+        expect(download.suggestedFilename()).toContain(".csv");
+    });
 });
