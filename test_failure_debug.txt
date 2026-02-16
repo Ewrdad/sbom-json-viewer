@@ -1,0 +1,1687 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/home/ewrdad/portfolio/sbom-viewer/sbom-json-viewer[39m
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould render KPI cards with correct counts
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould show empty state when no vulnerabilities
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m50[39m,
+  vulnerabilityCounts: { critical: [33m0[39m, high: [33m0[39m, medium: [33m0[39m, low: [33m0[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [],
+  totalVulnerabilities: [33m0[39m,
+  allVulnerabilities: [],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m0[39m,
+  avgVulnerabilitiesPerComponent: [33m0[39m,
+  dependencyStats: { direct: [33m50[39m, transitive: [33m0[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m50[39m },
+  vulnerabilityImpactDistribution: {},
+  cweCounts: {},
+  sourceCounts: {}
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m50[39m,
+  vulnerabilityCounts: { critical: [33m0[39m, high: [33m0[39m, medium: [33m0[39m, low: [33m0[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [],
+  totalVulnerabilities: [33m0[39m,
+  allVulnerabilities: [],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m0[39m,
+  avgVulnerabilitiesPerComponent: [33m0[39m,
+  dependencyStats: { direct: [33m50[39m, transitive: [33m0[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m50[39m },
+  vulnerabilityImpactDistribution: {},
+  cweCounts: {},
+  sourceCounts: {}
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould render vulnerable components table
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould filter table when searching
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould switch to vulnerability view and show CVEs
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould filter CVEs when searching in vulnerability view
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould render comprehensive vulnerability details when selected
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-9999-DETAILED'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m1[39m,
+      affectedComponentRefs: [36m[Array][39m,
+      title: [32m'Detailed Title'[39m,
+      description: [32m'Detailed Description'[39m,
+      detail: [32m'Detailed long text'[39m,
+      recommendation: [32m'Fix it now'[39m,
+      cwes: [36m[Array][39m,
+      analysis: [36m[Object][39m,
+      created: [32m'2024-01-01T00:00:00Z'[39m,
+      proofOfConcept: [36m[Object][39m,
+      source: [36m[Object][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-79'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-9999-DETAILED'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m1[39m,
+      affectedComponentRefs: [36m[Array][39m,
+      title: [32m'Detailed Title'[39m,
+      description: [32m'Detailed Description'[39m,
+      detail: [32m'Detailed long text'[39m,
+      recommendation: [32m'Fix it now'[39m,
+      cwes: [36m[Array][39m,
+      analysis: [36m[Object][39m,
+      created: [32m'2024-01-01T00:00:00Z'[39m,
+      proofOfConcept: [36m[Object][39m,
+      source: [36m[Object][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-79'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould render all extended vulnerability fields
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-EXTENDED'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m1[39m,
+      affectedComponentRefs: [36m[Array][39m,
+      title: [32m'Extended Title'[39m,
+      description: [32m'Extended Description'[39m,
+      recommendation: [32m'Fix it'[39m,
+      workaround: [32m'Do this instead'[39m,
+      credits: [36m[Object][39m,
+      tools: [36m[Array][39m,
+      properties: [36m[Array][39m,
+      cwes: [36m[Array][39m,
+      affects: [36m[Array][39m,
+      ratings: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-EXTENDED'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m1[39m,
+      affectedComponentRefs: [36m[Array][39m,
+      title: [32m'Extended Title'[39m,
+      description: [32m'Extended Description'[39m,
+      recommendation: [32m'Fix it'[39m,
+      workaround: [32m'Do this instead'[39m,
+      credits: [36m[Object][39m,
+      tools: [36m[Array][39m,
+      properties: [36m[Array][39m,
+      cwes: [36m[Array][39m,
+      affects: [36m[Array][39m,
+      ratings: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould filter by severity when clicking KPI cards
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould filter by severity when selecting from dropdown
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+[90mstdout[2m | src/components/views/VulnerabilitiesView.test.tsx[2m > [22m[2mVulnerabilitiesView[2m > [22m[2mshould clear all filters when clicking Clear button
+[22m[39m[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+[VulnerabilitiesView] displayStats: {
+  totalComponents: [33m100[39m,
+  vulnerabilityCounts: { critical: [33m5[39m, high: [33m10[39m, medium: [33m20[39m, low: [33m15[39m, none: [33m50[39m },
+  licenseCounts: {},
+  topLicenses: [],
+  licenseDistribution: {
+    permissive: [33m0[39m,
+    copyleft: [33m0[39m,
+    weakCopyleft: [33m0[39m,
+    proprietary: [33m0[39m,
+    unknown: [33m0[39m
+  },
+  vulnerableComponents: [],
+  allVulnerableComponents: [
+    {
+      name: [32m'lodash'[39m,
+      version: [32m'4.17.20'[39m,
+      ref: [32m'ref-lodash'[39m,
+      critical: [33m2[39m,
+      high: [33m3[39m,
+      medium: [33m1[39m,
+      low: [33m0[39m,
+      total: [33m6[39m
+    },
+    {
+      name: [32m'express'[39m,
+      version: [32m'4.17.1'[39m,
+      ref: [32m'ref-express'[39m,
+      critical: [33m1[39m,
+      high: [33m2[39m,
+      medium: [33m0[39m,
+      low: [33m1[39m,
+      total: [33m4[39m
+    },
+    {
+      name: [32m'axios'[39m,
+      version: [32m'0.21.0'[39m,
+      ref: [32m'ref-axios'[39m,
+      critical: [33m0[39m,
+      high: [33m1[39m,
+      medium: [33m2[39m,
+      low: [33m0[39m,
+      total: [33m3[39m
+    }
+  ],
+  totalVulnerabilities: [33m50[39m,
+  allVulnerabilities: [
+    {
+      id: [32m'CVE-2024-001'[39m,
+      severity: [32m'critical'[39m,
+      affectedCount: [33m10[39m,
+      title: [32m'Critical Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'CVE-2024-002'[39m,
+      severity: [32m'high'[39m,
+      affectedCount: [33m5[39m,
+      title: [32m'High Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    },
+    {
+      id: [32m'GHSA-xxx'[39m,
+      severity: [32m'medium'[39m,
+      affectedCount: [33m2[39m,
+      title: [32m'Medium Vuln'[39m,
+      affectedComponentRefs: [36m[Array][39m
+    }
+  ],
+  allLicenses: [],
+  allLicenseComponents: [],
+  uniqueVulnerabilityCount: [33m3[39m,
+  avgVulnerabilitiesPerComponent: [33m0.5[39m,
+  dependencyStats: { direct: [33m30[39m, transitive: [33m70[39m },
+  dependentsDistribution: { [32m'0'[39m: [33m30[39m, [32m'1'[39m: [33m40[39m, [32m'5'[39m: [33m30[39m },
+  vulnerabilityImpactDistribution: { [32m'0'[39m: [33m10[39m, [32m'1'[39m: [33m20[39m, [32m'5'[39m: [33m20[39m },
+  cweCounts: { [32m'CWE-123'[39m: [33m1[39m },
+  sourceCounts: { NVD: [33m1[39m }
+}
+
+ [31m❯[39m src/components/views/VulnerabilitiesView.test.tsx [2m([22m[2m11 tests[22m[2m | [22m[31m11 failed[39m[2m)[22m[32m 114[2mms[22m[39m
+[31m     [31m×[31m should render KPI cards with correct counts[39m[32m 36[2mms[22m[39m
+[31m     [31m×[31m should show empty state when no vulnerabilities[39m[32m 12[2mms[22m[39m
+[31m     [31m×[31m should render vulnerable components table[39m[32m 13[2mms[22m[39m
+[31m     [31m×[31m should filter table when searching[39m[32m 20[2mms[22m[39m
+[31m     [31m×[31m should switch to vulnerability view and show CVEs[39m[32m 6[2mms[22m[39m
+[31m     [31m×[31m should filter CVEs when searching in vulnerability view[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should render comprehensive vulnerability details when selected[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should render all extended vulnerability fields[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should filter by severity when clicking KPI cards[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should filter by severity when selecting from dropdown[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should clear all filters when clicking Clear button[39m[32m 4[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 11 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould render KPI cards with correct counts
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould show empty state when no vulnerabilities
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould render vulnerable components table
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould filter table when searching
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould switch to vulnerability view and show CVEs
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould filter CVEs when searching in vulnerability view
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould render comprehensive vulnerability details when selected
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould render all extended vulnerability fields
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould filter by severity when clicking KPI cards
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould filter by severity when selecting from dropdown
+[41m[1m FAIL [22m[49m src/components/views/VulnerabilitiesView.test.tsx[2m > [22mVulnerabilitiesView[2m > [22mshould clear all filters when clicking Clear button
+[31m[1mReferenceError[22m: DropdownMenuGroup is not defined[39m
+[36m [2m❯[22m VulnerabilitiesView src/components/views/VulnerabilitiesView.tsx:[2m694:22[22m[39m
+    [90m692| [39m                  [33m<[39m[33m/[39m[33mDropdownMenuTrigger[39m[33m>[39m
+    [90m693| [39m                  [33m<[39m[33mDropdownMenuContent[39m [33malign[39m[33m=[39m[32m"end"[39m [33mclassName[39m[33m=[39m[32m"w-48"[39m[33m>[39m
+    [90m694| [39m                    [33m<[39m[33mDropdownMenuGroup[39m[33m>[39m
+    [90m   | [39m                     [31m^[39m
+    [90m695| [39m                      [33m<[39m[33mDropdownMenuLabel[39m[33m>[39mSeverity[33m<[39m[33m/[39m[33mDropdownMenuLabel[39m[33m>[39m
+    [90m696| [39m                      [33m<[39m[33mDropdownMenuSeparator[39m [33m/[39m[33m>[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+[90m [2m❯[22m performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:[2m16583:35[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m11 failed[39m[22m[90m (11)[39m
+[2m   Start at [22m 11:39:40
+[2m   Duration [22m 2.78s[2m (transform 531ms, setup 89ms, import 2.16s, tests 114ms, environment 299ms)[22m
+

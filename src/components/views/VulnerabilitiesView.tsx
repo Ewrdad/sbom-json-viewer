@@ -62,6 +62,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 
 const ITEMS_PER_PAGE = 20;
@@ -691,20 +692,22 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Severity</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {["Critical", "High", "Medium", "Low"].map((sev) => (
-                      <DropdownMenuCheckboxItem
-                        key={sev}
-                        checked={selectedSeverities.includes(sev)}
-                        onCheckedChange={() => toggleSeverity(sev)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: SEVERITY_COLORS[sev as keyof typeof SEVERITY_COLORS] }} />
-                          {sev}
-                        </div>
-                      </DropdownMenuCheckboxItem>
-                    ))}
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>Severity</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {["Critical", "High", "Medium", "Low"].map((sev) => (
+                        <DropdownMenuCheckboxItem
+                          key={sev}
+                          checked={selectedSeverities.includes(sev)}
+                          onCheckedChange={() => toggleSeverity(sev)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: SEVERITY_COLORS[sev as keyof typeof SEVERITY_COLORS] }} />
+                            {sev}
+                          </div>
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
