@@ -7,41 +7,52 @@ import { jsPDF } from 'jspdf';
  * @returns Promise that resolves to the generated canvas
  */
 const captureElement = async (elementId: string): Promise<HTMLCanvasElement> => {
+  console.log(`[exportUtils] Starting capture for element: ${elementId}`);
   const element = document.getElementById(elementId);
   if (!element) {
+    console.error(`[exportUtils] Element with id ${elementId} not found`);
     throw new Error(`Element with id ${elementId} not found`);
   }
+  console.log(`[exportUtils] Element found:`, element);
 
   // Ensure element is visible before capturing
-  const originalDisplay = element.style.display;
+  const originalOpacity = element.style.opacity;
   const originalPosition = element.style.position;
   const originalTop = element.style.top;
   const originalLeft = element.style.left;
   const originalZIndex = element.style.zIndex;
+  const originalPointerEvents = element.style.pointerEvents;
 
-  element.style.display = 'block';
+  element.style.opacity = '1';
   element.style.position = 'fixed';
   element.style.top = '0';
-  element.style.left = '-9999px'; // Render off-screen to prevent flash
-  element.style.zIndex = '-1';
+  element.style.left = '0'; 
+  element.style.zIndex = '9999'; // Bring to front temporarily
+  element.style.pointerEvents = 'none'; // But don't block clicks in case capture is slow
 
   try {
+    console.log(`[exportUtils] Invoking html2canvas...`);
     const canvas = await html2canvas(element, {
       scale: 2, // Higher resolution
       useCORS: true, // Allow cross-origin images to be rendered
-      logging: false, // Turn off html2canvas logging
+      logging: true, // Turn on html2canvas logging for debug
       backgroundColor: '#ffffff', // Force white background
       windowWidth: element.scrollWidth,
       windowHeight: element.scrollHeight,
     });
+    console.log(`[exportUtils] html2canvas success, canvas size: ${canvas.width}x${canvas.height}`);
     return canvas;
+  } catch (err) {
+    console.error(`[exportUtils] html2canvas failed:`, err);
+    throw err;
   } finally {
     // Restore original styles
-    element.style.display = originalDisplay;
+    element.style.opacity = originalOpacity;
     element.style.position = originalPosition;
     element.style.top = originalTop;
     element.style.left = originalLeft;
     element.style.zIndex = originalZIndex;
+    element.style.pointerEvents = originalPointerEvents;
   }
 };
 
@@ -56,10 +67,12 @@ export const exportElementToPng = async (elementId: string, filename: string): P
     
     // Create download link
     const dataUrl = canvas.toDataURL('image/png');
+    console.log(`[exportUtils] Triggering PNG download...`);
     const link = document.createElement('a');
     link.download = `${filename}.png`;
     link.href = dataUrl;
     link.click();
+    console.log(`[exportUtils] PNG download triggered successfully`);
   } catch (error) {
     console.error('Failed to export PNG:', error);
     throw error;
@@ -103,7 +116,9 @@ export const exportElementToPdf = async (elementId: string, filename: string): P
       heightLeft -= pageHeight;
     }
 
+    console.log(`[exportUtils] Saving PDF...`);
     pdf.save(`${filename}.pdf`);
+    console.log(`[exportUtils] PDF saved successfully`);
   } catch (error) {
     console.error('Failed to export PDF:', error);
     throw error;
