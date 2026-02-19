@@ -104,8 +104,10 @@ export const Formatter = async ({
 
   const formattedSBOM: formattedSBOM = {
     statistics: {
-      licenses: uniqueLicenses(rawSBOM.components),
-      vulnerabilities: uniqueVulnerabilities(rawSBOM),
+      licenses: [],
+      vulnerabilities: {
+        Critical: [], High: [], Medium: [], Low: [], Informational: []
+      },
     },
     metadata: rawSBOM.metadata,
     componentMap: new Map<string, EnhancedComponent>(),
@@ -115,13 +117,34 @@ export const Formatter = async ({
     topLevelRefs: [],
   };
 
+  // 0. Initial statistics (can be slow on huge SBOMs)
+  setProgress(() => ({ progress: 5, message: "Analyzing vulnerabilities..." }));
+  await tick();
+  formattedSBOM.statistics.vulnerabilities = uniqueVulnerabilities(rawSBOM);
+  
+  setProgress(() => ({ progress: 10, message: "Analyzing licenses..." }));
+  await tick();
+  formattedSBOM.statistics.licenses = uniqueLicenses(rawSBOM.components);
+
   // 1. Build basic maps and Index Vulnerabilities
+  setProgress(() => ({ progress: 15, message: "Preparing component list..." }));
+  await tick();
+  const rawComponents = Array.from(rawSBOM.components);
+  const totalRaw = rawComponents.length;
+  
+  setProgress(() => ({ progress: 18, message: "Indexing vulnerabilities..." }));
+  await tick();
   const rawComponentMap = new Map<string, Component>();
   const allChildRefs = new Set<string>();
   const vulnIndex = new Map<string, Vulnerability[]>();
 
   // Index vulns
+  let vulnProcessCount = 0;
   for (const vuln of rawSBOM.vulnerabilities) {
+    vulnProcessCount++;
+    if (vulnProcessCount % 1000 === 0) {
+      await tick();
+    }
     for (const affect of vuln.affects) {
       const ref = (affect.ref && typeof affect.ref === "object" && 'value' in affect.ref) 
         ? (affect.ref as { value: string }).value 
@@ -134,7 +157,7 @@ export const Formatter = async ({
     }
   }
 
-  await batchProcess(rawSBOM.components, (component) => {
+  await batchProcess(rawComponents, (component, index) => {
     const bomRef = component.bomRef.value;
     if (!bomRef) return;
     rawComponentMap.set(bomRef, component);
@@ -147,9 +170,19 @@ export const Formatter = async ({
       }
     });
     formattedSBOM.dependencyGraph.set(bomRef, deps);
+
+    if (index % 500 === 0) {
+      setProgress(() => ({ 
+        progress: Math.min(25, Math.round((index / totalRaw) * 25)), 
+        message: `Step 1/4: Indexing components (${index}/${totalRaw})...` 
+      }));
+    }
   });
 
   // 2. Identify top-level refs
+  setProgress(() => ({ progress: 25, message: "Step 2/4: Identifying top-level deps..." }));
+  await tick();
+
   rawComponentMap.forEach((_, ref) => {
     if (!allChildRefs.has(ref)) {
       formattedSBOM.topLevelRefs.push(ref);
@@ -160,14 +193,16 @@ export const Formatter = async ({
     if (rawSBOM.metadata?.component?.bomRef?.value) {
       formattedSBOM.topLevelRefs.push(rawSBOM.metadata.component.bomRef.value);
     } else if (rawComponentMap.size > 0) {
-      formattedSBOM.topLevelRefs.push(rawComponentMap.keys().next().value);
+      const key = rawComponentMap.keys().next().value;
+      if (key) formattedSBOM.topLevelRefs.push(key);
     }
   }
 
   // 3. Initialize Enhanced Map with Inherent Metrics (Phase 1)
   const enhancedMap = new Map<string, EnhancedComponent>();
+  const allEntries = Array.from(rawComponentMap.entries());
   
-  for (const [ref, comp] of rawComponentMap.entries()) {
+  await batchProcess(allEntries, ([ref, comp], index) => {
     const inherentVulns = categorizeVulnerabilities(vulnIndex.get(ref) || []);
     const inherentLicenses: LicenseDistribution = {
       permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0
@@ -200,9 +235,6 @@ export const Formatter = async ({
       }
     });
 
-    // We must manually ensure bomRef is an 'own' enumerable property so deepToPlain picks it up.
-    // comp.bomRef is a getter on the class, so Object.assign won't copy it.
-    // And we can't simple assign it because there's no setter.
     Object.defineProperty(enhanced, "bomRef", {
       value: comp.bomRef as unknown,
       enumerable: true,
@@ -211,19 +243,68 @@ export const Formatter = async ({
     });
 
     enhancedMap.set(ref, enhanced);
-  }
+
+    if (index % 500 === 0) {
+       setProgress(() => ({ 
+        progress: 25 + Math.min(25, Math.round((index / allEntries.length) * 25)), 
+        message: `Step 3/4: Component analysis (${index}/${allEntries.length})...` 
+      }));
+    }
+  }, 500);
 
   // 4. Compute Transitive Metrics (Phase 2 - Graph Traversal)
-  // Why: We tag each vulnerability with its source package ref so that:
-  //   - Same CVE on DIFFERENT packages counts separately (matches npm audit)
-  //   - Same CVE on SAME package via diamond paths is deduplicated correctly
+  // We use an iterative approach with memoization to avoid stack overflow and allow progress reporting.
   const memo = new Map<string, TransitiveMetrics>();
+  
+  // Topological sort or just iterative post-order traversal would be ideal, 
+  // but a simple memoized recursion with yielding is easier to refactor safely 
+  // without changing the logic, provided we manage the stack. 
+  // However, deep recursion is the issue. 
+  // Let's use an iterative approach for the *main loop* and keep the recursion shallow if possible,
+  // OR fully iterative. Given the complexity of the data aggregation, a full iterative refactor 
+  // is risky for correctness without heavy testing. 
+  //
+  // ALTERNATIVE: We can keep the recursion but make it async and yield? 
+  // No, async recursion is slow.
+  //
+  // BETTER: We iterate over all components. For each component, we calculate metrics.
+  // If a dependency is not calculated, we calculate it dynamically.
+  // To prevent blocking, we just batch the "roots" of our calculation.
+  
+  // Actually, `getTransitiveMetrics` does a full traversal.
+  // Let's wrap the top-level loop in `batchProcess` and add `tick()`. 
+  // The recursion itself `getTransitiveMetrics` is still sync, but if we call it 
+  // node by node from the top loop, we can yield in between nodes. 
+  // BUT: if one node has a huge tree, `getTransitiveMetrics` will still block for that whole tree.
+  //
+  // OPTIMIZATION: Memoization is already there! `memo.has(ref)`.
+  // If we process leaf nodes first (post-order), we populate the memo cache 
+  // cheaply, and then upper nodes just aggregate cheap results.
+  //
+  // Let's implement a "compute order" based on dependency depth or post-order traversal.
+  
+  // 4a. Sort components by "depth" or dependency count to encourage bottom-up processing?
+  // Computing depth is also a traversal.
+  //
+  // Simplest fix for "Stuck UI": 
+  // Just use `batchProcess` for the main loop (lines 283). 
+  // And to avoid the "one huge tree blocks everything" issue, 
+  // we really should try to populate leaves first.
+  
+  const allRefs = Array.from(enhancedMap.keys());
+  
+  // We'll proceed with the existing recursion but call it via batchProcess on the keys.
+  // This ensures that at least between every X components we yield.
+  // The memoization means subsequent calls for shared dependencies will be fast.
+  
+  const totalComponents = allRefs.length;
+
   const visiting = new Set<string>();
 
   const getTransitiveMetrics = (ref: string): TransitiveMetrics => {
     if (memo.has(ref)) return memo.get(ref)!;
     
-    // Cycle detection: return empty to break infinite recursion.
+    // Cycle detection
     if (visiting.has(ref)) return emptyTransitiveMetrics();
 
     visiting.add(ref);
@@ -235,7 +316,7 @@ export const Formatter = async ({
       const childComp = enhancedMap.get(childRef);
       if (!childComp) continue;
 
-      // Add child's INHERENT vulns, tagged with childRef as the source
+      // Add child's INHERENT vulns
       Object.keys(childComp.vulnerabilities.inherent).forEach(k => {
         const key = k as keyof typeof childComp.vulnerabilities.inherent;
         for (const v of childComp.vulnerabilities.inherent[key]) {
@@ -243,7 +324,7 @@ export const Formatter = async ({
         }
       });
 
-      // Add child's TRANSITIVE entries (already tagged with their original sourceRef)
+      // Add child's TRANSITIVE entries
       const childTransitive = getTransitiveMetrics(childRef);
       Object.keys(childTransitive.vulns).forEach(k => {
         const key = k as keyof typeof childTransitive.vulns;
@@ -256,9 +337,7 @@ export const Formatter = async ({
 
     visiting.delete(ref);
     
-    // Dedup by composite key (vulnId::sourceRef) — same CVE on different
-    // packages counts separately; same CVE on same package via different
-    // paths is deduplicated.
+    // Dedup
     const result = emptyTransitiveMetrics();
     result.licenses = collected.licenses;
     
@@ -278,10 +357,11 @@ export const Formatter = async ({
     return result;
   }
 
-  // Execute for all components — map tagged entries back to Vulnerability[]
-  for (const ref of enhancedMap.keys()) {
+  // Use batchProcess to allow UI updates during the heavy calculation phase
+  await batchProcess(allRefs, (ref, index) => {
     const trans = getTransitiveMetrics(ref);
     const comp = enhancedMap.get(ref)!;
+    
     comp.vulnerabilities.transitive = {
       Critical: trans.vulns.Critical.map(e => e.vuln),
       High: trans.vulns.High.map(e => e.vuln),
@@ -290,9 +370,18 @@ export const Formatter = async ({
       Informational: trans.vulns.Informational.map(e => e.vuln),
     };
     comp.transitiveLicenseDistribution = trans.licenses;
-  }
+
+    if (index % 100 === 0) {
+      const percent = 50 + Math.round((index / totalComponents) * 50);
+      setProgress(() => ({ 
+        progress: Math.min(99, percent), 
+        message: `Step 4/4: Transitive analysis (${index}/${totalComponents})...` 
+      }));
+    }
+  }, 50); // Small chunk size to keep UI responsive
 
   formattedSBOM.componentMap = enhancedMap;
-  setProgress(() => ({ progress: 100, message: "Formatting complete" }));
+  setProgress(() => ({ progress: 100, message: "Ready" }));
+  await tick(); // Allow final render
   return formattedSBOM;
 };

@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
 import { useSbomStats } from "../../hooks/useSbomStats";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
@@ -418,7 +419,9 @@ export function DashboardView({
                         <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">
                           {vuln.severity}
                         </Badge>
-                        <p className="text-sm font-bold leading-none">{vuln.id}</p>
+                        <p className="text-sm font-bold leading-none">
+                          <VulnerabilityLink id={vuln.id} />
+                        </p>
                       </div>
                       <p className="text-[10px] text-muted-foreground line-clamp-1 max-w-[180px]">
                         {vuln.title || "No description available"}

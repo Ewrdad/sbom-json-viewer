@@ -2,7 +2,7 @@ import { Bom, BomRef, Component } from "@cyclonedx/cyclonedx-library/Models";
 import { batchProcess, tick } from "./asyncUtils";
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const convertJsonToBom = async (
   rawJson: Record<string, any>,
 ): Promise<Bom> => {
@@ -88,7 +88,7 @@ export const convertJsonToBom = async (
     // Link to component object
     const component = componentLookup.get(dep.ref);
     if (component) {
-      childRefs.forEach(cr => component.dependencies.add(cr));
+      childRefs.forEach((cr: BomRef) => component.dependencies.add(cr));
     }
   });
 

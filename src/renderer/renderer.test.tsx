@@ -42,6 +42,8 @@ const mockFormatted = {
   topLevelRefs: ["pkg:npm/comp-a@1.0.0"],
 };
 
+import { createEmptyBom } from "../test/mockData";
+
 describe("Renderer", () => {
   beforeEach(() => {
     vi.resetModules();
@@ -69,7 +71,7 @@ describe("Renderer", () => {
     }));
 
     const { Renderer } = await import("./renderer");
-    render(<Renderer SBOM={{}} />);
+    render(<Renderer SBOM={createEmptyBom()} />);
 
     // Ensure the loading UI appears promptly
     await screen.findByText("Formatting...", {}, { timeout: 10000 });
@@ -95,7 +97,7 @@ describe("Renderer", () => {
     }));
 
     const { Renderer } = await import("./renderer");
-    render(<Renderer SBOM={{}} />);
+    render(<Renderer SBOM={createEmptyBom()} />);
 
     expect(await screen.findByText("SBOM Statistics")).toBeInTheDocument();
     const totals = screen.getAllByText(/Total Components:/);
@@ -125,7 +127,7 @@ describe("Renderer", () => {
     }));
 
     const { Renderer } = await import("./renderer");
-    render(<Renderer SBOM={{}} />);
+    render(<Renderer SBOM={createEmptyBom()} />);
 
     expect(
       await screen.findByText("Component render failed"),

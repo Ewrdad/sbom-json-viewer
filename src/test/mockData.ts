@@ -320,7 +320,7 @@ export const createLargeBom = (options: {
     for (let i = 0; i < vulnerabilitiesPerLeaf; i += 1) {
       vulnerabilities.push(
         createMockVulnerability(`CVE-PERF-${leafIndex}-${i}`, "low", [
-          leaf.bomRef.value,
+          leaf.bomRef.value || "",
         ]),
       );
     }

@@ -9,6 +9,8 @@ export type MermaidBuildOptions = {
   maxEdges?: number;
   maxLabelLength?: number;
   rootRefs?: string[];
+  enableGrouping?: boolean;
+  onProgress?: (message: string) => void;
 };
 
 type MermaidBuildResult = {
@@ -109,22 +111,29 @@ const severityClass = (component: EnhancedComponent) => {
   return "clean";
 };
 
+const tick = () => new Promise(resolve => setTimeout(resolve, 0));
+
 /**
  * Build a Mermaid flowchart for the SBOM dependency tree using flat structure.
  */
-export const buildMermaidDiagram = (
+export const buildMermaidDiagram = async (
   formattedSbom: formattedSBOM,
   options: MermaidBuildOptions,
-): MermaidBuildResult => {
+): Promise<MermaidBuildResult> => {
   const maxNodes = options.maxNodes ?? 320;
   const maxEdges = options.maxEdges ?? 640;
   const maxLabelLength = options.maxLabelLength ?? 160;
+  const enableGrouping = options.enableGrouping ?? true; 
+  const onProgress = options.onProgress;
+
+  if (onProgress) onProgress("Initializing graph builder...");
+  await tick();
+
   const idMap = new Map<string, string>();
   let idCounter = 0;
-  const nodes: string[] = [];
-  const edges: string[] = [];
-  const visitedNodes = new Set<string>();
-  const visitedEdges = new Set<string>();
+  const nodes = new Map<string, string>();
+  const edges = new Set<string>();
+  const flowChartEdges: string[] = [];
   let truncated = false;
 
   const { componentMap, dependencyGraph, topLevelRefs } = formattedSbom;
@@ -136,7 +145,6 @@ export const buildMermaidDiagram = (
     return id;
   };
 
-  // Helper to check if a component or its children match the query
   const memoMatchesTree = new Map<string, boolean>();
   const matchesTree = (ref: string): boolean => {
     if (memoMatchesTree.has(ref)) return memoMatchesTree.get(ref)!;
@@ -162,53 +170,8 @@ export const buildMermaidDiagram = (
     return true;
   };
 
-  const walk = (
-    ref: string,
-    depth: number,
-    parentId?: string,
-  ) => {
-    if (!shouldIncludeNode(ref)) return;
-    if (nodes.length >= maxNodes || edges.length >= maxEdges) {
-      truncated = true;
-      return;
-    }
-
-    const component = componentMap.get(ref);
-    if (!component) return;
-
-    const nodeId = getNodeId(ref);
-    if (!visitedNodes.has(nodeId)) {
-      const label = buildLabel(component, maxLabelLength);
-      const klass = severityClass(component);
-      nodes.push(`${nodeId}["${label}"]:::${klass}`);
-      visitedNodes.add(nodeId);
-    }
-
-    if (parentId) {
-      const pId = getNodeId(parentId);
-      const edgeId = `${pId}->${nodeId}`;
-      if (!visitedEdges.has(edgeId)) {
-        if (edges.length < maxEdges) {
-          edges.push(`${pId} --> ${nodeId}`);
-          visitedEdges.add(edgeId);
-        } else {
-          truncated = true;
-          return;
-        }
-      }
-    }
-
-    if (depth >= options.maxDepth) return;
-
-    const deps = dependencyGraph.get(ref) || [];
-    deps.forEach((childRef) => {
-      if (nodes.length >= maxNodes || edges.length >= maxEdges) {
-        truncated = true;
-        return;
-      }
-      walk(childRef, depth + 1, ref);
-    });
-  };
+  const queue: { ref: string; depth: number; parentRef?: string }[] = [];
+  const expandedRefs = new Set<string>();
 
   const initialRoots = options.rootRefs && options.rootRefs.length > 0 
     ? options.rootRefs 
@@ -221,9 +184,115 @@ export const buildMermaidDiagram = (
       })
     : initialRoots;
 
-  filteredRoots.forEach((rootRef) => walk(rootRef, 0));
+  filteredRoots.forEach(root => {
+    if (shouldIncludeNode(root)) {
+      queue.push({ ref: root, depth: 0 });
+    }
+  });
 
-  if (nodes.length === 0) {
+  const renderedNodes = new Set<string>();
+  let processCount = 0;
+
+  while (queue.length > 0) {
+    if (nodes.size >= maxNodes || flowChartEdges.length >= maxEdges) {
+      truncated = true;
+      break;
+    }
+
+    const { ref, depth, parentRef } = queue.shift()!;
+    const component = componentMap.get(ref);
+
+    if (!component) continue;
+
+    processCount++;
+    if (processCount % 50 === 0) {
+      if (onProgress) onProgress(`Processed ${processCount} nodes...`);
+      await tick();
+    }
+
+    // Process Node
+    const nodeId = getNodeId(ref);
+    if (!renderedNodes.has(ref)) {
+      if (nodes.size >= maxNodes) {
+        truncated = true;
+        break;
+      }
+      const label = buildLabel(component, maxLabelLength);
+      const klass = severityClass(component);
+      nodes.set(ref, `${nodeId}["${label}"]:::${klass}`);
+      renderedNodes.add(ref);
+    }
+
+    // Process Edge
+    if (parentRef) {
+      const parentId = getNodeId(parentRef);
+      const edgeKey = `${parentId}->${nodeId}`;
+      if (!edges.has(edgeKey)) {
+        if (flowChartEdges.length >= maxEdges) {
+          truncated = true;
+          break;
+        }
+        flowChartEdges.push(`${parentId} --> ${nodeId}`);
+        edges.add(edgeKey);
+      }
+    }
+
+    // Enqueue Children if not already expanded
+    if (depth < options.maxDepth && !expandedRefs.has(ref)) {
+      const deps = dependencyGraph.get(ref) || [];
+      deps.forEach(childRef => {
+        if (shouldIncludeNode(childRef)) {
+          queue.push({ ref: childRef, depth: depth + 1, parentRef: ref });
+        }
+      });
+      expandedRefs.add(ref);
+    }
+  }
+
+  if (onProgress) onProgress("Generating diagram string...");
+  await tick();
+
+  // Group nodes
+  const nodesByGroup = new Map<string, string[]>();
+  const ungroupedNodes: string[] = [];
+
+  nodes.forEach((def, ref) => {
+    const component = componentMap.get(ref);
+    const group = component?.group;
+    
+    if (enableGrouping && group && group.trim().length > 0) {
+      if (!nodesByGroup.has(group)) {
+        nodesByGroup.set(group, []);
+      }
+      nodesByGroup.get(group)!.push(def);
+    } else {
+      ungroupedNodes.push(def);
+    }
+  });
+
+  const diagramParts: string[] = [
+    "flowchart LR",
+    "classDef critical fill:#7f1d1d,stroke:#fecaca,color:#fff;",
+    "classDef high fill:#b45309,stroke:#fed7aa,color:#111;",
+    "classDef medium fill:#a16207,stroke:#fde68a,color:#111;",
+    "classDef low fill:#0f766e,stroke:#99f6e4,color:#fff;",
+    "classDef clean fill:#1e3a8a,stroke:#bfdbfe,color:#fff;"
+  ];
+
+  // Add subgroups
+  nodesByGroup.forEach((groupNodes, groupName) => {
+    // Sanitize group name for ID
+    const groupId = `group_${groupName.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    diagramParts.push(`subgraph ${groupId} ["${groupName}"]`);
+    diagramParts.push("direction TB");
+    diagramParts.push(...groupNodes);
+    diagramParts.push("end");
+  });
+
+  diagramParts.push(...ungroupedNodes);
+  diagramParts.push(...flowChartEdges);
+
+  if (renderedNodes.size === 0) {
     return {
       diagram: [
         "flowchart LR",
@@ -237,21 +306,10 @@ export const buildMermaidDiagram = (
     };
   }
 
-  const diagram = [
-    "flowchart LR",
-    "classDef critical fill:#7f1d1d,stroke:#fecaca,color:#fff;",
-    "classDef high fill:#b45309,stroke:#fed7aa,color:#111;",
-    "classDef medium fill:#a16207,stroke:#fde68a,color:#111;",
-    "classDef low fill:#0f766e,stroke:#99f6e4,color:#fff;",
-    "classDef clean fill:#1e3a8a,stroke:#bfdbfe,color:#fff;",
-    ...nodes,
-    ...edges,
-  ].join("\n");
-
   return {
-    diagram,
-    nodeCount: nodes.length,
-    edgeCount: edges.length,
+    diagram: diagramParts.join("\n"),
+    nodeCount: nodes.size,
+    edgeCount: edges.size,
     truncated,
     maxNodes,
     maxEdges,

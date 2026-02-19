@@ -243,19 +243,19 @@ describe('VulnerabilitiesView', () => {
         expect(screen.getByText('ID:')).toBeInTheDocument();
 
         // Check Overview (Open by default)
-        expect(await screen.findByText('Detailed Title')).toBeInTheDocument();
-        expect(screen.getByText('Fix it now')).toBeInTheDocument();
-        expect(screen.getByText('CWE-79')).toBeInTheDocument();
+        expect((await screen.findAllByText('Detailed Title')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Fix it now')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('CWE-79')).length).toBeGreaterThan(0);
 
         // Check Technical Details (Open by default)
-        expect(screen.getByText('Detailed Description')).toBeInTheDocument();
-        expect(screen.getByText(/not_affected/i)).toBeInTheDocument();
-        expect(screen.getByText(/code_not_reachable/i)).toBeInTheDocument();
+        expect((await screen.findAllByText('Detailed Description')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText(/not_affected/i)).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText(/code_not_reachable/i)).length).toBeGreaterThan(0);
         
         // Open Remediation & Evidence
         const remTrigger = screen.getAllByRole('button', { name: /Remediation & Evidence/ })[0];
         fireEvent.click(remTrigger);
-        expect(await screen.findByText('Step 1: Run it')).toBeInTheDocument();
+        expect((await screen.findAllByText('Step 1: Run it')).length).toBeGreaterThan(0);
 
         // Open Metadata & Provenance
         const metaTrigger = screen.getAllByRole('button', { name: /Metadata & Provenance/ })[0];
@@ -322,33 +322,33 @@ describe('VulnerabilitiesView', () => {
         expect(await screen.findByText('Vulnerability Details')).toBeInTheDocument();
 
         // Check Overview (Open by default)
-        expect(await screen.findByText('CWE-123')).toBeInTheDocument();
+        expect((await screen.findAllByText('CWE-123')).length).toBeGreaterThan(0);
         
         // Open Remediation & Evidence
         const remediationTrigger = screen.getAllByRole('button', { name: /Remediation & Evidence/ })[0];
         fireEvent.click(remediationTrigger);
-        expect(await screen.findByText('Workaround')).toBeInTheDocument();
-        expect(screen.getByText('Do this instead')).toBeInTheDocument();
+        expect((await screen.findAllByText('Workaround')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Do this instead')).length).toBeGreaterThan(0);
 
         // Open Metadata & Provenance
         const metadataTrigger = screen.getAllByRole('button', { name: /Metadata & Provenance/ })[0];
         fireEvent.click(metadataTrigger);
-        expect(await screen.findByText('Credits')).toBeInTheDocument();
-        expect(screen.getByText('Security Org')).toBeInTheDocument();
-        expect(screen.getByText('Jane Doe')).toBeInTheDocument();
-        expect(screen.getByText('Extended Properties')).toBeInTheDocument();
-        expect(screen.getByText('custom-prop')).toBeInTheDocument();
-        expect(screen.getByText('custom-val')).toBeInTheDocument();
+        expect((await screen.findAllByText('Credits')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Security Org')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Jane Doe')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Extended Properties')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('custom-prop')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('custom-val')).length).toBeGreaterThan(0);
 
         // Already open or checked via Technical Details
-        expect(screen.getByText('CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H')).toBeInTheDocument();
+        expect((await screen.findAllByText('CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H')).length).toBeGreaterThan(0);
         
         // Open Affected Components
         const triggers = screen.getAllByRole('button', { name: /Affected Components/ });
         // The one in the detail panel is likely the second one.
         fireEvent.click(triggers[triggers.length - 1]);
         
-        expect(await screen.findAllByText(/affected/i)).toHaveLength(3); // One in list, one in trigger, one in details row
+        expect((await screen.findAllByText(/affected/i)).length).toBeGreaterThanOrEqual(3); // One in list, one in trigger, one in details row, plus any in print view
     });
     it('should filter by severity when clicking KPI cards', async () => {
         render(

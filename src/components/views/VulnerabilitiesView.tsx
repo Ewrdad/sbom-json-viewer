@@ -47,6 +47,8 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
+import { VulnerabilityPrintView } from "../vulnerabilities/VulnerabilityPrintView";
+import { exportElementToPdf, exportElementToPng } from "@/lib/exportUtils";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { SearchButton } from "@/components/common/SearchButton";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
@@ -56,6 +58,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -540,6 +543,21 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                             tickLine={false} 
                             axisLine={false}
                             width={100}
+                            tick={(props) => {
+                              const { x, y, payload } = props;
+                              return (
+                                <g transform={`translate(${x},${y})`}>
+                                  <foreignObject x={-100} y={-10} width={100} height={20}>
+                                    <div className="flex justify-end pr-2 h-full items-center">
+                                      <VulnerabilityLink 
+                                        id={payload.value} 
+                                        className="text-[10px] text-[#888888] hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis"
+                                      />
+                                    </div>
+                                  </foreignObject>
+                                </g>
+                              );
+                            }}
                           />
                           <Tooltip
                             contentStyle={CHART_TOOLTIP_STYLE}
@@ -882,16 +900,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           className="border-b hover:bg-muted/50 transition-colors"
                         >
                           <td className="px-4 py-3 font-bold font-mono text-xs text-destructive">
-                            {vuln.id.startsWith('CVE-') ? (
-                              <a 
-                                href={`https://nvd.nist.gov/vuln/detail/${vuln.id}`} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="hover:underline flex items-center gap-1"
-                              >
-                                {vuln.id}
-                              </a>
-                            ) : vuln.id}
+                            <VulnerabilityLink id={vuln.id} />
                           </td>
                           <td className="px-4 py-3">
                             <Badge 
@@ -1020,7 +1029,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                               <div>
                                 <div data-testid="vuln-id-label" className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">ID:</div>
                                 <div className="text-2xl font-black font-mono text-destructive flex items-center gap-2">
-                                  {v.id}
+                                  <VulnerabilityLink id={v.id} />
                                   {v.source?.url && (
                                     <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="inline-flex p-1 hover:bg-muted rounded text-muted-foreground transition-colors">
                                       <ExternalLink className="h-4 w-4" />
@@ -1029,6 +1038,25 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                                 </div>
                                 <div className="flex gap-2 mt-2">
                                   <SearchButton query={v.id} size="sm" />
+                                </div>
+                                
+                                <div className="flex gap-2 mt-4">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-7 text-[10px]"
+                                    onClick={() => exportElementToPdf('vulnerability-print-view', `vulnerability-${v.id}`)}
+                                  >
+                                    <Download className="mr-1 h-3 w-3" /> PDF Card
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-7 text-[10px]"
+                                    onClick={() => exportElementToPng('vulnerability-print-view', `vulnerability-${v.id}`)}
+                                  >
+                                    <Download className="mr-1 h-3 w-3" /> PNG Card
+                                  </Button>
                                 </div>
                               </div>
                               <div className="text-right">
@@ -1073,7 +1101,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                                       <div className="flex flex-wrap gap-2">
                                         {v.cwes.map((cwe: number) => (
                                           <Badge key={cwe} variant="secondary" className="font-mono text-[10px] py-0 px-2 h-6 border-primary/10 bg-muted/60">
-                                            CWE-{cwe}
+                                            <VulnerabilityLink id={`CWE-${cwe}`} />
                                           </Badge>
                                         ))}
                                       </div>
@@ -1442,24 +1470,19 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                               </div>
                             )}
 
-                            {v.id.startsWith('CVE-') && (
-                              <div className="pt-8">
-                                <a 
-                                  href={`https://nvd.nist.gov/vuln/detail/${v.id}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="w-full inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground h-11 px-6 text-sm font-black shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
-                                >
-                                  Investigate on NVD
-                                  <ExternalLink className="ml-2 h-4 w-4" />
-                                </a>
-                              </div>
-                            )}
                       </div>
                         );
                       })()}
                     </ScrollArea>
                   </div>
+                )}
+                
+                {/* Hidden print view for exporting */}
+                {selectedVulnerability && (
+                  <VulnerabilityPrintView 
+                    vulnerability={selectedVulnerability}
+                    allVulnerableComponents={displayStats.allVulnerableComponents}
+                  />
                 )}
               </ErrorBoundary>
             </div>

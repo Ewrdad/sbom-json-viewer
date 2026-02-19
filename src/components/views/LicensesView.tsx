@@ -611,7 +611,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
         </ScrollArea>
       </ResizablePanel>
 
-      {(selectedComponent || selectedLicense) && (
+      {(!!selectedComponent || !!selectedLicense) && (
         <>
           <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/50 transition-colors" />
           <ResizablePanel defaultSize={40} minSize={20}>

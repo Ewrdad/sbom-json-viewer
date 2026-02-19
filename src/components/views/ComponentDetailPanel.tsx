@@ -16,6 +16,7 @@ import {
 import { ChevronRight } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { SearchButton } from "@/components/common/SearchButton";
+import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
 
 interface ComponentDetailPanelProps {
   component: Component | EnhancedComponent;
@@ -87,7 +88,7 @@ export function ComponentDetailPanel({
               {component.name}
             </div>
             <div className="mt-2">
-              <SearchButton query={`${component.name} ${component.version || ''} vulnerability`} className="w-full justify-start" />
+              <SearchButton query={component.name} className="w-full justify-start" />
             </div>
           </div>
 
@@ -204,9 +205,10 @@ export function ComponentDetailPanel({
                                  <div className="space-y-1">
                                     {vulns.map((v: any) => (
                                        <div key={v.id} className="flex items-center gap-2">
-                                           <a href={`https://nvd.nist.gov/vuln/detail/${v.id}`} target="_blank" rel="noopener noreferrer" className="text-xs font-mono hover:underline text-destructive/80">
-                                             {v.id}
-                                           </a>
+                                           <VulnerabilityLink
+                                             id={v.id}
+                                             className="text-xs font-mono text-destructive/80"
+                                           />
                                        </div>
                                     ))}
                                  </div>

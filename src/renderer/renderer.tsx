@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-/** @typedef {import('@cyclonedx/cyclonedx-library/Models').Bom} Bom */
+import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 
 // Why: keep large SBOM render paths out of the initial bundle.
 const SBOMComponent = lazy(() =>
@@ -33,7 +33,7 @@ const SBOMComponent = lazy(() =>
  * <Renderer SBOM={SBOM}
  * </Suspence>
  */
-export const Renderer = ({ SBOM }) => {
+export const Renderer = ({ SBOM }: { SBOM: Bom }) => {
   const [loadingStatus, setLoadingStatus] = useState({
     progress: 0,
     message: "Initializing Formatter...",
@@ -90,10 +90,10 @@ export const Renderer = ({ SBOM }) => {
            console.error("Formatter load failed:", error);
            const aborted =
              (error instanceof Error && /aborted/i.test(error.message)) || false;
-           setLoadingStatus({
-             progress: aborted ? loadingStatus.progress : 100,
+           setLoadingStatus((prev) => ({
+             progress: aborted ? prev.progress : 100,
              message: aborted ? "Formatting cancelled" : "Unable to format SBOM.",
-           });
+           }));
          }
        }
     };
@@ -191,7 +191,8 @@ export const Renderer = ({ SBOM }) => {
           );
           setMermaidSvg(serialized);
         }
-      } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_error) {
         if (!cancelled) {
           setMermaidSvg("");
           setMermaidError("Unable to render Mermaid preview.");
@@ -332,14 +333,14 @@ export const Renderer = ({ SBOM }) => {
 
   const prepareMermaidSource = async () => {
     const { buildMermaidDiagram } = await import("@/lib/mermaid/sbomToMermaid");
-    const result = buildMermaidDiagram(formattedNestedSBOM, {
+    const result = await buildMermaidDiagram(formattedNestedSBOM, {
       maxDepth,
       query,
       pruneNonMatches,
       showVulnerableOnly,
       rootRefs: mermaidRoots.map(r => typeof r.bomRef === 'string' ? r.bomRef : r.bomRef?.value || ""),
     });
-    const previewResult = buildMermaidDiagram(formattedNestedSBOM, {
+    const previewResult = await buildMermaidDiagram(formattedNestedSBOM, {
       maxDepth,
       query,
       pruneNonMatches,

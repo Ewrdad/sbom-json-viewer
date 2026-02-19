@@ -130,7 +130,7 @@ describe("SBOMComponent", () => {
             Informational: [],
           },
         },
-      } as EnhancedComponent;
+      } as unknown as EnhancedComponent;
 
       render(<SBOMComponent component={vulnComponent} />);
 

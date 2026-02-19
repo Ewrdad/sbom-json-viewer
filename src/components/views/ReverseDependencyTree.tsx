@@ -214,7 +214,7 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
 
                 <div className="space-y-1.5">
                     <Label className="text-[10px] text-muted-foreground uppercase font-semibold">License Category</Label>
-                    <Select value={licenseFilter} onValueChange={setLicenseFilter}>
+                    <Select value={licenseFilter} onValueChange={(val) => val && setLicenseFilter(val)}>
                         <SelectTrigger size="sm" className="w-full h-8">
                             <SelectValue placeholder="All categories" />
                         </SelectTrigger>

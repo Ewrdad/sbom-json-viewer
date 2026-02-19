@@ -98,7 +98,7 @@ export function AdvancedSearch({ onSearch, onClear, onClose, initialCriteria }: 
 
         <div className="space-y-1.5">
           <Label htmlFor="search-type" className="text-[10px] uppercase font-bold text-muted-foreground">Component Type</Label>
-          <Select value={criteria.type} onValueChange={(val) => handleChange("type", val)}>
+          <Select value={criteria.type} onValueChange={(val) => val && handleChange("type", val)}>
             <SelectTrigger id="search-type" className="h-8 text-sm">
               <SelectValue placeholder="All types" />
             </SelectTrigger>
@@ -128,7 +128,7 @@ export function AdvancedSearch({ onSearch, onClear, onClose, initialCriteria }: 
 
         <div className="space-y-1.5">
           <Label htmlFor="search-severity" className="text-[10px] uppercase font-bold text-muted-foreground">Min Severity</Label>
-          <Select value={criteria.severity} onValueChange={(val) => handleChange("severity", val)}>
+          <Select value={criteria.severity} onValueChange={(val) => val && handleChange("severity", val)}>
             <SelectTrigger id="search-severity" className="h-8 text-sm">
               <SelectValue placeholder="Any severity" />
             </SelectTrigger>

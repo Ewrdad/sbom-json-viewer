@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { type Bom } from "@cyclonedx/cyclonedx-library/Models";
 import {
   Formatter,
@@ -30,12 +30,17 @@ export function DependencyGraph({
   );
   const [formatting, setFormatting] = useState(false);
   const [maxDepth, setMaxDepth] = useState<number>(3);
+  const [enableGrouping, setEnableGrouping] = useState(true);
+  const [showVulnerableOnly, setShowVulnerableOnly] = useState(false);
   const [allowLargeFormat, setAllowLargeFormat] = useState(false);
   const [progress, setProgress] = useState({
     progress: 0,
-    message: "Preparing graph...",
+    message: "Analyzing SBOM data...",
   });
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
+
+  const [mermaidChart, setMermaidChart] = useState<string>("");
+  const [generationProgress, setGenerationProgress] = useState<string>("");
 
   useEffect(() => {
     if (preFormattedSbom) {
@@ -45,6 +50,8 @@ export function DependencyGraph({
       setFormattedData(null);
     }
   }, [sbom, preFormattedSbom]);
+
+  const [formatterError, setFormatterError] = useState<string | null>(null);
 
   // Format the SBOM when it changes
   useEffect(() => {
@@ -59,9 +66,23 @@ export function DependencyGraph({
     }
 
     const runFormatter = async () => {
-      if (!sbom || preFormattedSbom) return;
+      // If we have pre-formatted data from the parent/worker, use it!
+      // This is crucial for large SBOMs where we don't want to re-run formatting on the main thread.
+      if (preFormattedSbom) {
+        setFormatting(false);
+        setFormattedData(preFormattedSbom);
+        return;
+      }
+
+      if (!sbom) return;
+      
       setFormatting(true);
-      setProgress({ progress: 0, message: "Initializing formatter..." });
+      setFormatterError(null);
+      setProgress({ progress: 0, message: "Starting formatter..." });
+      
+      // Small yield to allow UI update
+      await new Promise(resolve => setTimeout(resolve, 0));
+
       try {
         const result = await Formatter({ rawSBOM: sbom, setProgress });
         if (mounted) {
@@ -69,6 +90,7 @@ export function DependencyGraph({
         }
       } catch (error) {
         console.error("Error formatting SBOM:", error);
+        if (mounted) setFormatterError(error instanceof Error ? error.message : String(error));
       } finally {
         if (mounted) setFormatting(false);
       }
@@ -80,19 +102,49 @@ export function DependencyGraph({
     };
   }, [sbom, allowLargeFormat, isLarge, preFormattedSbom]);
 
-  const mermaidChart = useMemo(() => {
-    if (!formattedData) return "";
+  // Generate Mermaid Chart
+  useEffect(() => {
+    let mounted = true;
+    if (!formattedData) {
+      setMermaidChart("");
+      return;
+    }
 
-    const options = {
-      maxDepth: maxDepth,
-      query: "",
-      pruneNonMatches: false,
-      showVulnerableOnly: false,
+    const generate = async () => {
+      setGenerationProgress("Preparing graph...");
+      
+      // Allow UI to update
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const options = {
+        maxDepth: maxDepth,
+        query: "",
+        pruneNonMatches: false,
+        showVulnerableOnly: showVulnerableOnly,
+        enableGrouping: enableGrouping,
+        onProgress: (msg: string) => {
+          if (mounted) setGenerationProgress(msg);
+        }
+      };
+
+      try {
+        const result = await buildMermaidDiagram(formattedData, options);
+        if (mounted) {
+          setMermaidChart(result.diagram);
+          setGenerationProgress("");
+        }
+      } catch (error) {
+        console.error("Error generating mermaid diagram:", error);
+        if (mounted) setGenerationProgress("Error generating graph");
+      }
     };
 
-    const result = buildMermaidDiagram(formattedData, options);
-    return result.diagram;
-  }, [formattedData, maxDepth]);
+    generate();
+
+    return () => {
+      mounted = false;
+    };
+  }, [formattedData, maxDepth, showVulnerableOnly, enableGrouping]);
 
   const handleDownloadSVG = () => {
     const svgElement = document.querySelector(".mermaid-container svg");
@@ -128,17 +180,48 @@ export function DependencyGraph({
     );
   }
 
+  // Initial Formatting Loading State (Full Screen)
   if (formatting || !formattedData) {
+    if (formatterError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full gap-4 px-6 text-center bg-muted/10">
+          <h2 className="text-xl font-bold text-red-600">Formatting Error</h2>
+          <p className="text-sm text-muted-foreground max-w-md">{formatterError}</p>
+          <Button onClick={() => setAllowLargeFormat(false)}>Go Back</Button>
+        </div>
+      );
+    }
+
     const width = Math.min(Math.max(progress.progress, 0), 100);
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-4">
         <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">{progress.message}</p>
+        <p className="text-muted-foreground">{progress.message || "Initializing..."}</p>
         <div className="w-64 h-2 rounded-full bg-muted/50 overflow-hidden">
           <div
             className="h-full bg-primary transition-all"
             style={{ width: `${width}%` }}
           />
+        </div>
+      </div>
+    );
+  }
+
+  // Graph Generation Loading State (Overlay/Replacement)
+  // We keep this as a replacement for now to prevent showing stale graph, 
+  // but we style it slightly differently or provide more context.
+  if (generationProgress) {
+     return (
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="relative">
+             <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+             <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[10px] font-bold text-primary">...</span>
+             </div>
+        </div>
+        <div className="text-center">
+            <p className="font-medium">Updating Visual Graph</p>
+            <p className="text-sm text-muted-foreground">{generationProgress}</p>
         </div>
       </div>
     );
@@ -157,11 +240,27 @@ export function DependencyGraph({
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
+             <Button
+              variant={enableGrouping ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setEnableGrouping(!enableGrouping)}
+              title="Toggle Grouping"
+            >
+              Group
+            </Button>
+            <Button
+              variant={showVulnerableOnly ? "destructive" : "ghost"}
+              size="sm"
+              onClick={() => setShowVulnerableOnly(!showVulnerableOnly)}
+              title="Show Vulnerable Only"
+            >
+              Vuln Only
+            </Button>
             <Layers className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Depth:</span>
             <Select
               value={maxDepth.toString()}
-              onValueChange={(val) => setMaxDepth(parseInt(val))}
+              onValueChange={(val) => val && setMaxDepth(parseInt(val))}
             >
               <SelectTrigger className="w-[80px]">
                 <SelectValue placeholder="Depth" />
@@ -186,6 +285,7 @@ export function DependencyGraph({
             Export SVG
           </Button>
         </div>
+
       </div>
 
       <Card className="flex-1 overflow-hidden bg-card border flex flex-col shadow-sm">

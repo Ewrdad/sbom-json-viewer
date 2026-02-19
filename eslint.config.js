@@ -20,10 +20,12 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      "react-hooks/set-state-in-effect": "off", // This is a pattern supported by the react team you dumbasses
-      "@typescript-eslint/no-unused-vars": "off", // Just isnt functional
+      "react-hooks/set-state-in-effect": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "@typescript-eslint/no-explicit-any": "warn",
       "react-refresh/only-export-components": "warn",
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "eqeqeq": ["error", "always"],
     },
   },
 ]);
