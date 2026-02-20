@@ -37,6 +37,14 @@ export function calculateSbomStats(bom: any): SbomStats {
     vulnerabilityImpactDistribution: {},
     cweCounts: {},
     sourceCounts: {},
+    developerStats: {
+      versionConflicts: [],
+      metadataQuality: {
+        score: 0,
+        grade: "F",
+        checks: { purl: false, hashes: false, licenses: false, supplier: false, properties: false, tools: false, dependencies: false }
+      }
+    }
   };
 
   const licenseSummaryMap = new Map<string, { id: string; name: string; category: string; affectedRefs: Set<string> }>();
@@ -421,5 +429,115 @@ export function calculateSbomStats(bom: any): SbomStats {
 
   stats.uniqueVulnerabilityCount = vulnSummaryMap.size;
 
+  // 6. Calculate Developer Insights
+  stats.developerStats = calculateDeveloperStats(bom, components);
+
   return stats;
+}
+
+function calculateDeveloperStats(bom: any, components: any[]): any {
+  // A. Version Conflicts
+  const nameToVersions = new Map<string, Set<string>>();
+  const nameToRefs = new Map<string, Set<string>>();
+
+  for (const comp of components) {
+    const name = comp.name;
+    const version = comp.version;
+    const ref = comp.bomRef?.value || comp.bomRef || comp["bom-ref"];
+
+    if (!name || !version || !ref) continue;
+
+    if (!nameToVersions.has(name)) {
+      nameToVersions.set(name, new Set());
+      nameToRefs.set(name, new Set());
+    }
+    nameToVersions.get(name)!.add(version);
+    nameToRefs.get(name)!.add(ref);
+  }
+
+  const versionConflicts: any[] = [];
+  for (const [name, versions] of nameToVersions.entries()) {
+    if (versions.size > 1) {
+      versionConflicts.push({
+        name,
+        versions: Array.from(versions),
+        affectedRefs: Array.from(nameToRefs.get(name)!),
+      });
+    }
+  }
+
+  // B. Metadata Quality
+  const checks = {
+    purl: false,
+    hashes: false,
+    licenses: false,
+    supplier: false,
+    properties: false,
+    tools: false,
+    dependencies: false,
+  };
+
+  if (components.length > 0) {
+    let purlCount = 0;
+    let hashCount = 0;
+    let licenseCount = 0;
+    let supplierCount = 0;
+    let propertyCount = 0;
+
+    for (const comp of components) {
+      if (comp.purl) purlCount++;
+      if (comp.hashes && (Array.isArray(comp.hashes) ? comp.hashes.length > 0 : (typeof comp.hashes.size === 'number' ? comp.hashes.size > 0 : false))) hashCount++;
+      if (comp.licenses && (Array.isArray(comp.licenses) ? comp.licenses.length > 0 : (typeof comp.licenses.size === 'number' ? comp.licenses.size > 0 : false))) licenseCount++;
+      if (comp.supplier || comp.author) supplierCount++;
+      if (comp.properties && (Array.isArray(comp.properties) ? comp.properties.length > 0 : (typeof comp.properties.size === 'number' ? comp.properties.size > 0 : false))) propertyCount++;
+    }
+
+    const threshold = components.length * 0.5; // If >50% have it, count as true for the check
+    checks.purl = purlCount > threshold;
+    checks.hashes = hashCount > threshold;
+    checks.licenses = licenseCount > threshold;
+    checks.supplier = supplierCount > threshold;
+    checks.properties = propertyCount > threshold;
+    
+    // Check Tools & Dependencies at the BOM level
+    const hasToolsArray = Array.isArray(bom.metadata?.tools);
+    const hasToolsComponents = bom.metadata?.tools?.components && Array.isArray(bom.metadata.tools.components);
+    checks.tools = (hasToolsArray && bom.metadata.tools.length > 0) || (hasToolsComponents && bom.metadata.tools.components.length > 0) || !!bom.metadata?.tools?.services;
+
+    checks.dependencies = !!bom.dependencies && (Array.isArray(bom.dependencies) ? bom.dependencies.length > 0 : (typeof bom.dependencies.size === 'number' ? bom.dependencies.size > 0 : true));
+  }
+
+  const scoreMap = {
+    purl: 20,
+    hashes: 15,
+    licenses: 20,
+    supplier: 15,
+    properties: 10,
+    tools: 10,
+    dependencies: 10,
+  };
+
+  let score = 0;
+  if (checks.purl) score += scoreMap.purl;
+  if (checks.hashes) score += scoreMap.hashes;
+  if (checks.licenses) score += scoreMap.licenses;
+  if (checks.supplier) score += scoreMap.supplier;
+  if (checks.properties) score += scoreMap.properties;
+  if (checks.tools) score += scoreMap.tools;
+  if (checks.dependencies) score += scoreMap.dependencies;
+
+  let grade: "A" | "B" | "C" | "D" | "F" = "F";
+  if (score >= 90) grade = "A";
+  else if (score >= 75) grade = "B";
+  else if (score >= 60) grade = "C";
+  else if (score >= 40) grade = "D";
+
+  return {
+    versionConflicts: versionConflicts.sort((a, b) => b.versions.length - a.versions.length),
+    metadataQuality: {
+      score,
+      grade,
+      checks,
+    },
+  };
 }

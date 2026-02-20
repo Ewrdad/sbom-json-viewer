@@ -106,6 +106,32 @@ export interface SbomStats {
   vulnerabilityImpactDistribution: Record<number, number>;
   cweCounts: Record<string, number>;
   sourceCounts: Record<string, number>;
+  developerStats?: DeveloperStats;
+}
+
+export interface DeveloperStats {
+  versionConflicts: VersionConflict[];
+  metadataQuality: MetadataQuality;
+}
+
+export interface VersionConflict {
+  name: string;
+  versions: string[];
+  affectedRefs: string[];
+}
+
+export interface MetadataQuality {
+  score: number;
+  grade: "A" | "B" | "C" | "D" | "F";
+  checks: {
+    purl: boolean;
+    hashes: boolean;
+    licenses: boolean;
+    supplier: boolean;
+    properties: boolean;
+    tools: boolean;
+    dependencies: boolean;
+  };
 }
 
 export interface WorkerProgressUpdate {

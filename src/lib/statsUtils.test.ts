@@ -112,4 +112,94 @@ describe('statsUtils Dependency Analysis', () => {
         // In statsUtils, we iterate over `components`. If root is not in `components`, it won't be in distribution counts unless added there.
         // `calculateSbomStats` iterates over `components`.
     });
+
+    describe('Developer Insights - calculateDeveloperStats', () => {
+        it('should correctly identify version conflicts', () => {
+            const bom = {
+                components: [
+                    { "bom-ref": "pkg1-v1", name: "Lodash", version: "1.0.0" },
+                    { "bom-ref": "pkg1-v2", name: "Lodash", version: "2.0.0" },
+                    { "bom-ref": "pkg2", name: "React", version: "18.0.0" }
+                ],
+                vulnerabilities: []
+            };
+
+            const stats = calculateSbomStats(bom);
+            expect(stats.developerStats).toBeDefined();
+            const { versionConflicts } = stats.developerStats!;
+            
+            expect(versionConflicts).toHaveLength(1);
+            expect(versionConflicts[0].name).toBe("Lodash");
+            expect(versionConflicts[0].versions).toContain("1.0.0");
+            expect(versionConflicts[0].versions).toContain("2.0.0");
+            expect(versionConflicts[0].affectedRefs).toContain("pkg1-v1");
+        });
+
+        it('should correctly calculate metadata quality score and grade', () => {
+            const bom = {
+                components: [
+                    { 
+                        "bom-ref": "pkg1", 
+                        name: "Package 1", 
+                        version: "1.0.0",
+                        purl: "pkg:npm/package1@1.0.0",
+                        hashes: [{ alg: "SHA-256", content: "hash1" }],
+                        licenses: [{ license: { id: "MIT" } }],
+                        supplier: { name: "Supplier A" },
+                        properties: [{ name: "prop1", value: "val1" }]
+                    },
+                    { 
+                        "bom-ref": "pkg2", 
+                        name: "Package 2", 
+                        version: "1.0.0",
+                        purl: "pkg:npm/package2@1.0.0" 
+                        // Missing hashes, licenses, supplier, properties
+                    }
+                ],
+                vulnerabilities: []
+            };
+
+            const stats = calculateSbomStats(bom);
+            expect(stats.developerStats).toBeDefined();
+            const { metadataQuality } = stats.developerStats!;
+            
+            // Expected bounds (> 50% threshold for 2 components means > 1) 
+            // Here, exactly 1 out of 2 has the metadata, which is not > 1 (50%).
+            // purl is in 2/2 -> check is true.
+            // others are in 1/2 -> check is false.
+            expect(metadataQuality.checks.purl).toBe(true);
+            expect(metadataQuality.checks.hashes).toBe(false);
+            expect(metadataQuality.checks.licenses).toBe(false);
+            expect(metadataQuality.checks.supplier).toBe(false);
+            expect(metadataQuality.checks.properties).toBe(false);
+
+            // Grade should be F since only purl (20) is true
+            expect(metadataQuality.score).toBe(20);
+            expect(metadataQuality.grade).toBe("F");
+        });
+
+        it('should assign A grade if all metadata threshold checks pass', () => {
+            const bom = {
+                components: [
+                    { 
+                        "bom-ref": "pkg1", 
+                        name: "Package 1", 
+                        version: "1.0.0",
+                        purl: "pkg...",
+                        hashes: [{}],
+                        licenses: [{}],
+                        supplier: {},
+                        properties: [{}]
+                    }
+                ],
+                metadata: { tools: ["cdxgen"] },
+                dependencies: [{ ref: "pkg1", dependsOn: [] }],
+                vulnerabilities: []
+            };
+            const stats = calculateSbomStats(bom);
+            const { metadataQuality } = stats.developerStats!;
+            expect(metadataQuality.score).toBe(100);
+            expect(metadataQuality.grade).toBe("A");
+        });
+    });
 });
