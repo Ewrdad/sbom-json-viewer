@@ -9,13 +9,19 @@ describe("HelpGuide", () => {
     expect(button).toBeInTheDocument();
   });
 
-  it("opens the dialog when clicked", () => {
+  it("opens the dialog and displays accordion sections when clicked", () => {
     render(<HelpGuide />);
     const button = screen.getByRole("button", { name: /help guide/i });
     fireEvent.click(button);
     
+    // Check dialog basic elements
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByText("SBOM Viewer Guide")).toBeInTheDocument();
-    expect(screen.getByText(/1. Generate an SBOM/i)).toBeInTheDocument();
+    
+    // Check Accordion sections exist
+    expect(screen.getByText(/What is an SBOM\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Getting Started/i)).toBeInTheDocument();
+    expect(screen.getByText(/Best Practices/i)).toBeInTheDocument();
+    expect(screen.getByText(/Making the Most of SBOMs/i)).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../types";
-import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info, GitGraph } from "lucide-react";
+import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info, GitGraph, Wrench } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
@@ -57,6 +57,12 @@ export function Sidebar() {
       label: "Metadata",
       icon: <Info className="h-4 w-4 mr-2" />,
       description: "Metadata about the SBOM file itself",
+    },
+    {
+      id: "developer",
+      label: "Developer Insights",
+      icon: <Wrench className="h-4 w-4 mr-2" />,
+      description: "Package hygiene, version conflicts, and metadata quality",
     },
   ];
 

@@ -50,6 +50,7 @@ const ReverseDependencyTree = lazy(() =>
     default: module.ReverseDependencyTree,
   })),
 );
+const DeveloperView = lazy(() => import("./components/views/DeveloperView"));
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { Upload, Download } from "lucide-react";
 import {
@@ -226,6 +227,12 @@ function AppContent({
           <KeepAliveView activeView={activeView} viewKey="metadata">
             <ErrorBoundary resetKeys={[sbom]}>
               <MetadataView sbom={sbom} />
+            </ErrorBoundary>
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="developer">
+            <ErrorBoundary resetKeys={[sbom]}>
+              <DeveloperView sbom={sbom} preComputedStats={sbomStats || undefined} />
             </ErrorBoundary>
           </KeepAliveView>
         </Suspense>

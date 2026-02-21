@@ -81,6 +81,18 @@ test.describe("Vulnerabilities View", () => {
       await expect(page.getByRole("button", { name: "Overview", exact: true })).toBeVisible();
       await expect(page.getByText("Technical Details")).toBeVisible();
       
+      // Verify Export Buttons
+      const pngBtn = page.getByRole("button", { name: "PNG Card" });
+      const pdfBtn = page.getByRole("button", { name: "PDF Card" });
+      await expect(pngBtn).toBeVisible();
+      await expect(pdfBtn).toBeVisible();
+      
+      // Verify PNG Download triggers
+      const downloadPromise = page.waitForEvent('download', { timeout: 15000 });
+      await pngBtn.click();
+      const download = await downloadPromise;
+      expect(download.suggestedFilename()).toMatch(/^vulnerability-.*\.png/);
+      
       // 4. Close panel
       // 4. Close panel
       await page.getByRole("button", { name: "Close" }).click();

@@ -1,126 +1,127 @@
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { getVulnerabilityCardHtml, type VulnerabilityPrintData, type ComponentPrintData } from './vulnerabilityCardTemplate';
 
 /**
- * Temporarily unhides the target element, captures it as a canvas, and triggers a download.
- * @param elementId The ID of the HTML element to capture
- * @returns Promise that resolves to the generated canvas
+ * Creates a hidden iframe and injects HTML content for capturing.
+ * This isolates the capture from the main document's CSS (e.g. oklch).
  */
-const captureElement = async (elementId: string): Promise<HTMLCanvasElement> => {
-  console.log(`[exportUtils] Starting capture for element: ${elementId}`);
-  const element = document.getElementById(elementId);
-  if (!element) {
-    console.error(`[exportUtils] Element with id ${elementId} not found`);
-    throw new Error(`Element with id ${elementId} not found`);
+const createCaptureIframe = async (html: string): Promise<{ iframe: HTMLIFrameElement, element: HTMLElement }> => {
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.left = '-10000px';
+  iframe.style.top = '0';
+  iframe.style.width = '1200px'; // Wider to avoid any overflow clipping
+  iframe.style.height = '3000px'; // Tall enough for long reports
+  iframe.style.border = 'none';
+  iframe.style.visibility = 'hidden';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) {
+    document.body.removeChild(iframe);
+    throw new Error("Could not access iframe document");
   }
-  console.log(`[exportUtils] Element found:`, element);
 
-  // Ensure element is visible before capturing
-  const originalOpacity = element.style.opacity;
-  const originalPosition = element.style.position;
-  const originalTop = element.style.top;
-  const originalLeft = element.style.left;
-  const originalZIndex = element.style.zIndex;
-  const originalPointerEvents = element.style.pointerEvents;
+  doc.open();
+  doc.write(html);
+  doc.close();
 
-  element.style.opacity = '1';
-  element.style.position = 'fixed';
-  element.style.top = '0';
-  element.style.left = '0'; 
-  element.style.zIndex = '9999'; // Bring to front temporarily
-  element.style.pointerEvents = 'none'; // But don't block clicks in case capture is slow
+  // Wait for resources to load
+  await new Promise(resolve => setTimeout(resolve, 250));
 
+  const element = doc.querySelector('.container') as HTMLElement;
+  if (!element) {
+    document.body.removeChild(iframe);
+    throw new Error("Capture container not found in iframe");
+  }
+
+  return { iframe, element };
+};
+
+const captureFromIframe = async (element: HTMLElement): Promise<HTMLCanvasElement> => {
   try {
-    console.log(`[exportUtils] Invoking html2canvas...`);
+    // Get precise dimensions
+    const rect = element.getBoundingClientRect();
+    const width = rect.width || element.offsetWidth;
+    const height = rect.height || element.offsetHeight;
+
     const canvas = await html2canvas(element, {
-      scale: 2, // Higher resolution
-      useCORS: true, // Allow cross-origin images to be rendered
-      logging: true, // Turn on html2canvas logging for debug
-      backgroundColor: '#ffffff', // Force white background
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      width: width,
+      height: height,
+      windowWidth: width + 100, // Small buffer to ensure no clipping
+      windowHeight: height,
+      logging: false,
+      x: 0,
+      y: 0,
     });
-    console.log(`[exportUtils] html2canvas success, canvas size: ${canvas.width}x${canvas.height}`);
     return canvas;
   } catch (err) {
-    console.error(`[exportUtils] html2canvas failed:`, err);
+    console.error('html2canvas failed in iframe:', err);
     throw err;
-  } finally {
-    // Restore original styles
-    element.style.opacity = originalOpacity;
-    element.style.position = originalPosition;
-    element.style.top = originalTop;
-    element.style.left = originalLeft;
-    element.style.zIndex = originalZIndex;
-    element.style.pointerEvents = originalPointerEvents;
   }
 };
 
 /**
- * Captures an element and downloads it as a PNG file.
- * @param elementId The ID of the element to export
- * @param filename The desired filename (without extension)
+ * Exports a vulnerability card to PNG.
  */
-export const exportElementToPng = async (elementId: string, filename: string): Promise<void> => {
+export const exportVulnerabilityToPng = async (vulnerability: unknown, allVulnerableComponents: unknown[]) => {
+  let iframeObj: { iframe: HTMLIFrameElement; element: HTMLElement } | null = null;
   try {
-    const canvas = await captureElement(elementId);
+    const html = getVulnerabilityCardHtml(vulnerability as VulnerabilityPrintData, allVulnerableComponents as ComponentPrintData[]);
+    iframeObj = await createCaptureIframe(html);
+    const canvas = await captureFromIframe(iframeObj.element);
     
-    // Create download link
     const dataUrl = canvas.toDataURL('image/png');
-    console.log(`[exportUtils] Triggering PNG download...`);
     const link = document.createElement('a');
-    link.download = `${filename}.png`;
+    link.download = `vulnerability-${(vulnerability as VulnerabilityPrintData).id}.png`;
     link.href = dataUrl;
     link.click();
-    console.log(`[exportUtils] PNG download triggered successfully`);
   } catch (error) {
     console.error('Failed to export PNG:', error);
-    throw error;
+    alert('Failed to generate PNG card. Check console for details.');
+  } finally {
+    if (iframeObj) document.body.removeChild(iframeObj.iframe);
   }
 };
 
 /**
- * Captures an element and embeds it into a downloaded A4 PDF.
- * @param elementId The ID of the element to export
- * @param filename The desired filename (without extension)
+ * Exports a vulnerability card to PDF.
  */
-export const exportElementToPdf = async (elementId: string, filename: string): Promise<void> => {
+export const exportVulnerabilityToPdf = async (vulnerability: unknown, allVulnerableComponents: unknown[]) => {
+  let iframeObj: { iframe: HTMLIFrameElement; element: HTMLElement } | null = null;
   try {
-    const canvas = await captureElement(elementId);
-    const imgData = canvas.toDataURL('image/png', 1.0);
-
-    // Calculate dimensions for A4 paper (210mm x 297mm)
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
-    });
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    // Optional: handle page breaks if the canvas is longer than one A4 page
-    let heightLeft = pdfHeight;
+    const html = getVulnerabilityCardHtml(vulnerability as VulnerabilityPrintData, allVulnerableComponents as ComponentPrintData[]);
+    iframeObj = await createCaptureIframe(html);
+    const canvas = await captureFromIframe(iframeObj.element);
+    
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 297; // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    let heightLeft = imgHeight;
     let position = 0;
-    const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // First page
-    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+    const imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
     heightLeft -= pageHeight;
 
-    // Remaining pages
     while (heightLeft >= 0) {
-      position = heightLeft - pdfHeight;
+      position = heightLeft - imgHeight;
       pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
       heightLeft -= pageHeight;
     }
 
-    console.log(`[exportUtils] Saving PDF...`);
-    pdf.save(`${filename}.pdf`);
-    console.log(`[exportUtils] PDF saved successfully`);
+    pdf.save(`vulnerability-${(vulnerability as VulnerabilityPrintData).id}.pdf`);
   } catch (error) {
     console.error('Failed to export PDF:', error);
-    throw error;
+    alert('Failed to generate PDF card. Check console for details.');
+  } finally {
+    if (iframeObj) document.body.removeChild(iframeObj.iframe);
   }
 };

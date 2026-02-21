@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:bf6c9318-5a06-484f-8ada-a929f0532499",
+  "serialNumber": "urn:uuid:5104beb0-57cb-419b-bca9-e5dd66235de4",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-16T20:46:03+00:00",
+    "timestamp": "2026-02-20T14:19:38+00:00",
     "tools": {
       "components": [
         {
@@ -20,7 +20,7 @@
       ]
     },
     "component": {
-      "bom-ref": "2f78275f-becd-46be-bbe7-dfe7ea631be3",
+      "bom-ref": "ab09e4de-5b94-4d77-b364-152bc05b3008",
       "type": "application",
       "name": ".",
       "properties": [
@@ -33,7 +33,7 @@
   },
   "components": [
     {
-      "bom-ref": "c98abd4a-915e-4044-aafb-feec355ff8de",
+      "bom-ref": "9d583741-5e87-482a-90af-81aaaa358984",
       "type": "application",
       "name": "package-lock.json",
       "properties": [
@@ -20473,13 +20473,7 @@
   ],
   "dependencies": [
     {
-      "ref": "2f78275f-becd-46be-bbe7-dfe7ea631be3",
-      "dependsOn": [
-        "c98abd4a-915e-4044-aafb-feec355ff8de"
-      ]
-    },
-    {
-      "ref": "c98abd4a-915e-4044-aafb-feec355ff8de",
+      "ref": "9d583741-5e87-482a-90af-81aaaa358984",
       "dependsOn": [
         "pkg:npm/%40base-ui/react@1.1.0",
         "pkg:npm/%40cyclonedx/cyclonedx-library@9.4.1",
@@ -20526,6 +20520,12 @@
         "pkg:npm/typescript@5.9.3",
         "pkg:npm/vite@7.3.1",
         "pkg:npm/vitest@4.0.18"
+      ]
+    },
+    {
+      "ref": "ab09e4de-5b94-4d77-b364-152bc05b3008",
+      "dependsOn": [
+        "9d583741-5e87-482a-90af-81aaaa358984"
       ]
     },
     {
@@ -25630,6 +25630,80 @@
   ],
   "vulnerabilities": [
     {
+      "id": "CVE-2025-69873",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "redhat"
+          },
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        }
+      ],
+      "cwes": [
+        400
+      ],
+      "description": "ajv (Another JSON Schema Validator) through version 8.17.1 is vulnerable to Regular Expression Denial of Service (ReDoS) when the $data option is enabled. The pattern keyword accepts runtime data via JSON Pointer syntax ($data reference), which is passed directly to the JavaScript RegExp() constructor without validation. An attacker can inject a malicious regex pattern (e.g., \"^(a|a)*$\") combined with crafted input to cause catastrophic backtracking. A 31-character payload causes approximately 44 seconds of CPU blocking, with each additional character doubling execution time. This enables complete denial of service with a single HTTP request against any API using ajv with $data: true for dynamic schema validation.",
+      "recommendation": "Upgrade ajv to version 8.18.0",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2025-69873"
+        },
+        {
+          "url": "https://access.redhat.com/security/cve/CVE-2025-69873"
+        },
+        {
+          "url": "https://github.com/EthanKim88/ethan-cve-disclosures/blob/main/CVE-2025-69873-ajv-ReDoS.md"
+        },
+        {
+          "url": "https://github.com/ajv-validator/ajv"
+        },
+        {
+          "url": "https://github.com/ajv-validator/ajv/commit/720a23fa453ffae8340e92c9b0fe886c54cfe0d5"
+        },
+        {
+          "url": "https://github.com/ajv-validator/ajv/pull/2586"
+        },
+        {
+          "url": "https://github.com/ajv-validator/ajv/releases/tag/v8.18.0"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69873"
+        },
+        {
+          "url": "https://www.cve.org/CVERecord?id=CVE-2025-69873"
+        }
+      ],
+      "published": "2026-02-11T19:15:50+00:00",
+      "updated": "2026-02-12T16:16:05+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/ajv@6.12.6",
+          "versions": [
+            {
+              "version": "6.12.6",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "pkg:npm/ajv@8.17.1",
+          "versions": [
+            {
+              "version": "8.17.1",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "CVE-2026-2391",
       "source": {
         "name": "ghsa",
@@ -25691,6 +25765,311 @@
           "versions": [
             {
               "version": "6.14.1",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-25535",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "redhat"
+          },
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        }
+      ],
+      "cwes": [
+        400,
+        770
+      ],
+      "description": "jsPDF is a library to generate PDFs in JavaScript. Prior to 4.2.0, user control of the first argument of the `addImage` method results in denial of service. If given the possibility to pass unsanitized image data or URLs to the `addImage` method, a user can provide a harmful GIF file that results in out of memory errors and denial of service. Harmful GIF files have large width and/or height entries in their headers, which lead to excessive memory allocation. Other affected methods are: `html`. The vulnerability has been fixed in jsPDF 4.2.0. As a workaround, sanitize image data or URLs before passing it to the addImage method or one of the other affected methods.",
+      "recommendation": "Upgrade jspdf to version 4.2.0",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2026-25535"
+        },
+        {
+          "url": "https://access.redhat.com/security/cve/CVE-2026-25535"
+        },
+        {
+          "url": "https://github.com/ZeroXJacks/CVEs/blob/main/2026/CVE-2026-25535.md"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/commit/2e5e156e284d92c7d134bce97e6418756941d5e6"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/releases/tag/v4.2.0"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/security/advisories/GHSA-67pg-wm7f-q7fj"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25535"
+        },
+        {
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-25535"
+        }
+      ],
+      "published": "2026-02-19T15:16:12+00:00",
+      "updated": "2026-02-19T15:52:39+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/jspdf@4.1.0",
+          "versions": [
+            {
+              "version": "4.1.0",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-25755",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "ghsa"
+          },
+          "score": 8.1,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N"
+        },
+        {
+          "source": {
+            "name": "redhat"
+          },
+          "score": 8.1,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N"
+        }
+      ],
+      "cwes": [
+        94,
+        116
+      ],
+      "description": "jsPDF is a library to generate PDFs in JavaScript. Prior to 4.2.0, user control of the argument of the `addJS` method allows an attacker to inject arbitrary PDF objects into the generated document. By crafting a payload that escapes the JavaScript string delimiter, an attacker can execute malicious actions or alter the document structure, impacting any user who opens the generated PDF. The vulnerability has been fixed in jspdf@4.2.0. As a workaround, escape parentheses in user-provided JavaScript code before passing them to the `addJS` method.",
+      "recommendation": "Upgrade jspdf to version 4.2.0",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2026-25755"
+        },
+        {
+          "url": "https://access.redhat.com/security/cve/CVE-2026-25755"
+        },
+        {
+          "url": "https://github.com/ZeroXJacks/CVEs/blob/main/2026/CVE-2026-25755.md"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/commit/56b46d45b052346f5995b005a34af5dcdddd5437"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/releases/tag/v4.2.0"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/security/advisories/GHSA-9vjf-qc39-jprp"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25755"
+        },
+        {
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-25755"
+        }
+      ],
+      "published": "2026-02-19T15:16:12+00:00",
+      "updated": "2026-02-19T15:52:39+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/jspdf@4.1.0",
+          "versions": [
+            {
+              "version": "4.1.0",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-25940",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "ghsa"
+          },
+          "score": 8.1,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N"
+        }
+      ],
+      "cwes": [
+        116
+      ],
+      "description": "jsPDF is a library to generate PDFs in JavaScript. Prior to 4.2.0, user control of properties and methods of the Acroform module allows users to inject arbitrary PDF objects, such as JavaScript actions. If given the possibility to pass unsanitized input to one of the following property, a user can inject arbitrary PDF objects, such as JavaScript actions, which are executed when the victim hovers over the radio option. The vulnerability has been fixed in jsPDF@4.2.0. As a workaround, sanitize user input before passing it to the vulnerable API members.",
+      "recommendation": "Upgrade jspdf to version 4.2.0",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2026-25940"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/commit/71ad2dbfa6c7c189ab42b855b782620fa8a38375"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/releases/tag/v4.2.0"
+        },
+        {
+          "url": "https://github.com/parallax/jsPDF/security/advisories/GHSA-p5xg-68wr-hm3m"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25940"
+        }
+      ],
+      "published": "2026-02-19T16:27:15+00:00",
+      "updated": "2026-02-19T16:27:15+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/jspdf@4.1.0",
+          "versions": [
+            {
+              "version": "4.1.0",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-26996",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [],
+      "cwes": [
+        1333
+      ],
+      "description": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Versions 10.2.0 and below are vulnerable to Regular Expression Denial of Service (ReDoS) when a glob pattern contains many consecutive * wildcards followed by a literal character that doesn't appear in the test string. Each * compiles to a separate [^/]*? regex group, and when the match fails, V8's regex engine backtracks exponentially across all possible splits. The time complexity is O(4^N) where N is the number of * characters. With N=15, a single minimatch() call takes ~2 seconds. With N=34, it hangs effectively forever. Any application that passes user-controlled strings to minimatch() as the pattern argument is vulnerable to DoS. This issue has been fixed in version 10.2.1.",
+      "recommendation": "Upgrade minimatch to version 10.2.1",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2026-26996"
+        },
+        {
+          "url": "https://github.com/isaacs/minimatch"
+        },
+        {
+          "url": "https://github.com/isaacs/minimatch/commit/2e111f3a79abc00fa73110195de2c0f2351904f5"
+        },
+        {
+          "url": "https://github.com/isaacs/minimatch/security/advisories/GHSA-3ppc-4f35-3m26"
+        }
+      ],
+      "published": "2026-02-20T03:16:01+00:00",
+      "updated": "2026-02-20T03:16:01+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/minimatch@10.1.1",
+          "versions": [
+            {
+              "version": "10.1.1",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "pkg:npm/minimatch@3.1.2",
+          "versions": [
+            {
+              "version": "3.1.2",
+              "status": "affected"
+            }
+          ]
+        },
+        {
+          "ref": "pkg:npm/minimatch@9.0.5",
+          "versions": [
+            {
+              "version": "9.0.5",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "GHSA-gq3j-xvxp-8hrf",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "ghsa"
+          },
+          "score": 3.7,
+          "severity": "low",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+        }
+      ],
+      "description": "## Summary\n\nThe `basicAuth` and `bearerAuth` middlewares previously used a comparison that was not fully timing-safe.\n\nThe `timingSafeEqual` function used normal string equality (`===`) when comparing hash values. This comparison may stop early if values differ, which can theoretically cause small timing differences.\n\nThe implementation has been updated to use a safer comparison method.\n\n\n## Details\n\nThe issue was caused by the use of normal string equality (`===`) when comparing hash values inside the `timingSafeEqual` function.\n\nIn JavaScript, string comparison may stop as soon as a difference is found. This means the comparison time can slightly vary depending on how many characters match.\n\nUnder very specific and controlled conditions, this behavior could theoretically allow timing-based analysis.\n\nThe implementation has been updated to:\n\n- Avoid early termination during comparison\n- Use a constant-time-style comparison method\n\n## Impact\n\nThis issue is unlikely to be exploited in normal environments.\n\nIt may only be relevant in highly controlled situations where precise timing measurements are possible.\n\nThis change is considered a security hardening improvement. Users are encouraged to upgrade to the latest version.",
+      "recommendation": "Upgrade hono to version 4.11.10",
+      "advisories": [
+        {
+          "url": "https://github.com/advisories/GHSA-gq3j-xvxp-8hrf"
+        },
+        {
+          "url": "https://github.com/honojs/hono"
+        },
+        {
+          "url": "https://github.com/honojs/hono/commit/91def7cab654bad5eecc9270e6620d577971ff5e"
+        },
+        {
+          "url": "https://github.com/honojs/hono/releases/tag/v4.11.10"
+        },
+        {
+          "url": "https://github.com/honojs/hono/security/advisories/GHSA-gq3j-xvxp-8hrf"
+        }
+      ],
+      "published": "2026-02-19T20:15:59+00:00",
+      "updated": "2026-02-19T20:15:59+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/hono@4.11.8",
+          "versions": [
+            {
+              "version": "4.11.8",
               "status": "affected"
             }
           ]

@@ -91,6 +91,9 @@ vi.mock("lucide-react", () => ({
   Layers: () => <div />,
   ArrowRight: () => <div />,
   Download: () => <div />,
+  Wrench: () => <div />,
+  CheckCircle: () => <div />,
+  Lightbulb: () => <div />,
 }));
 
 // Polyfill Worker

@@ -163,19 +163,20 @@ describe('statsUtils Dependency Analysis', () => {
             expect(stats.developerStats).toBeDefined();
             const { metadataQuality } = stats.developerStats!;
             
-            // Expected bounds (> 50% threshold for 2 components means > 1) 
-            // Here, exactly 1 out of 2 has the metadata, which is not > 1 (50%).
+            // Expected bounds (> 50% threshold for standard, > 10% or > 0 for lenient) 
+            // Here, exactly 1 out of 2 has the metadata.
             // purl is in 2/2 -> check is true.
-            // others are in 1/2 -> check is false.
+            // licenses is standard (>1 required) -> false
+            // hashes, supplier, properties use lenient (>0 required) -> true
             expect(metadataQuality.checks.purl).toBe(true);
-            expect(metadataQuality.checks.hashes).toBe(false);
+            expect(metadataQuality.checks.hashes).toBe(true);
             expect(metadataQuality.checks.licenses).toBe(false);
-            expect(metadataQuality.checks.supplier).toBe(false);
-            expect(metadataQuality.checks.properties).toBe(false);
+            expect(metadataQuality.checks.supplier).toBe(true);
+            expect(metadataQuality.checks.properties).toBe(true);
 
-            // Grade should be F since only purl (20) is true
-            expect(metadataQuality.score).toBe(20);
-            expect(metadataQuality.grade).toBe("F");
+            // Grade should be B (Score: 20 purl + 15 hashes + 15 supplier + 10 properties = 60)
+            expect(metadataQuality.score).toBe(60);
+            expect(metadataQuality.grade).toBe("B");
         });
 
         it('should assign A grade if all metadata threshold checks pass', () => {

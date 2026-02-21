@@ -47,8 +47,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
-import { VulnerabilityPrintView } from "../vulnerabilities/VulnerabilityPrintView";
-import { exportElementToPdf, exportElementToPng } from "@/lib/exportUtils";
+import { exportVulnerabilityToPdf, exportVulnerabilityToPng } from "@/lib/exportUtils";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { SearchButton } from "@/components/common/SearchButton";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
@@ -1045,7 +1044,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                                     variant="outline" 
                                     size="sm" 
                                     className="h-7 text-[10px]"
-                                    onClick={() => exportElementToPdf('vulnerability-print-view', `vulnerability-${v.id}`)}
+                                    onClick={() => exportVulnerabilityToPdf(v, displayStats.allVulnerableComponents)}
                                   >
                                     <Download className="mr-1 h-3 w-3" /> PDF Card
                                   </Button>
@@ -1053,7 +1052,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                                     variant="outline" 
                                     size="sm" 
                                     className="h-7 text-[10px]"
-                                    onClick={() => exportElementToPng('vulnerability-print-view', `vulnerability-${v.id}`)}
+                                    onClick={() => exportVulnerabilityToPng(v, displayStats.allVulnerableComponents)}
                                   >
                                     <Download className="mr-1 h-3 w-3" /> PNG Card
                                   </Button>
@@ -1477,13 +1476,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   </div>
                 )}
                 
-                {/* Hidden print view for exporting */}
-                {selectedVulnerability && (
-                  <VulnerabilityPrintView 
-                    vulnerability={selectedVulnerability}
-                    allVulnerableComponents={displayStats.allVulnerableComponents}
-                  />
-                )}
+
               </ErrorBoundary>
             </div>
           </ResizablePanel>
