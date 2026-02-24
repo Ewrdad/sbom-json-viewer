@@ -11,7 +11,7 @@ test.describe("SBOM Performance", () => {
     await expect(page.getByText(/Preparing viewer|Loading analysis/)).not.toBeVisible({ timeout: 20000 });
     
     // Verify we are actually in the app
-    const sbomSelector = page.getByPlaceholder("Simple Example");
+    const sbomSelector = page.getByPlaceholder("Self Scan (Latest)");
     await expect(sbomSelector).toBeVisible();
     
     // 1. Click on the Huge SBOM button

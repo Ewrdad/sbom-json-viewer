@@ -1,0 +1,151 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@chevrotain/cst-dts-gen": {
+      "name": "@chevrotain/cst-dts-gen",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@chevrotain/gast",
+        "lodash-es"
+      ],
+      "effects": [],
+      "range": "11.0.0 - 11.1.0",
+      "nodes": [
+        "node_modules/@chevrotain/cst-dts-gen"
+      ],
+      "fixAvailable": true
+    },
+    "@chevrotain/gast": {
+      "name": "@chevrotain/gast",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "lodash-es"
+      ],
+      "effects": [],
+      "range": "11.0.0 - 11.1.0",
+      "nodes": [
+        "node_modules/@chevrotain/gast"
+      ],
+      "fixAvailable": true
+    },
+    "@mermaid-js/parser": {
+      "name": "@mermaid-js/parser",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "langium"
+      ],
+      "effects": [
+        "mermaid"
+      ],
+      "range": "<=0.6.3",
+      "nodes": [
+        "node_modules/@mermaid-js/parser"
+      ],
+      "fixAvailable": true
+    },
+    "chevrotain": {
+      "name": "chevrotain",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@chevrotain/cst-dts-gen",
+        "@chevrotain/gast",
+        "lodash-es"
+      ],
+      "effects": [
+        "langium"
+      ],
+      "range": "11.0.0 - 11.1.0",
+      "nodes": [
+        "node_modules/chevrotain"
+      ],
+      "fixAvailable": true
+    },
+    "langium": {
+      "name": "langium",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "chevrotain"
+      ],
+      "effects": [
+        "@mermaid-js/parser"
+      ],
+      "range": "2.1.0 - 4.1.3",
+      "nodes": [
+        "node_modules/langium"
+      ],
+      "fixAvailable": true
+    },
+    "lodash-es": {
+      "name": "lodash-es",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1112453,
+          "name": "lodash-es",
+          "dependency": "lodash-es",
+          "title": "Lodash has Prototype Pollution Vulnerability in `_.unset` and `_.omit` functions",
+          "url": "https://github.com/advisories/GHSA-xxjr-mmjv-4gpg",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L"
+          },
+          "range": ">=4.0.0 <=4.17.22"
+        }
+      ],
+      "effects": [
+        "@chevrotain/cst-dts-gen",
+        "@chevrotain/gast",
+        "chevrotain"
+      ],
+      "range": "4.0.0 - 4.17.22",
+      "nodes": [
+        "node_modules/@chevrotain/cst-dts-gen/node_modules/lodash-es",
+        "node_modules/@chevrotain/gast/node_modules/lodash-es",
+        "node_modules/chevrotain/node_modules/lodash-es"
+      ],
+      "fixAvailable": true
+    },
+    "mermaid": {
+      "name": "mermaid",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@mermaid-js/parser"
+      ],
+      "effects": [],
+      "range": "11.0.0-alpha.1 - 11.12.2",
+      "nodes": [
+        "node_modules/mermaid"
+      ],
+      "fixAvailable": true
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 7,
+      "high": 0,
+      "critical": 0,
+      "total": 7
+    },
+    "dependencies": {
+      "prod": 246,
+      "dev": 521,
+      "optional": 92,
+      "peer": 8,
+      "peerOptional": 0,
+      "total": 859
+    }
+  }
+}

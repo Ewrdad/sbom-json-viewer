@@ -8,10 +8,10 @@ const gotoViewer = async (page: Page) => {
 
   // Now the manifest buttons should be visible
   await expect(
-    page.getByPlaceholder("Simple Example"),
+    page.getByPlaceholder("Self Scan (Latest)"),
   ).toBeVisible();
   await expect(
-    page.getByText("Viewing: examples/sample-simple"),
+    page.getByText("Viewing: self/latest"),
   ).toBeVisible();
 };
 
@@ -20,7 +20,7 @@ test.describe("SBOM Viewer", () => {
     await gotoViewer(page);
 
     await expect(
-      page.getByText("Viewing: examples/sample-simple"),
+      page.getByText("Viewing: self/latest"),
     ).toBeVisible();
   });
 
@@ -28,18 +28,18 @@ test.describe("SBOM Viewer", () => {
     await gotoViewer(page);
 
     // Open the combobox
-    await page.getByPlaceholder("Simple Example").click();
+    await page.getByPlaceholder("Self Scan (Latest)").click();
     // Select the option
-    await page.getByRole("option", { name: "Full SBOM" }).click();
+    await page.getByLabel("Self Scan").getByRole("option", { name: "TrivyScan", exact: true }).click();
     
-    await expect(page.getByText("Viewing: examples/sbom-full")).toBeVisible();
+    await expect(page.getByText("Viewing: self/TrivyScan")).toBeVisible();
 
     // Switch back
-    await page.getByPlaceholder("Full SBOM").click();
-    await page.getByRole("option", { name: "Simple Example" }).click();
+    await page.getByPlaceholder("TrivyScan").click();
+    await page.getByRole("option", { name: "Self Scan (Latest)", exact: true }).click();
     
     await expect(
-      page.getByText("Viewing: examples/sample-simple"),
+      page.getByText("Viewing: self/latest"),
     ).toBeVisible();
   });
 
@@ -64,14 +64,15 @@ test.describe("SBOM Viewer", () => {
     ).toBeVisible();
 
     const searchInput = page.getByPlaceholder("Search components...");
-    await searchInput.fill("axios");
-    await expect(page.getByText("axios")).toBeVisible();
+    await searchInput.fill("react");
+    await expect(page.getByText("react").first()).toBeVisible();
 
     await searchInput.fill("no-matches-here");
     await expect(page.getByText("No results.")).toBeVisible();
 
+    // Clear search and just verify table populates again (any row beyond the header)
     await searchInput.fill("");
-    await expect(page.getByText("express")).toBeVisible();
+    await expect(page.getByRole("row").nth(1)).toBeVisible();
   });
 
   test("opens the component detail panel from the explorer", async ({
@@ -85,12 +86,14 @@ test.describe("SBOM Viewer", () => {
     ).toBeVisible();
 
     // Why: validate row selection drives the detail panel.
-    await page.getByRole("cell", { name: "axios" }).click();
+    const searchInput = page.getByPlaceholder("Search components...");
+    await searchInput.fill("react");
+    await page.getByRole("row").filter({ hasText: "react" }).first().click();
     const detailPanel = page.getByTestId("detail-panel");
     await expect(
       detailPanel.getByRole("heading", { name: "Component Details" }),
     ).toBeVisible();
-    await expect(detailPanel.getByText("axios", { exact: true })).toBeVisible();
+    await expect(detailPanel).toContainText("react");
   });
 
   test("expands the dependency tree", async ({ page }) => {

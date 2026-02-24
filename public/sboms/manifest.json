@@ -1,5 +1,5 @@
 {
-  "default": "examples/sample-simple",
+  "default": "self/latest",
   "files": [
     {
       "name": "Simple Example",
@@ -26,10 +26,148 @@
       "group": "Examples"
     },
     {
+      "name": "CDXGEN",
+      "path": "sboms/self/CDXGEN.sbom.json",
+      "id": "self/CDXGEN",
+      "group": "Self Scan"
+    },
+    {
+      "name": "CycloneDXNPM",
+      "path": "sboms/self/CycloneDXNPM.sbom.json",
+      "id": "self/CycloneDXNPM",
+      "group": "Self Scan"
+    },
+    {
+      "name": "GrypeNPMDefault",
+      "path": "sboms/self/GrypeNPMDefault.sbom.json",
+      "id": "self/GrypeNPMDefault",
+      "group": "Self Scan"
+    },
+    {
+      "name": "GrypeSyft",
+      "path": "sboms/self/GrypeSyft.sbom.json",
+      "id": "self/GrypeSyft",
+      "group": "Self Scan"
+    },
+    {
       "name": "Self Scan (Latest)",
       "path": "sboms/self/latest.sbom.json",
       "id": "self/latest",
       "group": "Self Scan"
+    },
+    {
+      "name": "NPMDefault",
+      "path": "sboms/self/NPMDefault.sbom.json",
+      "id": "self/NPMDefault",
+      "group": "Self Scan"
+    },
+    {
+      "name": "Syft",
+      "path": "sboms/self/Syft.sbom.json",
+      "id": "self/Syft",
+      "group": "Self Scan"
+    },
+    {
+      "name": "TrivyCDXGEN",
+      "path": "sboms/self/TrivyCDXGEN.sbom.json",
+      "id": "self/TrivyCDXGEN",
+      "group": "Self Scan"
+    },
+    {
+      "name": "TrivyCycloneDXNPM",
+      "path": "sboms/self/TrivyCycloneDXNPM.sbom.json",
+      "id": "self/TrivyCycloneDXNPM",
+      "group": "Self Scan"
+    },
+    {
+      "name": "TrivyNoScan",
+      "path": "sboms/self/TrivyNoScan.sbom.json",
+      "id": "self/TrivyNoScan",
+      "group": "Self Scan"
+    },
+    {
+      "name": "TrivyNPMDefault",
+      "path": "sboms/self/TrivyNPMDefault.sbom.json",
+      "id": "self/TrivyNPMDefault",
+      "group": "Self Scan"
+    },
+    {
+      "name": "TrivyScan",
+      "path": "sboms/self/TrivyScan.sbom.json",
+      "id": "self/TrivyScan",
+      "group": "Self Scan"
+    },
+    {
+      "name": "TrivySyft",
+      "path": "sboms/self/TrivySyft.sbom.json",
+      "id": "self/TrivySyft",
+      "group": "Self Scan"
+    },
+    {
+      "name": "CDXGEN",
+      "path": "sboms/simpleghome/CDXGEN.sbom.json",
+      "id": "simpleghome/CDXGEN",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "CycloneDXNPM",
+      "path": "sboms/simpleghome/CycloneDXNPM.sbom.json",
+      "id": "simpleghome/CycloneDXNPM",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "GrypeSyft",
+      "path": "sboms/simpleghome/GrypeSyft.sbom.json",
+      "id": "simpleghome/GrypeSyft",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "NPMDefault",
+      "path": "sboms/simpleghome/NPMDefault.sbom.json",
+      "id": "simpleghome/NPMDefault",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "Syft",
+      "path": "sboms/simpleghome/Syft.sbom.json",
+      "id": "simpleghome/Syft",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "TrivyCDXGEN",
+      "path": "sboms/simpleghome/TrivyCDXGEN.sbom.json",
+      "id": "simpleghome/TrivyCDXGEN",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "TrivyCycloneDXNPM",
+      "path": "sboms/simpleghome/TrivyCycloneDXNPM.sbom.json",
+      "id": "simpleghome/TrivyCycloneDXNPM",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "TrivyNoScan",
+      "path": "sboms/simpleghome/TrivyNoScan.sbom.json",
+      "id": "simpleghome/TrivyNoScan",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "TrivyNPMDefault",
+      "path": "sboms/simpleghome/TrivyNPMDefault.sbom.json",
+      "id": "simpleghome/TrivyNPMDefault",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "TrivyScan",
+      "path": "sboms/simpleghome/TrivyScan.sbom.json",
+      "id": "simpleghome/TrivyScan",
+      "group": "Simpleghome"
+    },
+    {
+      "name": "TrivySyft",
+      "path": "sboms/simpleghome/TrivySyft.sbom.json",
+      "id": "simpleghome/TrivySyft",
+      "group": "Simpleghome"
     }
   ]
 }

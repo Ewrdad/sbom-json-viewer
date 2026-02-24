@@ -1,9 +1,23 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Export Functionality", () => {
+    test.beforeEach(async ({ page }) => {
+        test.setTimeout(90000);
+        await page.goto("/", { waitUntil: "networkidle" });
+        
+        // Wait for example to load
+        await expect(page.getByPlaceholder("Self Scan (Latest)")).toBeVisible({ timeout: 30000 });
+        
+        // Since 'self' SBOMs typically have 0 vulnerabilities (as we just fixed them),
+        // we will upload the examples/sample-simple file via the UI to explicitly test exports that require data.
+        const fileInput = page.locator('input[type="file"]');
+        const filePath = "public/sboms/examples/sample-simple.sbom.json";
+        await fileInput.setInputFiles(filePath);
+        
+        await expect(page.getByText("Viewing: Local: sample-simple.sbom.json")).toBeVisible({ timeout: 20000 });
+    });
+
     test("export buttons are present and clickable", async ({ page }) => {
-        test.setTimeout(60000);
-        await page.goto("/");
         // Ensure dashboard is loaded
         await expect(page.getByRole("heading", { name: "Dashboard" }).first()).toBeVisible({ timeout: 60000 });
 
@@ -34,12 +48,6 @@ test.describe("Export Functionality", () => {
     });
 
     test("exports vulnerabilities to Jira CSV", async ({ page }) => {
-        test.setTimeout(90000);
-        await page.goto("/", { waitUntil: "networkidle" });
-        
-        // Wait for example to load
-        await expect(page.getByPlaceholder("Simple Example")).toBeVisible({ timeout: 30000 });
-        
         // Navigate to Vulnerabilities
         await page.getByRole("button", { name: "Vulnerabilities", exact: true }).click();
         await expect(page.getByRole("heading", { name: "Vulnerabilities" }).first()).toBeVisible();
@@ -66,9 +74,6 @@ test.describe("Export Functionality", () => {
     });
 
     test("exports components to GitLab CSV", async ({ page }) => {
-        test.setTimeout(90000);
-        await page.goto("/", { waitUntil: "networkidle" });
-        
         // Navigate to Vulnerabilities
         await page.getByRole("button", { name: "Vulnerabilities", exact: true }).click();
 

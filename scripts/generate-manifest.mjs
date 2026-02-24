@@ -35,7 +35,7 @@ function getGroupDisplayName(groupName) {
 
 function generateManifestJson(baseDir) {
   const manifest = {
-    default: "examples/sample-simple", 
+    default: "self/latest", 
     files: []
   };
 

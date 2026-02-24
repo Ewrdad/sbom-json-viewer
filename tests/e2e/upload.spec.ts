@@ -11,12 +11,12 @@ test.describe("SBOM Upload", () => {
     
     // 2. Upload a file
     // Using the project's own sample file
-    const filePath = "public/sboms/examples/sample-simple.sbom.json";
+    const filePath = "public/sboms/self/latest.sbom.json";
     await fileInput.setInputFiles(filePath);
 
     // 3. Verify the upload triggered a load
-    // The "Viewing: " text should update to "Local: sample-simple.sbom.json"
-    await expect(page.getByText(/Local: sample-simple.sbom.json/)).toBeVisible({ timeout: 10000 });
+    // The "Viewing: " text should update to "Local: latest.sbom.json"
+    await expect(page.getByText(/Local: latest.sbom.json/)).toBeVisible({ timeout: 10000 });
     
     // 4. Verify content is loaded
     await expect(page.getByText("Total Components")).toBeVisible();
