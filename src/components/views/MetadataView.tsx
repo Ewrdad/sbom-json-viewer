@@ -244,6 +244,26 @@ export function MetadataView({ sbom }: { sbom: any }) {
             </CardContent>
           </Card>
         </div>
+
+        {sbom._raw?.metadata && (
+          <div className="pt-2">
+            <Card className="shadow-sm border-muted-foreground/10">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Raw Metadata JSON
+                  <HelpTooltip text="The complete, underlying CycloneDX JSON for the metadata node, ensuring no fields are omitted." />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border p-3 text-[10px] sm:text-xs font-mono bg-muted/50 overflow-auto max-h-[400px]">
+                  <pre className="whitespace-pre-wrap break-all">
+                    {JSON.stringify(sbom._raw.metadata, null, 2)}
+                  </pre>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </ScrollArea>
   );

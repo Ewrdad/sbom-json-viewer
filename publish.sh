@@ -23,14 +23,21 @@ fi
 echo "Generating Self SBOM..."
 mkdir -p dist/sboms/self
 if command -v trivy &> /dev/null; then
-    trivy fs . --format cyclonedx --output dist/sboms/self/latest.sbom.json --scanners vuln,misconfig,secret,license --include-dev-deps
+    syft . -o cyclonedx-json -c .syft.yaml > latest.sbom.json
+    trivy sbom latest.sbom.json --format cyclonedx --output dist/sboms/self/latest.sbom.json --scanners vuln,misconfig,secret,license 
     # Copy to public/sboms/self so it's available in dev too
     mkdir -p public/sboms/self
     cp dist/sboms/self/latest.sbom.json public/sboms/self/latest.sbom.json
+    ./Generate-Sbom-Sampler.sh
+    cp ./sbom-json-viewer/* dist/sboms/self/ || true
 else
     echo "Trivy not found, cancelling deployment"
     exit 1
 fi
+
+# Dynamically generate manifest.json based on what's in dist/sboms/ and public/sboms/
+echo "Generating dynamic manifest.json..."
+node scripts/generate-manifest.mjs
 
 aws s3 sync dist/ "$(cat ./config/publish/s3Bucket)" --delete
 

@@ -23,6 +23,11 @@ describe("ComponentDetailPanel", () => {
       name: "test-package",
       version: "1.0.0",
       description: "A test package description",
+      author: "Test Author",
+      authors: [{ name: "Alice", email: "alice@example.com" }],
+      maintainers: [{ name: "Bob" }],
+      publisher: "Test Publisher",
+      supplier: { name: "Test Supplier", url: ["https://example.com/supplier"] },
       licenses: new Set([{ id: "MIT" }]),
       vulnerabilities: {
         inherent: {
@@ -41,6 +46,7 @@ describe("ComponentDetailPanel", () => {
         },
       },
       properties: new Set([{ name: "prop1", value: "val1" }]),
+      hashes: [{ alg: "SHA-256", content: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" }],
     } as any;
   });
 
@@ -140,6 +146,22 @@ describe("ComponentDetailPanel", () => {
     expect(screen.getByText("val1")).toBeDefined();
   });
 
+  it("renders hashes", () => {
+    render(
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
+    );
+
+    expect(screen.getByText("Cryptographic Hashes")).toBeDefined();
+    expect(screen.getByText("SHA-256")).toBeDefined();
+    expect(screen.getByText("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")).toBeDefined();
+  });
+
   it("passes correct query to SearchButton", () => {
     mockComponent.name = "my-special-component";
     render(
@@ -161,7 +183,28 @@ describe("ComponentDetailPanel", () => {
     // Check if the query is used only as component name by looking at the tooltip trigger or similar
     // The tooltip content is: `Click to search for "${query}" on ${currentEngine.name}`
     // But tooltip might not be in DOM yet. 
-    // However, we can check if the text "Search on Google" is there, and we've already verified the implementation.
+    // However,    // We can check if the text "Search on Google" is there, and we've already verified the implementation.
     expect(screen.getByText(/Search on Google/i)).toBeDefined();
+  });
+
+  it("renders origin and contact information", () => {
+    render(
+      <SettingsProvider>
+        <ComponentDetailPanel
+          component={mockComponent}
+          analysis={null}
+          onClose={mockOnClose}
+        />
+      </SettingsProvider>
+    );
+
+    expect(screen.getByText("Origin & Contacts")).toBeDefined();
+    expect(screen.getByText("Test Author")).toBeDefined();
+    expect(screen.getByText("Test Publisher")).toBeDefined();
+    expect(screen.getByText("Test Supplier")).toBeDefined();
+    expect(screen.getByText("Alice")).toBeDefined();
+    expect(screen.getByText("<alice@example.com>")).toBeDefined();
+    expect(screen.getByText("Bob")).toBeDefined();
+    expect(screen.getByText("https://example.com/supplier")).toBeDefined();
   });
 });

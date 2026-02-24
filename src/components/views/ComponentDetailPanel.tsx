@@ -133,6 +133,83 @@ export function ComponentDetailPanel({
             </div>
           )}
 
+          {!!(component.author || (component.authors && component.authors.length > 0) || (component.maintainers && component.maintainers.length > 0) || component.publisher || component.supplier) && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold">Origin & Contacts</h4>
+                
+                {component.author && (
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Author</h5>
+                    <div className="text-sm">{component.author}</div>
+                  </div>
+                )}
+
+                {component.authors && component.authors.length > 0 && (
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Authors</h5>
+                    <div className="text-sm space-y-1">
+                      {component.authors.map((a, i) => (
+                        <div key={i}>
+                          {a.name || "Unknown"}
+                          {a.email && (
+                            <a href={`mailto:${a.email}`} className="text-primary hover:underline ml-1">
+                              &lt;{a.email}&gt;
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {component.maintainers && component.maintainers.length > 0 && (
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Maintainers</h5>
+                    <div className="text-sm space-y-1">
+                      {component.maintainers.map((m, i) => (
+                        <div key={i}>
+                          {m.name || "Unknown"}
+                          {m.email && (
+                            <a href={`mailto:${m.email}`} className="text-primary hover:underline ml-1">
+                              &lt;{m.email}&gt;
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {component.publisher && (
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Publisher</h5>
+                    <div className="text-sm">{component.publisher}</div>
+                  </div>
+                )}
+
+                {!!component.supplier && (
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Supplier</h5>
+                    <div className="text-sm">
+                      {component.supplier.name || "Unknown"}
+                      {!!component.supplier.url && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {Array.from(component.supplier.url as any || []).map((url: any, i: number) => (
+                            <a key={i} href={url.toString()} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline break-all">
+                              {url.toString()}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           <Separator />
 
           <div>
@@ -301,7 +378,7 @@ export function ComponentDetailPanel({
             )}
           </div>
 
-          {propertiesCount > 0 && (
+          {component.properties && propertiesCount > 0 && (
             <>
               <Separator />
               <Collapsible
@@ -331,19 +408,36 @@ export function ComponentDetailPanel({
             </>
           )}
 
-          {component.purl && (
+          {component.hashes && (Array.isArray(component.hashes) ? component.hashes.length > 0 : (typeof component.hashes.size === 'number' ? component.hashes.size > 0 : false)) && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
+                Cryptographic Hashes
+                <HelpTooltip text="Cryptographic hashes verify the integrity of the component." />
+              </h4>
+              <div className="space-y-2">
+                {Array.from(component.hashes as any).map((hash: any, i) => (
+                  <div key={i} className="bg-muted p-2 rounded border">
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">{hash.alg}</div>
+                    <code className="text-[10px] break-all block">{hash.content}</code>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {component.purl ? (
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 Package URL (PURL)
                 <HelpTooltip text="Standardized identifier for software packages." />
               </h4>
               <code className="bg-muted p-2 rounded text-[10px] break-all block border">
-                {component.purl.toString()}
+                {String(component.purl)}
               </code>
             </div>
-          )}
+          ) : null}
 
-          {component.bomRef && (
+          {component.bomRef ? (
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 BOM Ref
@@ -353,7 +447,29 @@ export function ComponentDetailPanel({
                 {component.bomRef.value}
               </code>
             </div>
-          )}
+          ) : null}
+
+          {component._raw ? (
+            <>
+              <Separator />
+              <Collapsible>
+                <CollapsibleTrigger className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors w-full bg-transparent border-none p-0 group data-[state=open]:[&>svg]:rotate-90">
+                  <ChevronRight className="h-4 w-4 transition-transform" />
+                  <h4 className="text-sm font-semibold flex items-center gap-1">
+                    Raw JSON Data
+                    <HelpTooltip text="The complete, underlying CycloneDX JSON structure for this component, ensuring 100% of data is accessible." />
+                  </h4>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-2">
+                  <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
+                    <pre className="whitespace-pre-wrap break-all">
+                      {JSON.stringify(component._raw, null, 2)}
+                    </pre>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </>
+          ) : null}
 
           <Separator />
           

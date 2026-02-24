@@ -361,14 +361,15 @@ describe('VulnerabilitiesView', () => {
         const criticalText = screen.getByText('Immediate action');
         const criticalCard = criticalText.closest('[data-slot="card"]');
         if (!criticalCard) throw new Error('Critical card not found');
-        fireEvent.click(criticalCard);
+        
+        await userEvent.click(criticalCard);
 
         expect(screen.getByText('lodash')).toBeInTheDocument();
         expect(screen.getByText('express')).toBeInTheDocument();
         expect(screen.queryByText('axios')).not.toBeInTheDocument();
 
         // Click again to toggle off
-        fireEvent.click(criticalCard);
+        await userEvent.click(criticalCard);
         expect(screen.getByText('axios')).toBeInTheDocument();
     });
 
@@ -386,7 +387,7 @@ describe('VulnerabilitiesView', () => {
         const filterDropdown = dropdownContents.find(d => within(d).queryByText('Severity'));
         if (!filterDropdown) throw new Error('Filter dropdown not found');
         const criticalOption = within(filterDropdown).getByText('Critical');
-        fireEvent.click(criticalOption);
+        await userEvent.click(criticalOption);
 
         // Check if only lodash and express (have critical) are shown, axios (only high/medium) is hidden
         expect(screen.getByText('lodash')).toBeInTheDocument();
@@ -408,12 +409,12 @@ describe('VulnerabilitiesView', () => {
         const criticalText = screen.getByText('Immediate action');
         const criticalCard = criticalText.closest('[data-slot="card"]');
         if (!criticalCard) throw new Error('Critical card not found');
-        fireEvent.click(criticalCard);
+        await userEvent.click(criticalCard);
         
         expect(screen.queryByText('axios')).not.toBeInTheDocument();
 
         const clearBtn = screen.getByText(/clear/i);
-        fireEvent.click(clearBtn);
+        await userEvent.click(clearBtn);
 
         expect(screen.getByText('axios')).toBeInTheDocument();
     });
@@ -434,7 +435,7 @@ describe('VulnerabilitiesView', () => {
         const exportDropdown = dropdownContents.find(d => within(d).queryByText('Ticket Systems'));
         if (!exportDropdown) throw new Error('Export dropdown not found');
         const jiraOption = within(exportDropdown).getByText('Export for Jira');
-        fireEvent.click(jiraOption);
+        await userEvent.click(jiraOption);
 
         expect(generateTicketCSV).toHaveBeenCalled();
         expect(downloadCSV).toHaveBeenCalledWith("mock-csv", expect.stringContaining("jira"));

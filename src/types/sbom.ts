@@ -131,6 +131,9 @@ export interface MetadataQuality {
     properties: boolean;
     tools: boolean;
     dependencies: boolean;
+    versions: boolean;
+    types: boolean;
+    timestamp: boolean;
   };
 }
 
@@ -150,7 +153,7 @@ export interface LicenseDistribution {
 /**
  * Enhanced Component with pre-calculated vulnerability and license metadata
  */
-export interface EnhancedComponent extends Component {
+export interface EnhancedComponent extends Omit<Component, "supplier" | "author" | "publisher"> {
   vulnerabilities: {
     inherent: {
       Critical: Vulnerability[];
@@ -169,6 +172,13 @@ export interface EnhancedComponent extends Component {
   };
   licenseDistribution: LicenseDistribution;
   transitiveLicenseDistribution: LicenseDistribution;
+  // Extended fields that might be present in JSON from varying cyclonedx versions
+  author?: string;
+  authors?: Array<{ name?: string; email?: string }>;
+  maintainers?: Array<{ name?: string; email?: string }>;
+  supplier?: Models.OrganizationalEntity | any;
+  publisher?: string;
+  _raw?: unknown;
 }
 
 export type formattedSBOM = {
@@ -204,6 +214,10 @@ export type formattedSBOM = {
    * Top level component refs (roots of the tree)
    */
   topLevelRefs: string[];
+  /**
+   * Raw CycloneDX JSON
+   */
+  _raw?: unknown;
 };
 
 export interface Signature {

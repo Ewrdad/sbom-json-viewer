@@ -1,0 +1,16 @@
+# .syft.yaml
+file:
+  metadata:
+    selection: all # Tells Syft to look at EVERY file
+    digests: # Specify which algorithms you want
+      - sha256
+      - md5
+format:
+  cyclonedx-json:
+    pretty: true
+output:
+  - "cyclonedx-json"
+check-for-app-update: true
+package:
+  search-indexed-archives: true
+  search-unindexed-archives: true

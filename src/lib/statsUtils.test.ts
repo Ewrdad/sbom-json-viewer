@@ -186,6 +186,7 @@ describe('statsUtils Dependency Analysis', () => {
                         "bom-ref": "pkg1", 
                         name: "Package 1", 
                         version: "1.0.0",
+                        type: "library",
                         purl: "pkg...",
                         hashes: [{}],
                         licenses: [{}],
@@ -193,7 +194,7 @@ describe('statsUtils Dependency Analysis', () => {
                         properties: [{}]
                     }
                 ],
-                metadata: { tools: ["cdxgen"] },
+                metadata: { tools: ["cdxgen"], timestamp: "2024-01-01T00:00:00Z" },
                 dependencies: [{ ref: "pkg1", dependsOn: [] }],
                 vulnerabilities: []
             };

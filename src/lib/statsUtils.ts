@@ -42,7 +42,7 @@ export function calculateSbomStats(bom: any): SbomStats {
       metadataQuality: {
         score: 0,
         grade: "F",
-        checks: { purl: false, hashes: false, licenses: false, supplier: false, properties: false, tools: false, dependencies: false }
+        checks: { purl: false, hashes: false, licenses: false, supplier: false, properties: false, tools: false, dependencies: false, versions: false, types: false, timestamp: false }
       }
     }
   };
@@ -475,6 +475,9 @@ function calculateDeveloperStats(bom: any, components: any[]): any {
     properties: false,
     tools: false,
     dependencies: false,
+    versions: false,
+    types: false,
+    timestamp: false,
   };
 
   if (components.length > 0) {
@@ -483,6 +486,8 @@ function calculateDeveloperStats(bom: any, components: any[]): any {
     let licenseCount = 0;
     let supplierCount = 0;
     let propertyCount = 0;
+    let versionCount = 0;
+    let typeCount = 0;
 
     for (const comp of components) {
       if (comp.purl) purlCount++;
@@ -490,6 +495,8 @@ function calculateDeveloperStats(bom: any, components: any[]): any {
       if (comp.licenses && (Array.isArray(comp.licenses) ? comp.licenses.length > 0 : (typeof comp.licenses.size === 'number' ? comp.licenses.size > 0 : false))) licenseCount++;
       if (comp.supplier || comp.author) supplierCount++;
       if (comp.properties && (Array.isArray(comp.properties) ? comp.properties.length > 0 : (typeof comp.properties.size === 'number' ? comp.properties.size > 0 : false))) propertyCount++;
+      if (comp.version) versionCount++;
+      if (comp.type) typeCount++;
     }
 
     const standardThreshold = components.length * 0.5; // >50% threshold for essentials
@@ -500,6 +507,8 @@ function calculateDeveloperStats(bom: any, components: any[]): any {
     checks.licenses = licenseCount > standardThreshold;
     checks.supplier = supplierCount > lenientThreshold || supplierCount > 0; // Lockfiles often lack supplier info for most nodes
     checks.properties = propertyCount > lenientThreshold || propertyCount > 0; // properties are tool-specific extensions
+    checks.versions = versionCount > standardThreshold;
+    checks.types = typeCount > standardThreshold;
     
     // Check Tools & Dependencies at the BOM level
     const hasToolsArray = Array.isArray(bom.metadata?.tools);
@@ -507,26 +516,34 @@ function calculateDeveloperStats(bom: any, components: any[]): any {
     checks.tools = (hasToolsArray && bom.metadata.tools.length > 0) || (hasToolsComponents && bom.metadata.tools.components.length > 0) || !!bom.metadata?.tools?.services;
 
     checks.dependencies = !!bom.dependencies && (Array.isArray(bom.dependencies) ? bom.dependencies.length > 0 : (typeof bom.dependencies.size === 'number' ? bom.dependencies.size > 0 : true));
+    
+    checks.timestamp = !!bom.metadata?.timestamp;
   }
 
   const scoreMap = {
-    purl: 20,
-    hashes: 15,
-    licenses: 20,
-    supplier: 15,
-    properties: 10,
-    tools: 10,
+    versions: 20,
+    licenses: 15,
+    purl: 15,
     dependencies: 10,
+    hashes: 10,
+    supplier: 10,
+    timestamp: 5,
+    tools: 5,
+    types: 5,
+    properties: 5,
   };
 
   let score = 0;
-  if (checks.purl) score += scoreMap.purl;
-  if (checks.hashes) score += scoreMap.hashes;
+  if (checks.versions) score += scoreMap.versions;
   if (checks.licenses) score += scoreMap.licenses;
-  if (checks.supplier) score += scoreMap.supplier;
-  if (checks.properties) score += scoreMap.properties;
-  if (checks.tools) score += scoreMap.tools;
+  if (checks.purl) score += scoreMap.purl;
   if (checks.dependencies) score += scoreMap.dependencies;
+  if (checks.hashes) score += scoreMap.hashes;
+  if (checks.supplier) score += scoreMap.supplier;
+  if (checks.timestamp) score += scoreMap.timestamp;
+  if (checks.tools) score += scoreMap.tools;
+  if (checks.types) score += scoreMap.types;
+  if (checks.properties) score += scoreMap.properties;
 
   let grade: "A" | "B" | "C" | "D" | "F" = "F";
   if (score >= 70) grade = "A"; // Trivy FS natively satisfies 70 points perfectly.

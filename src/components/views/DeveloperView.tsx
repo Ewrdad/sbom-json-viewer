@@ -32,7 +32,7 @@ export default function DeveloperView({
     metadataQuality: {
       score: 0,
       grade: "F",
-      checks: { purl: false, hashes: false, licenses: false, supplier: false, properties: false, tools: false, dependencies: false }
+      checks: { purl: false, hashes: false, licenses: false, supplier: false, properties: false, tools: false, dependencies: false, versions: false, types: false, timestamp: false }
     }
   };
 

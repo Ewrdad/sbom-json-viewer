@@ -29,6 +29,7 @@ export const convertJsonToBom = async (
         purl: metaComp.purl,
       },
     );
+    (rootComponent as any)._raw = metaComp;
     bom.metadata.component = rootComponent;
     bom.components.add(rootComponent);
   }
@@ -57,6 +58,7 @@ export const convertJsonToBom = async (
       });
     }
 
+    (component as any)._raw = compData;
     bom.components.add(component);
   });
 
@@ -124,6 +126,8 @@ export const convertJsonToBom = async (
 
     bom.vulnerabilities.add(vuln as any);
   });
+
+  (bom as any)._raw = rawJson;
 
   await tick();
   return bom;

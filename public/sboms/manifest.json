@@ -20,16 +20,16 @@
       "group": "Examples"
     },
     {
-      "name": "Self Scan (Latest)",
-      "path": "sboms/self/latest.sbom.json",
-      "id": "self/latest",
-      "group": "Self Scan"
-    },
-    {
       "name": "Signed SBOM Demo",
       "path": "sboms/examples/signed-sample.sbom.json",
       "id": "examples/signed-sample",
       "group": "Examples"
+    },
+    {
+      "name": "Self Scan (Latest)",
+      "path": "sboms/self/latest.sbom.json",
+      "id": "self/latest",
+      "group": "Self Scan"
     }
   ]
 }

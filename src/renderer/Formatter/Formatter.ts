@@ -115,6 +115,7 @@ export const Formatter = async ({
     dependentsGraph: new Map<string, string[]>(),
     blastRadius: new Map<string, number>(),
     topLevelRefs: [],
+    _raw: (rawSBOM as any)._raw,
   };
 
   // 0. Initial statistics (can be slow on huge SBOMs)
