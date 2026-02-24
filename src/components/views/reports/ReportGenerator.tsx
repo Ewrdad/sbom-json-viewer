@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Download, FileImage } from "lucide-react";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-import html2canvas from "html2canvas";
+
 import type { SbomStats } from "@/types/sbom";
 
 interface ReportGeneratorProps {
@@ -617,6 +615,7 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
   
   const generateOverviewImage = async () => {
     try {
+      const html2canvas = (await import("html2canvas")).default;
       const { iframe, element } = await createReportIframe();
       
       const canvas = await html2canvas(element, { 
@@ -644,6 +643,8 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
 
   const generateOverviewReport = async () => {
     try {
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
       const { iframe, element } = await createReportIframe();
       
       const canvas = await html2canvas(element, { 
@@ -672,7 +673,9 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
     }
   };
 
-  const generateVulnerabilitiesReport = () => {
+  const generateVulnerabilitiesReport = async () => {
+    const { jsPDF } = await import("jspdf");
+    const autoTable = (await import("jspdf-autotable")).default;
     const doc = new jsPDF();
     doc.text("Vulnerabilities Report", 20, 20);
     doc.setFontSize(10);
@@ -697,7 +700,9 @@ export function ReportGenerator({ stats, sbomName = "SBOM Report" }: ReportGener
     doc.save("sbom-vulnerabilities-report.pdf");
   };
 
-  const generateLicensesReport = () => {
+  const generateLicensesReport = async () => {
+    const { jsPDF } = await import("jspdf");
+    const autoTable = (await import("jspdf-autotable")).default;
     const doc = new jsPDF();
     doc.text("Licenses Report", 20, 20);
     doc.setFontSize(10);

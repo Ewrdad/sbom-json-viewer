@@ -1,5 +1,4 @@
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+
 import { getVulnerabilityCardHtml, type VulnerabilityPrintData, type ComponentPrintData } from './vulnerabilityCardTemplate';
 
 /**
@@ -46,6 +45,7 @@ const captureFromIframe = async (element: HTMLElement): Promise<HTMLCanvasElemen
     const width = rect.width || element.offsetWidth;
     const height = rect.height || element.offsetHeight;
 
+    const html2canvas = (await import('html2canvas')).default;
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
@@ -94,6 +94,7 @@ export const exportVulnerabilityToPng = async (vulnerability: unknown, allVulner
 export const exportVulnerabilityToPdf = async (vulnerability: unknown, allVulnerableComponents: unknown[]) => {
   let iframeObj: { iframe: HTMLIFrameElement; element: HTMLElement } | null = null;
   try {
+    const { jsPDF } = await import('jspdf');
     const html = getVulnerabilityCardHtml(vulnerability as VulnerabilityPrintData, allVulnerableComponents as ComponentPrintData[]);
     iframeObj = await createCaptureIframe(html);
     const canvas = await captureFromIframe(iframeObj.element);
