@@ -5,6 +5,7 @@
   "type": "module",
   "license": "MIT-based(MODIFIED)",
   "scripts": {
+    "predev": "node scripts/generate-manifest.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
