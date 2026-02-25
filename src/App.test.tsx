@@ -140,7 +140,14 @@ class MockWorker {
             allLicenses: [],
             allLicenseComponents: [],
             cweCounts: {},
-            sourceCounts: {}
+            sourceCounts: {},
+            multiSbomStats: {
+              sources: [],
+              overlap: {
+                components: { total: 0, unique: 0, shared: 0 },
+                vulnerabilities: { total: 0, unique: 0, shared: 0 }
+              }
+            }
           }
         };
         this.onmessage({ data: { type: "complete", result: mockResult } });

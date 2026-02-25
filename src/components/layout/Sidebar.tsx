@@ -64,6 +64,12 @@ export function Sidebar() {
       icon: <Wrench className="h-4 w-4 mr-2" />,
       description: "Package hygiene, version conflicts, and metadata quality",
     },
+    {
+      id: "multi-stats",
+      label: "Multi-SBOM Stats",
+      icon: <LayoutDashboard className="h-4 w-4 mr-2" />,
+      description: "Compare overlaps and tool efficacy across multiple SBOMs",
+    },
   ];
 
   return (

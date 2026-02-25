@@ -53,7 +53,7 @@ export interface SbomStats {
     cwes?: number[];
     source?: { name?: string; url?: string };
     references?: { url: string; comment?: string }[];
-    ratings?: any[];
+    ratings?: Record<string, unknown>[];
     analysis?: {
       state?: string;
       justification?: string;
@@ -76,8 +76,8 @@ export interface SbomStats {
       organizations?: { name: string; url?: string }[];
       individuals?: { name: string; email?: string; url?: string }[];
     };
-    tools?: any[];
-    properties?: any[];
+    tools?: Record<string, unknown>[];
+    properties?: Record<string, unknown>[];
     affects?: {
       ref: string;
       versions?: { version: string; status: string }[];
@@ -107,6 +107,15 @@ export interface SbomStats {
   cweCounts: Record<string, number>;
   sourceCounts: Record<string, number>;
   developerStats?: DeveloperStats;
+  multiSbomStats?: MultiSbomStats;
+}
+
+export interface MultiSbomStats {
+  sources: { name: string; componentsFound: number; vulnerabilitiesFound: number }[];
+  overlap: {
+    components: { unique: 0; shared: 0; total: 0 };
+    vulnerabilities: { unique: 0; shared: 0; total: 0 };
+  };
 }
 
 export interface DeveloperStats {
@@ -176,9 +185,10 @@ export interface EnhancedComponent extends Omit<Component, "supplier" | "author"
   author?: string;
   authors?: Array<{ name?: string; email?: string }>;
   maintainers?: Array<{ name?: string; email?: string }>;
-  supplier?: Models.OrganizationalEntity | any;
+  supplier?: Models.OrganizationalEntity | Record<string, unknown>;
   publisher?: string;
   _raw?: unknown;
+  _rawSources?: { name: string; json: Record<string, unknown> }[];
 }
 
 export type formattedSBOM = {

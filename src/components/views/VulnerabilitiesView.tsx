@@ -39,8 +39,10 @@ import {
   User,
   Building,
   Download,
+  FileJson,
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -338,7 +340,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
   const handleExport = (platform: ExportPlatform) => {
     // We export activeList because it respects the current UI filter and search state,
     // ensuring the export matches exactly what the user sees in the table.
-    const csv = generateTicketCSV(activeList, viewMode, platform);
+    const csv = generateTicketCSV(activeList as (VulnerabilityItem | ComponentItem)[], viewMode, platform);
     const filename = `sbom-tickets-${platform.toLowerCase()}-${viewMode}-${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csv, filename);
   };
@@ -1442,6 +1444,61 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                                   )}
                                 </AccordionContent>
                               </AccordionItem>
+
+                              {/* 6. Raw JSON Data */}
+                              {(v._raw || (v._rawSources && v._rawSources.length > 0)) ? (
+                                <AccordionItem value="raw" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
+                                  <AccordionTrigger className="hover:no-underline py-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="p-2 bg-primary/10 rounded-lg">
+                                        <FileJson className="h-4 w-4 text-primary" />
+                                      </div>
+                                      <span className="font-bold flex items-center gap-2">
+                                        Raw JSON Data
+                                        <HelpTooltip text="The complete, underlying CycloneDX JSON structure for this vulnerability." />
+                                      </span>
+                                    </div>
+                                  </AccordionTrigger>
+                                  <AccordionContent className="pb-4 pt-2">
+                                    <Tabs defaultValue={v._rawSources && v._rawSources.length > 0 ? v._rawSources[0].name : "combined"} className="w-full">
+                                      {(v._rawSources && v._rawSources.length > 1) || v._raw ? (
+                                        <TabsList className="mb-2 w-full justify-start overflow-x-auto h-auto min-h-9 flex-wrap">
+                                          {v._rawSources?.map((src: {name: string, json: unknown}) => (
+                                            <TabsTrigger key={src.name} value={src.name} className="text-xs">
+                                              {src.name}
+                                            </TabsTrigger>
+                                          ))}
+                                          {v._raw && (
+                                            <TabsTrigger value="combined" className="text-xs">
+                                              Combined
+                                            </TabsTrigger>
+                                          )}
+                                        </TabsList>
+                                      ) : null}
+
+                                      {v._rawSources?.map((src: {name: string, json: unknown}) => (
+                                        <TabsContent key={src.name} value={src.name} className="mt-0">
+                                          <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
+                                            <pre className="whitespace-pre-wrap break-all">
+                                              {JSON.stringify(src.json, null, 2)}
+                                            </pre>
+                                          </div>
+                                        </TabsContent>
+                                      ))}
+
+                                      {v._raw && (
+                                        <TabsContent value="combined" className="mt-0">
+                                          <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
+                                            <pre className="whitespace-pre-wrap break-all">
+                                              {JSON.stringify(v._raw, null, 2)}
+                                            </pre>
+                                          </div>
+                                        </TabsContent>
+                                      )}
+                                    </Tabs>
+                                  </AccordionContent>
+                                </AccordionItem>
+                              ) : null}
                             </Accordion>
 
                             {v.references && v.references.length > 0 && (

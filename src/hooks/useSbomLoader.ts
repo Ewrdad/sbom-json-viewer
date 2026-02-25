@@ -52,6 +52,7 @@ export function useSbomLoader() {
         jsonText?: string;
         url?: string;
         file?: File;
+        files?: File[];
         filename: string;
       },
       loadId: number,
@@ -171,17 +172,19 @@ export function useSbomLoader() {
   );
 
   const handleImport = useCallback(
-    async (file: File) => {
+    async (files: File[]) => {
       const loadId = ++loadSequence.current;
       setSbom(null);
       setFormattedSbom(null);
       setSbomStats(null);
       setError(null);
-      setCurrentFile(`Local: ${file.name}`);
-      updateLoading(`Preparing ${file.name}...`, 0);
+      
+      const fileNameDisplay = files.length === 1 ? files[0].name : `Merged: ${files.map(f => f.name).join(', ')}`;
+      setCurrentFile(`Local: ${fileNameDisplay}`);
+      updateLoading(`Preparing ${fileNameDisplay}...`, 0);
 
       try {
-        await processWithWorker({ file, filename: file.name }, loadId);
+        await processWithWorker({ files, filename: fileNameDisplay }, loadId);
       } catch (err) {
         if (loadSequence.current !== loadId) return;
         const message =

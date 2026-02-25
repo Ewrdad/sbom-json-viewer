@@ -17,6 +17,7 @@ import { ChevronRight } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { SearchButton } from "@/components/common/SearchButton";
 import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ComponentDetailPanelProps {
   component: Component | EnhancedComponent;
@@ -53,7 +54,7 @@ export function ComponentDetailPanel({
   const propertiesCount = component.properties?.size || (Array.isArray(component.properties) ? component.properties.length : 0);
 
   // Helper to count vulns
-  const getVulnCount = (vulns: any) => {
+  const getVulnCount = (vulns: Record<string, unknown[]>) => {
     if (!vulns) return 0;
     return (vulns.Critical?.length || 0) + (vulns.High?.length || 0) + (vulns.Medium?.length || 0) + (vulns.Low?.length || 0);
   };
@@ -196,7 +197,7 @@ export function ComponentDetailPanel({
                       {component.supplier.name || "Unknown"}
                       {!!component.supplier.url && (
                         <div className="mt-1 flex flex-wrap gap-1">
-                          {Array.from(component.supplier.url as any || []).map((url: any, i: number) => (
+                          {Array.from((component.supplier.url as string[]) || []).map((url: string, i: number) => (
                             <a key={i} href={url.toString()} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline break-all">
                               {url.toString()}
                             </a>
@@ -396,7 +397,7 @@ export function ComponentDetailPanel({
                 </div>
                 <CollapsibleContent className="space-y-2">
                   <div className="rounded-md border p-2 text-xs font-mono bg-muted/50 overflow-auto max-h-[200px]">
-                    {Array.from(component.properties || []).map((prop: any, i) => (
+                    {Array.from(component.properties || []).map((prop: {name?: string, value?: string}, i) => (
                       <div key={i} className="grid grid-cols-3 gap-2 py-1 border-b last:border-0 border-border/50">
                         <span className="font-semibold text-muted-foreground truncate" title={prop.name}>{prop.name}</span>
                         <span className="col-span-2 truncate select-all" title={prop.value}>{prop.value}</span>
@@ -415,7 +416,7 @@ export function ComponentDetailPanel({
                 <HelpTooltip text="Cryptographic hashes verify the integrity of the component." />
               </h4>
               <div className="space-y-2">
-                {Array.from(component.hashes as any).map((hash: any, i) => (
+                {Array.from((component.hashes as unknown as {alg: string, content: string}[]) || []).map((hash: {alg?: string, content?: string}, i) => (
                   <div key={i} className="bg-muted p-2 rounded border">
                     <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1">{hash.alg}</div>
                     <code className="text-[10px] break-all block">{hash.content}</code>
@@ -449,7 +450,7 @@ export function ComponentDetailPanel({
             </div>
           ) : null}
 
-          {component._raw ? (
+          {component._raw || (component._rawSources && component._rawSources.length > 0) ? (
             <>
               <Separator />
               <Collapsible>
@@ -461,11 +462,42 @@ export function ComponentDetailPanel({
                   </h4>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-2">
-                  <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
-                    <pre className="whitespace-pre-wrap break-all">
-                      {JSON.stringify(component._raw, null, 2)}
-                    </pre>
-                  </div>
+                  <Tabs defaultValue={component._rawSources && component._rawSources.length > 0 ? component._rawSources[0].name : "combined"} className="w-full">
+                     {(component._rawSources && component._rawSources.length > 1) || component._raw ? (
+                      <TabsList className="mb-2 w-full justify-start overflow-x-auto h-auto min-h-9 flex-wrap">
+                        {component._rawSources?.map((src) => (
+                          <TabsTrigger key={src.name} value={src.name} className="text-xs">
+                            {src.name}
+                          </TabsTrigger>
+                        ))}
+                        {component._raw && (
+                          <TabsTrigger value="combined" className="text-xs">
+                            Combined
+                          </TabsTrigger>
+                        )}
+                      </TabsList>
+                     ) : null}
+
+                     {component._rawSources?.map((src) => (
+                       <TabsContent key={src.name} value={src.name} className="mt-0">
+                         <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
+                           <pre className="whitespace-pre-wrap break-all">
+                             {JSON.stringify(src.json, null, 2)}
+                           </pre>
+                         </div>
+                       </TabsContent>
+                     ))}
+
+                     {component._raw && (
+                       <TabsContent value="combined" className="mt-0">
+                         <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
+                           <pre className="whitespace-pre-wrap break-all">
+                             {JSON.stringify(component._raw, null, 2)}
+                           </pre>
+                         </div>
+                       </TabsContent>
+                     )}
+                  </Tabs>
                 </CollapsibleContent>
               </Collapsible>
             </>

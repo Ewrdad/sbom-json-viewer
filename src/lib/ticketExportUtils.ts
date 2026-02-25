@@ -23,7 +23,7 @@ interface VulnerabilityItem {
   description?: string;
   recommendation?: string;
   source?: { name?: string };
-  ratings?: { score: number }[];
+  ratings?: Record<string, unknown>[];
 }
 
 interface ComponentItem {

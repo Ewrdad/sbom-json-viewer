@@ -51,6 +51,11 @@ const ReverseDependencyTree = lazy(() =>
   })),
 );
 const DeveloperView = lazy(() => import("./components/views/DeveloperView"));
+const MultiSbomStatsView = lazy(() =>
+  import("./components/views/MultiSbomStatsView").then((module) => ({
+    default: module.MultiSbomStatsView,
+  })),
+);
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import { Upload, Download } from "lucide-react";
 import {
@@ -87,7 +92,7 @@ function AppContent({
   formattedSbom: formattedSBOM | null;
   sbomStats: SbomStats | null;
   currentFile: string;
-  onImport: (file: File) => void;
+  onImport: (files: File[]) => void;
   manifest: Manifest | null;
 }) {
   const { activeView } = useView();
@@ -99,9 +104,9 @@ function AppContent({
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      onImport(file);
+    const files = Array.from(event.target.files || []);
+    if (files.length > 0) {
+      onImport(files);
     }
   };
   return (
@@ -126,6 +131,7 @@ function AppContent({
           )}
           <input
             type="file"
+            multiple
             ref={fileInputRef}
             onChange={handleFileChange}
             accept=".json"
@@ -233,6 +239,12 @@ function AppContent({
           <KeepAliveView activeView={activeView} viewKey="developer">
             <ErrorBoundary resetKeys={[sbom]}>
               <DeveloperView sbom={sbom} preComputedStats={sbomStats || undefined} />
+            </ErrorBoundary>
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="multi-stats">
+            <ErrorBoundary resetKeys={[sbom]}>
+              <MultiSbomStatsView stats={sbomStats || undefined} />
             </ErrorBoundary>
           </KeepAliveView>
         </Suspense>

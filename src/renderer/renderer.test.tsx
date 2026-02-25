@@ -60,7 +60,7 @@ describe("Renderer", () => {
     });
 
     vi.doMock("./Formatter/Formatter", () => ({
-      Formatter: vi.fn(async ({ setProgress }) => {
+      Formatter: vi.fn().mockImplementation(async ({ setProgress }) => {
         setProgress({ progress: 50, message: "Formatting..." });
         return formatterPromise;
       }),
@@ -84,9 +84,9 @@ describe("Renderer", () => {
 
   it("renders statistics and components after formatting", async () => {
     vi.doMock("./Formatter/Formatter", () => ({
-      Formatter: vi.fn(async ({ setProgress }) => {
+      Formatter: vi.fn().mockImplementation(async ({ setProgress }) => {
         setProgress({ progress: 100, message: "Done" });
-        return mockFormatted as any;
+        return Promise.resolve(mockFormatted as any);
       }),
     }));
 
@@ -114,9 +114,9 @@ describe("Renderer", () => {
     });
 
     vi.doMock("./Formatter/Formatter", () => ({
-      Formatter: vi.fn(async ({ setProgress }) => {
+      Formatter: vi.fn().mockImplementation(async ({ setProgress }) => {
         setProgress({ progress: 100, message: "Done" });
-        return mockFormatted as any;
+        return Promise.resolve(mockFormatted as any);
       }),
     }));
 
