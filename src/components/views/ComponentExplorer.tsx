@@ -104,9 +104,33 @@ export function ComponentExplorer({
         },
         cell: ({ row }) => {
           const name = row.getValue("name") as string;
+          const rawSources = row.original._rawSources || [];
+          const isMerged = rawSources.length > 1;
+          
           return (
-            <div className="font-medium truncate" title={name}>
-              <HighlightedText text={formatComponentName(name)} highlight={deferredFilter} />
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="font-medium truncate" title={name}>
+                <HighlightedText text={formatComponentName(name)} highlight={deferredFilter} />
+              </div>
+              {isMerged && (
+                <HelpTooltip text={
+                  <div className="space-y-1.5 p-1">
+                    <p className="font-bold text-[10px] uppercase text-primary">Found in {rawSources.length} sources:</p>
+                    <ul className="list-disc pl-4 space-y-0.5">
+                      {rawSources.map((s: any, i: number) => (
+                        <li key={i} className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+                          {s.name} {i === 0 && <span className="text-[8px] font-bold text-green-600 ml-1">(Primary)</span>}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-[9px] italic border-t pt-1 mt-1 opacity-70">Metadata from the primary source is shown.</p>
+                  </div>
+                }>
+                  <Badge variant="outline" className="h-4 px-1 text-[8px] uppercase font-black bg-primary/5 text-primary border-primary/20 cursor-help shrink-0">
+                    Merged
+                  </Badge>
+                </HelpTooltip>
+              )}
             </div>
           );
         },
@@ -277,7 +301,7 @@ export function ComponentExplorer({
                   onChange={(e) => setGlobalFilter(e.target.value)}
                   className="w-[180px] lg:w-[250px]"
                 />
-                <HelpTooltip text="Searches across Name, PURL, Version, Group, Type, and Licenses." />
+                <HelpTooltip text="Searches across all visible columns (Name, PURL, Version, Group, Type, and Licenses)." />
               </div>
 
               <div className="flex items-center gap-2">

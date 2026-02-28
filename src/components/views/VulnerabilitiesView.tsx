@@ -9,16 +9,22 @@ import { useSbomStats } from "../../hooks/useSbomStats";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
-  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
   PieChart,
   Pie,
   Cell,
-  Tooltip,
   BarChart,
   Bar,
   XAxis,
   YAxis,
+  ResponsiveContainer,
 } from "recharts";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   ShieldAlert,
   ShieldCheck,
@@ -595,12 +601,11 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           />
                         ))}
                       </Pie>
-                      <Tooltip
+                      <RechartsTooltip 
                         contentStyle={CHART_TOOLTIP_STYLE}
                         labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                         itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                      />
-                    </PieChart>
+                      />                    </PieChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center">
@@ -677,12 +682,11 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                               );
                             }}
                           />
-                          <Tooltip
+                          <RechartsTooltip 
                             contentStyle={CHART_TOOLTIP_STYLE}
                             labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                             itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                          />
-                          <Bar dataKey="value" fill="#ca8a04" radius={[0, 4, 4, 0]} barSize={20} />
+                          />                          <Bar dataKey="value" fill="#ca8a04" radius={[0, 4, 4, 0]} barSize={20} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
@@ -755,12 +759,11 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           />
                         ))}
                       </Pie>
-                      <Tooltip
+                      <RechartsTooltip 
                         contentStyle={CHART_TOOLTIP_STYLE}
                         labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                         itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                      />
-                    </PieChart>
+                      />                    </PieChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center">
@@ -924,15 +927,24 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                <Button
-                  variant={showMuted ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setShowMuted(!showMuted)}
-                  className="h-8 gap-2 text-xs"
-                >
-                  {showMuted ? <EyeOff className="h-3.5 w-3.5" /> : <Filter className="h-3.5 w-3.5" />}
-                  {showMuted ? "Showing Muted" : "Hide Muted"}
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={showMuted ? "secondary" : "ghost"}
+                        size="sm"
+                        onClick={() => setShowMuted(!showMuted)}
+                        className="h-8 gap-2 text-xs"
+                      >
+                        {showMuted ? <EyeOff className="h-3.5 w-3.5" /> : <Filter className="h-3.5 w-3.5" />}
+                        {showMuted ? "Showing Muted" : "Hide Muted"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-[200px] text-[10px]">
+                      <p>Toggles visibility of vulnerabilities manually marked as 'Not Affected' via VEX assessments.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
 
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -11,6 +11,7 @@ import {
   GitGraph, 
   Wrench,
   Menu,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -114,6 +115,28 @@ export function Header({
 
         {/* Center: Metadata Badges (conditionally visible) */}
         <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted/30 border border-border/50">
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="secondary" className="h-6 text-[10px] cursor-help bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800">
+                  <ShieldCheck className="h-3 w-3 mr-1" />
+                  Privacy First
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs p-3">
+                <div className="space-y-1">
+                  <p className="font-bold text-xs flex items-center gap-2">
+                    <ShieldCheck className="h-3.5 w-3.5 text-green-600" /> 
+                    Zero-Knowledge Architecture
+                  </p>
+                  <p className="text-[10px] leading-relaxed text-muted-foreground">
+                    Your data is processed entirely in your browser. No files are uploaded to any server.
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {isRemote && (
             <Badge variant="secondary" className="h-6 text-[10px] bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
               <Globe className="h-3 w-3 mr-1" />

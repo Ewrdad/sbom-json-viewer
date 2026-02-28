@@ -8,7 +8,8 @@ import {
   Info,
   TrendingUp,
   Search,
-  Target
+  Target,
+  ArrowUpRight
 } from "lucide-react";
 import { 
   ScatterChart, 
@@ -21,8 +22,10 @@ import {
   Cell
 } from "recharts";
 import { useSbom } from "../../context/SbomContext";
+import { useView } from "../../context/ViewContext";
 import { getLicenseCategory } from "../../lib/licenseUtils";
 import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { cn } from "../../lib/utils";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "../../lib/chartTheme";
@@ -34,6 +37,7 @@ import { CHART_TOOLTIP_STYLE, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART
  */
 export const SupplyChainRiskView: React.FC = () => {
   const { formattedSbom } = useSbom();
+  const { setActiveView } = useView();
   const [searchTerm, setSearchTerm] = useState("");
 
   const componentMap = formattedSbom?.componentMap;
@@ -90,7 +94,11 @@ export const SupplyChainRiskView: React.FC = () => {
           total: (v.Critical?.length || 0) + (v.High?.length || 0) + (v.Medium?.length || 0) + (v.Low?.length || 0)
         }
       };
-    }).sort((a, b) => b.totalScore - a.totalScore);
+    }).sort((a, b) => b.totalScore - a.totalScore)
+      .map((item, index, self) => ({
+        ...item,
+        percentile: Math.round(((self.length - index) / self.length) * 100)
+      }));
   }, [componentMap, blastRadiusMap]);
 
   const filteredRiskData = useMemo(() => {
@@ -288,23 +296,46 @@ export const SupplyChainRiskView: React.FC = () => {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-mono text-muted-foreground w-4">{idx + 1}.</span>
-                          <h4 className="text-sm font-bold truncate max-w-[180px]" title={item.name}>
+                          <h4 className="text-sm font-bold truncate max-w-[150px]" title={item.name}>
                             {item.name}
                           </h4>
                           {item.vulns.critical > 0 && (
                             <div className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" />
                           )}
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-5 w-5 hover:bg-primary/10 hover:text-primary" 
+                              title="View in Explorer"
+                              onClick={() => setActiveView('explorer')}
+                            >
+                              <Search className="h-3 w-3" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-5 w-5 hover:bg-indigo-100 hover:text-indigo-600" 
+                              title="View in Graph"
+                              onClick={() => setActiveView('graph')}
+                            >
+                              <GitGraph className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                         <p className="text-[10px] text-muted-foreground pl-6">
                           v{item.version} • Impact: {item.blastRadius}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col items-end">
                         <span className={cn(
-                          "text-xs font-black",
+                          "text-xs font-black leading-none",
                           item.totalScore > 50 ? "text-destructive" : item.totalScore > 20 ? "text-orange-500" : "text-primary"
                         )}>
                           {item.totalScore}
+                        </span>
+                        <span className="text-[8px] text-muted-foreground font-medium mt-1 uppercase tracking-tighter">
+                          Top {100 - (item as any).percentile}% Risk
                         </span>
                       </div>
                     </div>
@@ -352,7 +383,8 @@ export const SupplyChainRiskView: React.FC = () => {
             <div className="space-y-2">
               <h4 className="text-sm font-bold">How is the Risk Score calculated?</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                The Risk Score is a composite metric designed to highlight components that pose the greatest threat to your project. It factors in:
+                The Risk Score is a composite metric designed to highlight components that pose the greatest threat. 
+                It utilizes a <strong>linear impact multiplier</strong> to ensure transitive risk is properly weighted against base severity.
               </p>
               <div className="grid md:grid-cols-3 gap-4 mt-2">
                 <div className="bg-background p-2 rounded border border-border/50">
@@ -365,7 +397,7 @@ export const SupplyChainRiskView: React.FC = () => {
                   <p className="text-[10px] font-bold uppercase mb-1 flex items-center gap-1">
                     <TrendingUp className="h-3 w-3 text-blue-500" /> Impact Multiplier
                   </p>
-                  <p className="text-[10px] text-muted-foreground">Security risk is multiplied by the component's Blast Radius (reachability in your app).</p>
+                  <p className="text-[10px] text-muted-foreground">Security risk is multiplied by <code>(1 + BlastRadius/100)</code>. This ensures vulnerabilities in high-reachability components are prioritized.</p>
                 </div>
                 <div className="bg-background p-2 rounded border border-border/50">
                   <p className="text-[10px] font-bold uppercase mb-1 flex items-center gap-1">
