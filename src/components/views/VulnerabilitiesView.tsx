@@ -76,7 +76,18 @@ const SEVERITY_COLORS = {
   None: "#16a34a",
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ * VulnerabilitiesView component
+ * Displays a comprehensive analysis of vulnerabilities found in the SBOM.
+ * Supports filtering by severity, searching, and exporting to various formats.
+ * 
+ * @example
+ * <VulnerabilitiesView sbom={sbomData} />
+ * 
+ * @param {Object} props - Component props
+ * @param {any} props.sbom - The raw SBOM data
+ * @param {SbomStats} [props.preComputedStats] - Optional pre-computed statistics
+ */
 export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; preComputedStats?: SbomStats }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
@@ -137,14 +148,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     };
   }, [stats, preComputedStats, assessments, showMuted]);
   
-  // Use cn to avoid unused error if needed, but it is used below.
-  // The error might be a red herring if tsc is confused.
-  
-  // Debug log (only in dev)
-  if (import.meta.env.DEV && !isLoadingStats) {
-    // Stats loaded
-  }
-
   const [viewMode, setViewMode] = useState<ViewMode>("components");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,9 +187,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
       if (filters.selectedSeverities) setSelectedSeverities(filters.selectedSeverities);
       if (filters.searchQuery) setSearchQuery(filters.searchQuery);
       
-      // Clear filters after applying so they don't persist forever
-      // but only if we want them to be "one-shot" from dashboard.
-      // For now let's keep them one-shot.
       setViewFilters('vulnerabilities', null);
     }
   }, [viewFilters, setViewFilters]);
@@ -239,7 +239,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
 
     if (selectedSeverities.length > 0) {
       list = list.filter(c => {
-        // Check if any of the component's severities are in the selected list
         return selectedSeverities.some(s => {
           const key = s.toLowerCase() as "critical" | "high" | "medium" | "low";
           return ((c as any)[key] || 0) > 0;
@@ -302,7 +301,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     (page + 1) * ITEMS_PER_PAGE,
   );
 
-  // 2. Top CWEs
   const topCwes = useMemo(() => {
     return Object.entries(displayStats.cweCounts || {})
       .map(([name, value]) => ({ name, value }))
@@ -310,7 +308,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
       .slice(0, 5);
   }, [displayStats.cweCounts]);
 
-  // 3. Top Sources
   const topSources = useMemo(() => {
     return Object.entries(displayStats.sourceCounts || {})
       .map(([name, value]) => ({ name, value }))
@@ -383,7 +380,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
       
       if (!enrichedSbom.vulnerabilities) enrichedSbom.vulnerabilities = [];
       
-      // Inject VEX data as properties/analysis
       enrichedSbom.vulnerabilities.forEach((v: any) => {
         const vex = assessments[v.id];
         if (vex) {
@@ -412,8 +408,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
       return;
     }
 
-    // We export activeList because it respects the current UI filter and search state,
-    // ensuring the export matches exactly what the user sees in the table.
     let exportList = activeList as (VulnerabilityItem | ComponentItem)[];
     if (selectedItems.length > 0) {
       exportList = (activeList as any[]).filter((item: any) => 
@@ -450,7 +444,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           </div>
         )}
 
-        {/* Data Source Notice */}
         <div className="flex flex-col gap-2 bg-muted/30 p-3 rounded border border-dashed">
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
             <Info className="h-3 w-3" />
@@ -462,7 +455,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           </div>
         </div>
 
-        {/* KPI Cards Row */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mb-6">
           <Card className="border-l-4 border-l-destructive/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -561,9 +553,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           </Card>
         </div>
 
-        {/* Charts Row */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {/* Severity Donut */}
           <Card className="shadow-sm border-muted-foreground/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -576,21 +566,22 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 {severityPieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                                              <Pie
-                                                data={severityPieData}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={55}
-                                                outerRadius={75}
-                                                paddingAngle={4}
-                                                dataKey="value"
-                                                className="cursor-pointer"
-                                                onClick={(data) => {
-                                                  if (data && data.name) {
-                                                    toggleSeverity(String(data.name));
-                                                  }
-                                                }}
-                                              >                        {severityPieData.map((entry, index) => (
+                      <Pie
+                        data={severityPieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={75}
+                        paddingAngle={4}
+                        dataKey="value"
+                        className="cursor-pointer"
+                        onClick={(data) => {
+                          if (data && data.name) {
+                            toggleSeverity(String(data.name));
+                          }
+                        }}
+                      >
+                        {severityPieData.map((entry, index) => (
                           <Cell 
                             key={`cell-${index}`} 
                             fill={entry.color} 
@@ -605,7 +596,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         contentStyle={CHART_TOOLTIP_STYLE}
                         labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                         itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                      />                    </PieChart>
+                      />
+                    </PieChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center">
@@ -637,7 +629,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
             </CardContent>
           </Card>
 
-            {/* Vulnerability Distribution / CWEs */}
             <Card className="shadow-sm border-muted-foreground/10 overflow-hidden relative">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -686,7 +677,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                             contentStyle={CHART_TOOLTIP_STYLE}
                             labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                             itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                          />                          <Bar dataKey="value" fill="#ca8a04" radius={[0, 4, 4, 0]} barSize={20} />
+                          />
+                          <Bar dataKey="value" fill="#ca8a04" radius={[0, 4, 4, 0]} barSize={20} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
@@ -694,35 +686,37 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     )
                   ) : (
                     <ResponsiveContainer width="100%" height="100%">
-                                                              <BarChart 
-                                                                data={barData}
-                                                                onClick={(data) => {
-                                                                  if (data && data.activeLabel) {
-                                                                    toggleSeverity(String(data.activeLabel));
-                                                                  }
-                                                                }}
-                                                                className="cursor-pointer"
-                                                              >                                            <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
-                                            <YAxis {...CHART_AXIS_PROPS} />
-                                            <Tooltip
-                                              cursor={CHART_CURSOR}
-                                              contentStyle={CHART_TOOLTIP_STYLE}
-                                              labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                                              itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                                            />
-                                            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                                              {barData.map((entry, index) => (
-                                                <Cell 
-                                                  key={`cell-${index}`} 
-                                                  fill={entry.fill}
-                                                  className={cn(
-                                                    "transition-opacity duration-300",
-                                                    selectedSeverities.length > 0 && !selectedSeverities.includes(entry.name) && "opacity-30"
-                                                  )}
-                                                />
-                                              ))}
-                                            </Bar>
-                                          </BarChart>                    </ResponsiveContainer>
+                      <BarChart 
+                        data={barData}
+                        onClick={(data) => {
+                          if (data && data.activeLabel) {
+                            toggleSeverity(String(data.activeLabel));
+                          }
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
+                        <YAxis {...CHART_AXIS_PROPS} />
+                        <RechartsTooltip
+                          cursor={CHART_CURSOR}
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                          itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                        />
+                        <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                          {barData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={entry.fill}
+                              className={cn(
+                                "transition-opacity duration-300",
+                                selectedSeverities.length > 0 && !selectedSeverities.includes(entry.name) && "opacity-30"
+                              )}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
                   )}
                 </div>
               </CardContent>
@@ -763,7 +757,8 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                         contentStyle={CHART_TOOLTIP_STYLE}
                         labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                         itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                      />                    </PieChart>
+                      />
+                    </PieChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center">
@@ -793,7 +788,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           </Card>
         </div>
 
-        {/* Vulnerable Components Table */}
         <Card className="shadow-sm border-muted-foreground/10">
           <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">Vulnerabilities list unavailable due to a rendering error.</div>}>
             <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
@@ -1058,7 +1052,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                               size="xs"
                               className="h-7 text-[10px]"
                               onClick={() => {
-                                // Cross-reference with SBOM components to get the full object
                                 const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
                                 setSelectedComponent(fullComp || comp);
                                 setSelectedVulnerability(null);
@@ -1204,7 +1197,6 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 </table>
               </div>
   
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between mt-4">
                   <p className="text-xs text-muted-foreground">
@@ -1242,6 +1234,10 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
   );
 }
 
+/**
+ * VulnerabilitiesSkeleton component
+ * Displays a loading state for the VulnerabilitiesView.
+ */
 export function VulnerabilitiesSkeleton() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

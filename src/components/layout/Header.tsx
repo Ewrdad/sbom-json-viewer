@@ -25,6 +25,14 @@ import { useView } from "../../context/ViewContext";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 
+/**
+ * @interface HeaderProps
+ * @description Properties for the Header component
+ * @property {Bom} sbom - The current CycloneDX SBOM object
+ * @property {string} currentFile - The name or path of the currently loaded file
+ * @property {string[]} processingLogs - Array of log messages from the SBOM processing worker
+ * @property {function} [onMenuClick] - Optional callback for mobile menu toggle
+ */
 interface HeaderProps {
   sbom: Bom;
   currentFile: string;
@@ -32,6 +40,20 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
+/**
+ * @function Header
+ * @description The main header component that displays current view title, SBOM metadata badges, 
+ * and global action buttons (Search, Download, Logs, Help).
+ * 
+ * @example
+ * <Header 
+ *   sbom={mySbom} 
+ *   currentFile="Local: my-app.json" 
+ *   processingLogs={["File read complete", "Deduplicating..."]} 
+ * />
+ * 
+ * @param {HeaderProps} props - Component props
+ */
 export function Header({
   sbom,
   currentFile,

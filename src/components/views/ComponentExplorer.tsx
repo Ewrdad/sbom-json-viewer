@@ -50,6 +50,19 @@ function HighlightedText({ text, highlight }: { text: string; highlight: string 
   );
 }
 
+/**
+ * @function ComponentExplorer
+ * @description A powerful data table for browsing and searching all components in the SBOM.
+ * Supports sorting, global filtering, deduplication "Merged" badges, and direct/transitive 
+ * dependency filtering.
+ * 
+ * @example
+ * <ComponentExplorer sbom={mySbom} formattedSbom={formattedData} />
+ * 
+ * @param {Object} props - Component props
+ * @param {any} props.sbom - The raw SBOM data
+ * @param {formattedSBOM} [props.formattedSbom] - Optional pre-formatted SBOM data
+ */
 export function ComponentExplorer({ 
   sbom,
   formattedSbom 
@@ -113,23 +126,24 @@ export function ComponentExplorer({
                 <HighlightedText text={formatComponentName(name)} highlight={deferredFilter} />
               </div>
               {isMerged && (
-                <HelpTooltip text={
-                  <div className="space-y-1.5 p-1">
-                    <p className="font-bold text-[10px] uppercase text-primary">Found in {rawSources.length} sources:</p>
-                    <ul className="list-disc pl-4 space-y-0.5">
-                      {rawSources.map((s: any, i: number) => (
-                        <li key={i} className="text-[10px] text-muted-foreground truncate max-w-[200px]">
-                          {s.name} {i === 0 && <span className="text-[8px] font-bold text-green-600 ml-1">(Primary)</span>}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="text-[9px] italic border-t pt-1 mt-1 opacity-70">Metadata from the primary source is shown.</p>
-                  </div>
-                }>
-                  <Badge variant="outline" className="h-4 px-1 text-[8px] uppercase font-black bg-primary/5 text-primary border-primary/20 cursor-help shrink-0">
+                <div className="flex items-center gap-1">
+                  <Badge variant="outline" className="h-4 px-1 text-[8px] uppercase font-black bg-primary/5 text-primary border-primary/20 shrink-0">
                     Merged
                   </Badge>
-                </HelpTooltip>
+                  <HelpTooltip text={
+                    <div className="space-y-1.5 p-1">
+                      <p className="font-bold text-[10px] uppercase text-primary">Found in {rawSources.length} sources:</p>
+                      <ul className="list-disc pl-4 space-y-0.5">
+                        {rawSources.map((s: any, i: number) => (
+                          <li key={i} className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+                            {s.name} {i === 0 && <span className="text-[8px] font-bold text-green-600 ml-1">(Primary)</span>}
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="text-[9px] italic border-t pt-1 mt-1 opacity-70">Metadata from the primary source is shown.</p>
+                    </div>
+                  } />
+                </div>
               )}
             </div>
           );

@@ -1,14 +1,28 @@
 import { CircleHelp } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
+/**
+ * @interface HelpTooltipProps
+ * @description Properties for the HelpTooltip component
+ * @property {ReactNode} text - The content to display inside the tooltip (can be string or JSX)
+ * @property {number} [size=14] - The size of the help icon in pixels
+ * @property {string} [className] - Additional CSS classes for the container
+ */
 interface HelpTooltipProps {
-  text: string;
+  text: ReactNode;
   size?: number;
   className?: string;
 }
 
+/**
+ * @function HelpTooltip
+ * @description Renders a help icon that shows a portal-based tooltip on hover.
+ * @example <HelpTooltip text="This is a simple tooltip" />
+ * @example <HelpTooltip text={<div><strong>Bold</strong> and more</div>} />
+ * @param {HelpTooltipProps} props - Component props
+ */
 export function HelpTooltip({ text, size = 14, className }: HelpTooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });

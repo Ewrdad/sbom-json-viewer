@@ -8,8 +8,7 @@ import {
   Info,
   TrendingUp,
   Search,
-  Target,
-  ArrowUpRight
+  Target
 } from "lucide-react";
 import { 
   ScatterChart, 
@@ -31,9 +30,13 @@ import { cn } from "../../lib/utils";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "../../lib/chartTheme";
 
 /**
- * SupplyChainRiskView component
- * Provides a high-level analysis of supply chain risks including vulnerability impact,
- * license compliance, and dependency centrality (blast radius).
+ * @function SupplyChainRiskView
+ * @description Provides a high-level analysis of supply chain risks including vulnerability impact,
+ * license compliance, and dependency centrality (blast radius). It calculates a composite
+ * Risk Score to help prioritize component remediation.
+ * 
+ * @example
+ * <SupplyChainRiskView />
  */
 export const SupplyChainRiskView: React.FC = () => {
   const { formattedSbom } = useSbom();
