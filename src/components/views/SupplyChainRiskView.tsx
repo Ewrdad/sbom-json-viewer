@@ -12,7 +12,6 @@ import {
   Zap,
   ArrowRight,
   ShieldCheck,
-  History,
   Activity,
   Layers,
   Wrench

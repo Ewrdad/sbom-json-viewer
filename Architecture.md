@@ -106,6 +106,7 @@ stateDiagram-v2
     components --> common
 
     common --> ErrorBoundaryTsx
+    common --> SectionErrorBoundaryTsx
     common --> HelpTooltipTsx
     common --> HelpGuideTsx
     common --> SearchButtonTsx
@@ -201,7 +202,7 @@ Web Worker responsible for:
   - **NEW**: **Live VEX Assessment** panel allows users to locally override vulnerability status (e.g., to "Not Affected") with justification.
   - **NEW**: **VEX-Enriched CycloneDX export** allows downloading a JSON SBOM with local assessments injected as properties and analysis states.
   - **NEW**: **Muted Filtering** allows users to toggle visibility of vulnerabilities they've assessed as non-risky.
-- **SupplyChainRiskView.tsx**: **NEW**: Analyzes component risk by combining security findings (vulnerability score), impact (blast radius), and license compliance. Features a Risk Exposure Matrix (scatter plot) and a risk-ranked leaderboard.
+- **SupplyChainRiskView.tsx**: **NEW**: Provides a multi-dimensional risk analysis (A-F grade) by combining security findings, transitive impact (blast radius), license compliance, and maintenance quality. Features an interactive Risk Exposure Matrix (scatter plot), a remediation priority planner, and a detailed risk-ranked leaderboard. Uses `useSbomStats` for integrated data analysis.
 - **MultiSbomStatsView.tsx**: Visualizes overlap and deduplication metrics when merging multiple SBOMs. 
   - **NEW**: **Source Efficacy Ranking** provides a weighted score (Metadata, Breadth, Depth) to identify the "Best" SBOM from multiple uploads.
   - **NEW**: **Discovery Gap Analysis (Blind Spots)** highlights components and vulnerabilities that were only found by a single scanner, helping audit tool coverage.

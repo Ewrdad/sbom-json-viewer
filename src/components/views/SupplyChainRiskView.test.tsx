@@ -25,7 +25,7 @@ vi.mock('../../hooks/useSbomStats', () => ({
             versionConflicts: [],
             metadataQuality: { score: 80, grade: 'A', checks: {} }
         }
-    } as SbomStats)
+    } as unknown as SbomStats)
 }));
 
 describe('SupplyChainRiskView', () => {
@@ -50,7 +50,7 @@ describe('SupplyChainRiskView', () => {
             }
         },
         licenses: [{ id: 'MIT' }] as any,
-        purl: 'pkg:npm/test-pkg@1.0.0'
+        purl: 'pkg:npm/test-pkg@1.0.0' as any
     };
 
     const mockFormattedSbom: Partial<formattedSBOM> = {
