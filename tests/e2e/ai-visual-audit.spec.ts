@@ -54,18 +54,23 @@ test.describe("AI Visual Audit & Responsive Verification", () => {
         
         // On mobile/tablet, the sidebar might be hidden behind a drawer
         if (vp.width < 1024) { // Including tablet here
-            const sidebar = page.locator('.fixed.left-0.top-0.w-64');
+            const sidebar = page.getByTestId("sidebar-wrapper");
             const isSidebarVisible = await sidebar.isVisible();
-            if (!isSidebarVisible) {
+            
+            // Check if sidebar is actually within viewport (not just in DOM)
+            const box = await sidebar.boundingBox();
+            const isInViewport = box && box.x >= 0;
+
+            if (!isSidebarVisible || !isInViewport) {
                 // Click mobile menu button
-                await page.click('button:has(svg.lucide-menu)');
+                await page.getByTestId("mobile-menu-button").click();
                 await expect(sidebar).toBeVisible();
                 await page.waitForTimeout(500);
             }
         }
 
         // Click the sidebar item
-        await page.click(`[data-testid="sidebar-link-${view.id}"]`);
+        await page.getByTestId(`sidebar-link-${view.id}`).click();
         
         // Give it a moment to render
         await page.waitForTimeout(2000);

@@ -4,7 +4,7 @@ test.describe("UI Audit Features (v0.5.0)", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto("/", { waitUntil: "networkidle" });
         // Ensure a known SBOM is loaded (sample-simple has vulnerabilities)
-        const selectorTrigger = page.getByTestId("sbom-selector-trigger");
+        const selectorTrigger = page.getByTestId("sbom-selector-input");
         await expect(selectorTrigger).toBeVisible({ timeout: 30000 });
         
         const fileInput = page.locator('input[type="file"]');

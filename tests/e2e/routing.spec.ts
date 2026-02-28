@@ -21,17 +21,19 @@ test.describe("SBOM Routing", () => {
     test.setTimeout(60000);
     await page.goto("/");
     
-    // 1. Click a different SBOM button
-    await page.getByTestId("sbom-selector-trigger").click();
-    await page.getByTestId("sbom-option-self/TrivyScan").click();
-    
+    // 1. Switch file via UI
+    await page.getByTestId("sbom-selector-input").click();
+    await page.waitForTimeout(500);
+    await page.getByTestId("sbom-option-self/TrivyScan").click({ force: true });
+
     // 2. Verify URL and content update
     await expect(page).toHaveURL(/.*#\/self\/TrivyScan/);
     await expect(page.getByTestId("current-file-display")).toContainText("self/TrivyScan");
     
     // 3. Click back to simple
-    await page.getByTestId("sbom-selector-trigger").click();
-    await page.getByTestId("sbom-option-self/latest").click();
+    await page.getByTestId("sbom-selector-input").click();
+    await page.waitForTimeout(500);
+    await page.getByTestId("sbom-option-self/latest").click({ force: true });
     await expect(page).toHaveURL(/.*#\/self\/latest/);
     await expect(page.getByTestId("current-file-display")).toContainText("self/latest");
   });
@@ -42,8 +44,9 @@ test.describe("SBOM Routing", () => {
     await expect(page.getByTestId("current-file-display")).toContainText("self/latest", { timeout: 45000 });
 
     // 1. Navigate to another file
-    await page.getByTestId("sbom-selector-trigger").click();
-    await page.getByTestId("sbom-option-self/TrivyScan").click();
+    await page.getByTestId("sbom-selector-input").click();
+    await page.waitForTimeout(500);
+    await page.getByTestId("sbom-option-self/TrivyScan").click({ force: true });
     await expect(page.getByTestId("current-file-display")).toContainText("self/TrivyScan", { timeout: 45000 });
 
     // 2. Go Back

@@ -95,7 +95,7 @@ export function Header({
         {/* Left Side: Title & Current Context */}
         <div className="flex items-center gap-2 md:gap-4 min-w-0">
           {onMenuClick && (
-            <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden shrink-0">
+            <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden shrink-0" data-testid="mobile-menu-button">
               <Menu className="h-5 w-5" />
             </Button>
           )}

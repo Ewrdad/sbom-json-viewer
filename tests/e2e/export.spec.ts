@@ -6,7 +6,7 @@ test.describe("Export Functionality", () => {
         await page.goto("/", { waitUntil: "networkidle" });
         
         // Wait for example to load
-        await expect(page.getByTestId("sbom-selector-trigger")).toBeVisible({ timeout: 30000 });
+        await expect(page.getByTestId("sbom-selector-input")).toBeVisible({ timeout: 30000 });
         
         // Since 'self' SBOMs typically have 0 vulnerabilities (as we just fixed them),
         // we will upload the examples/sample-simple file via the UI to explicitly test exports that require data.

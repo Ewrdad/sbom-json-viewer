@@ -6,7 +6,7 @@ test.describe("Vulnerabilities View", () => {
         await page.goto("/", { waitUntil: "networkidle" });
         
         // Wait for the manifest to load and buttons to appear
-        const selectorTrigger = page.getByTestId("sbom-selector-trigger");
+        const selectorTrigger = page.getByTestId("sbom-selector-input");
         await expect(selectorTrigger).toBeVisible({ timeout: 30000 });
         
         // Since 'self' SBOMs typically have 0 vulnerabilities (as we just fixed them),

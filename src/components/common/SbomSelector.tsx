@@ -81,6 +81,8 @@ export function SbomSelector({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="h-8"
+          data-testid="sbom-selector-input"
+          showTrigger={true}
         />
         <ComboboxContent>
           <ComboboxList>

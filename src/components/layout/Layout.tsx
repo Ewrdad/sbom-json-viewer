@@ -137,7 +137,9 @@ export function Layout({ children, sbom }: { children: ReactNode; sbom?: any }) 
       )}
 
       {/* Sidebar - fixed drawer on mobile, relative on desktop */}
-      <div className={cn(
+      <div 
+        data-testid="sidebar-wrapper"
+        className={cn(
         "z-50 h-full transition-transform duration-300 ease-in-out",
         isMobile 
           ? "fixed left-0 top-0 w-64 shadow-2xl bg-card" 
@@ -147,7 +149,6 @@ export function Layout({ children, sbom }: { children: ReactNode; sbom?: any }) 
         <Sidebar 
           mobileOpen={sidebarOpen} 
           setMobileOpen={setSidebarOpen} 
-          isMobile={isMobile}
         />
       </div>
 

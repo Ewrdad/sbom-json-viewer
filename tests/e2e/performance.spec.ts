@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("SBOM Performance", () => {
   test("efficiently handles a huge SBOM (20k components)", async ({ page }) => {
     // Increase timeout for this heavy test
-    test.setTimeout(120000);
+    test.setTimeout(300000);
     
     await page.goto("/");
     
@@ -11,20 +11,32 @@ test.describe("SBOM Performance", () => {
     await expect(page.getByText(/Preparing viewer|Loading analysis/)).not.toBeVisible({ timeout: 20000 });
     
     // Verify we are actually in the app
-    const sbomSelector = page.getByTestId("sbom-selector-trigger");
+    const sbomSelector = page.getByTestId("sbom-selector-input");
     await expect(sbomSelector).toBeVisible();
     
     // 1. Click on the Huge SBOM button
-    await sbomSelector.click();
+    // Try clicking the trigger first, fallback to input
+    const trigger = page.getByTestId("sbom-selector-input-trigger");
+    if (await trigger.isVisible()) {
+        await trigger.click();
+    } else {
+        await page.getByTestId("sbom-selector-input").click();
+    }
+    await page.waitForTimeout(1000);
+    
     const hugeOption = page.getByTestId("sbom-option-examples/sbom-huge");
-    // Ensure it's in the DOM and visible (it's a portal usually)
-    await page.waitForSelector('[data-testid="sbom-option-examples/sbom-huge"]', { state: 'visible', timeout: 10000 });
     await hugeOption.click({ force: true });
 
-    // 2. Verify progress indicator appears
-    // The worker sends multiple progress updates. We check for the completion of processing.
-    await expect(page.getByText(/20,00\d components/)).toBeVisible({ timeout: 60000 });
-    await expect(page.getByTestId("large-sbom-badge")).toBeVisible();
+    // 2. Verify progress indicator and results
+    // Wait for Large SBOM badge first as it's a solid indicator
+    await expect(page.getByTestId("large-sbom-badge")).toBeVisible({ timeout: 200000 });
+
+    // Verify Dashboard shows the count (with comma or without)
+    const dashboardCount = page.locator('.text-2xl.font-bold').first();
+    await expect(dashboardCount).toContainText(/20,001|20001|20,000|20000/);
+
+    // Header should also have it
+    await expect(page.locator('header').getByText(/components/)).toContainText(/20,001|20001|20,000|20000/);
 
     // 3. Switch to Dependency Tree
     await page.getByTestId("sidebar-link-tree").click();

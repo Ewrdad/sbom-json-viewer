@@ -16,11 +16,12 @@
     "test:coverage": "vitest --coverage",
     "test:perf": "vitest bench --run",
     "test:e2e": "CI=1 playwright test",
-    "test:e2e:core": "CI=1 playwright test tests/e2e/sbom-viewer.spec.ts tests/e2e/routing.spec.ts tests/e2e/upload.spec.ts tests/e2e/debug.spec.ts",
-    "test:e2e:features": "CI=1 playwright test tests/e2e/export.spec.ts tests/e2e/caching.spec.ts tests/e2e/multi-sbom.spec.ts tests/e2e/multi-sbom-stats.spec.ts tests/e2e/vulnerabilities.spec.ts",
-    "test:e2e:audit": "CI=1 playwright test tests/e2e/ui-audit-features.spec.ts",
+    "test:e2e:dashboard": "CI=1 playwright test tests/e2e/sbom-viewer.spec.ts tests/e2e/debug.spec.ts",
+    "test:e2e:vulnerabilities": "CI=1 playwright test tests/e2e/vulnerabilities.spec.ts",
+    "test:e2e:explorer": "CI=1 playwright test tests/e2e/ui-audit-features.spec.ts tests/e2e/routing.spec.ts",
+    "test:e2e:multi": "CI=1 playwright test tests/e2e/multi-sbom.spec.ts tests/e2e/multi-sbom-stats.spec.ts",
+    "test:e2e:system": "CI=1 playwright test tests/e2e/upload.spec.ts tests/e2e/export.spec.ts tests/e2e/caching.spec.ts tests/e2e/performance.spec.ts",
     "test:e2e:visual": "playwright test tests/e2e/ai-visual-audit.spec.ts",
-    "test:e2e:perf": "CI=1 playwright test tests/e2e/performance.spec.ts",
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {

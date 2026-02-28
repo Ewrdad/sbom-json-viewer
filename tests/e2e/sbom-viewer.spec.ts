@@ -27,16 +27,18 @@ test.describe("SBOM Viewer", () => {
   test("switches between sample and full SBOM files", async ({ page }) => {
     await gotoViewer(page);
 
-    // Open the combobox
-    await page.getByTestId("sbom-selector-trigger").click();
+    // Open the combobox by clicking the input
+    await page.getByTestId("sbom-selector-input").click();
+    await page.waitForTimeout(500);
     // Select the option
-    await page.getByTestId("sbom-option-self/TrivyScan").click();
+    await page.getByTestId("sbom-option-self/TrivyScan").click({ force: true });
     
     await expect(page.getByTestId("current-file-display")).toContainText("self/TrivyScan");
 
     // Switch back
-    await page.getByTestId("sbom-selector-trigger").click();
-    await page.getByTestId("sbom-option-self/latest").click();
+    await page.getByTestId("sbom-selector-input").click();
+    await page.waitForTimeout(500);
+    await page.getByTestId("sbom-option-self/latest").click({ force: true });
     
     await expect(
       page.getByTestId("current-file-display"),

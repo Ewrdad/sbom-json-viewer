@@ -8,6 +8,7 @@ import { useSbom } from "../../context/SbomContext";
 import type { ViewType } from "../../types";
 import { useSettings } from "../../context/SettingsContext";
 import { SbomSelector } from "../common/SbomSelector";
+import { useLayout } from "../../context/LayoutContext";
 
 /**
  * Sidebar component that provides navigation, SBOM selection, and settings toggles.
@@ -16,17 +17,16 @@ import { SbomSelector } from "../common/SbomSelector";
  * 
  * @param {boolean} mobileOpen - Whether the sidebar is open on mobile
  * @param {function} setMobileOpen - Function to toggle mobile sidebar state
- * @param {boolean} isMobile - Whether the current viewport is mobile
  */
 export function Sidebar({ 
   mobileOpen, 
-  setMobileOpen, 
-  isMobile 
+  setMobileOpen
 }: { 
   mobileOpen?: boolean; 
   setMobileOpen?: (open: boolean) => void;
-  isMobile?: boolean;
 }) {
+  const { isMobile } = useLayout();
+  
   const { activeView, setActiveView, isMultiSbom } = useView();
   const { sbomStats } = useSbom();
   const { highContrast, setHighContrast } = useSettings();
@@ -159,11 +159,14 @@ export function Sidebar({
   };
 
   return (
-    <div className={cn(
-      "border-r bg-card flex flex-col h-screen transition-all duration-300 relative",
-      isCollapsed ? "w-16" : "w-64",
-      isMobile && "border-none shadow-2xl"
-    )}>
+    <div 
+      data-testid="sidebar"
+      className={cn(
+        "border-r bg-card flex flex-col h-screen transition-all duration-300 relative",
+        isCollapsed ? "w-16" : "w-64",
+        isMobile && "border-none shadow-2xl"
+      )}
+    >
       <div className={cn("p-4 border-b flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
         {!isCollapsed && (
           <h1 className="font-bold text-lg flex items-center gap-2 truncate">
@@ -234,7 +237,7 @@ export function Sidebar({
 
       {/* SBOM Source and Options */}
       <div className="px-2 pb-2 mt-auto border-t pt-4 space-y-2">
-        {!isCollapsed && (
+        {(!isCollapsed || (isMobile && mobileOpen)) && (
           <div className="px-2 mb-2" data-testid="sbom-selector-trigger">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
               Current SBOM

@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:e311e490-9fb3-4920-a916-5ccf14836bef",
+  "serialNumber": "urn:uuid:a83dd389-8e0f-4ec5-a128-eda8cf94ffd1",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-28T14:09:25Z",
+    "timestamp": "2026-02-28T16:59:23Z",
     "tools": {
       "components": [
         {
@@ -21518,7 +21518,7 @@
   ],
   "vulnerabilities": [
     {
-      "bom-ref": "urn:uuid:824fbbd5-e419-4701-850a-94435503fcba",
+      "bom-ref": "urn:uuid:fe169035-825d-4afe-bf4a-c947c0ad4af3",
       "id": "GHSA-7r86-cg39-jmmj",
       "source": {
         "name": "github-language-javascript",
@@ -21568,7 +21568,7 @@
       ]
     },
     {
-      "bom-ref": "urn:uuid:4ed7af00-1f90-4cb6-80b2-6a15115349d3",
+      "bom-ref": "urn:uuid:790f553e-8c77-410c-acdd-d8bfded9c239",
       "id": "GHSA-23c5-xmqv-rm74",
       "source": {
         "name": "github-language-javascript",
