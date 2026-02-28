@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:29a41631-ea84-41a0-8807-75dcdbce9f82",
+  "serialNumber": "urn:uuid:9999ed5a-5525-43af-90a8-170453dea727",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-26T11:14:54.253Z",
+    "timestamp": "2026-02-28T14:09:20.082Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -5862,19 +5862,19 @@
       ]
     },
     {
-      "bom-ref": "@rollup/rollup-linux-x64-gnu@4.57.1",
+      "bom-ref": "@rollup/rollup-linux-x64-gnu@4.59.0",
       "type": "library",
       "name": "@rollup/rollup-linux-x64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "scope": "optional",
       "author": "Lukas Taegert-Atkinson",
       "description": "Native bindings for Rollup",
-      "purl": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.59.0",
       "properties": [],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.57.1.tgz"
+          "url": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.59.0.tgz"
         },
         {
           "type": "vcs",
@@ -5888,45 +5888,7 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "00171ae1c793e0df93bff1ada2d9d601e5d9519b8cffd010c82c8a6322a7a64e32a00ed0200b81b7a1e4829c3c90072d6257b0da6bdc91792fc7415fa089e72e"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ]
-    },
-    {
-      "bom-ref": "@rollup/rollup-linux-x64-musl@4.57.1",
-      "type": "library",
-      "name": "@rollup/rollup-linux-x64-musl",
-      "version": "4.57.1",
-      "scope": "optional",
-      "author": "Lukas Taegert-Atkinson",
-      "description": "Native bindings for Rollup",
-      "purl": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.57.1",
-      "properties": [],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.57.1.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git+https://github.com/rollup/rollup.git"
-        },
-        {
-          "type": "website",
-          "url": "https://rollupjs.org/"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "1c5a6cd09786b6e391d9ca27be045190709e903ee3fa0740b9733efe2ea41b342d161942b50929c2d37390d8fa421083a7b0d127bfaa0bfd558368ede6248e17"
+          "content": "dc01e6b50abfa6936e52ca4a025bc0f07b4bc9b9037e590cb8b2b80cfa3bec37ed8516fbd55f38fdce0c9562578b1673e2eaee207e2e69ad3b22aa00906eb87e"
         }
       ],
       "licenses": [
@@ -25102,19 +25064,19 @@
       ]
     },
     {
-      "bom-ref": "rollup@4.57.1",
+      "bom-ref": "rollup@4.59.0",
       "type": "library",
       "name": "rollup",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "scope": "required",
       "author": "Rich Harris",
       "description": "Next-generation ES module bundler",
-      "purl": "pkg:npm/rollup@4.57.1",
+      "purl": "pkg:npm/rollup@4.59.0",
       "properties": [],
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/rollup/-/rollup-4.57.1.tgz"
+          "url": "https://registry.npmjs.org/rollup/-/rollup-4.59.0.tgz"
         },
         {
           "type": "vcs",
@@ -25132,7 +25094,7 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "a102fa9602b77b6419790ee07202244b66193e0e6c970dfb858b9f27779d2a57d04861a6f080a8c6cc0ad799ed4b317f6bcfa1ede911cbb93ba16737050ef2f0"
+          "content": "da832997aedadf3087f47efd2de31c6c38575bf526586ff2db3baa9c5da342ae6eabd4db33d4d5c97bc0e3eb7e9ded8822405dacba40691400be8ed823f6327a"
         }
       ],
       "licenses": [
@@ -30030,6 +29992,7 @@
         "globals@16.5.0",
         "happy-dom@20.5.0",
         "jsdom@28.0.0",
+        "rollup@4.59.0",
         "shadcn@3.8.5",
         "typescript@5.9.3",
         "typescript-eslint@8.56.1",
@@ -31061,11 +31024,7 @@
       "dependsOn": []
     },
     {
-      "ref": "@rollup/rollup-linux-x64-gnu@4.57.1",
-      "dependsOn": []
-    },
-    {
-      "ref": "@rollup/rollup-linux-x64-musl@4.57.1",
+      "ref": "@rollup/rollup-linux-x64-gnu@4.59.0",
       "dependsOn": []
     },
     {
@@ -34009,11 +33968,10 @@
       "dependsOn": []
     },
     {
-      "ref": "rollup@4.57.1",
+      "ref": "rollup@4.59.0",
       "dependsOn": [
         "@types/estree@1.0.8",
-        "@rollup/rollup-linux-x64-gnu@4.57.1",
-        "@rollup/rollup-linux-x64-musl@4.57.1"
+        "@rollup/rollup-linux-x64-gnu@4.59.0"
       ]
     },
     {
@@ -34567,7 +34525,7 @@
         "fdir@6.5.0",
         "picomatch@4.0.3",
         "postcss@8.5.6",
-        "rollup@4.57.1",
+        "rollup@4.59.0",
         "tinyglobby@0.2.15"
       ]
     },

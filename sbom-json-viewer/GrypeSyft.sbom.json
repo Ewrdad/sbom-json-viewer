@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:af487b21-c186-4778-a9c3-cd35bc0cc263",
+  "serialNumber": "urn:uuid:94fb7b84-bdae-4994-9576-bd02a383b90d",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-26T11:14:30Z",
+    "timestamp": "2026-02-28T14:08:58Z",
     "tools": {
       "components": [
         {
@@ -4854,10 +4854,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-android-arm-eabi@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-android-arm-eabi%404.57.1%3Fpackage-id%3Df52b26bcbaa8568d",
+      "bom-ref": "pkg:npm/%40rollup/rollup-android-arm-eabi@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-android-arm-eabi%404.59.0%3Fpackage-id%3D937c178bf5991c37",
       "type": "library",
       "name": "@rollup/rollup-android-arm-eabi",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -4865,8 +4865,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-android-arm-eabi:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-android-arm-eabi@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-android-arm-eabi:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-android-arm-eabi@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -4886,55 +4886,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm-eabi:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm-eabi:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm_eabi:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm_eabi:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm_eabi:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm_eabi:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-android-arm-eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-android-arm-eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_android_arm_eabi:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_android_arm_eabi:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -4943,10 +4943,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-android-arm64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-android-arm64%404.57.1%3Fpackage-id%3D8ff150b198c67e25",
+      "bom-ref": "pkg:npm/%40rollup/rollup-android-arm64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-android-arm64%404.59.0%3Fpackage-id%3Da1ab131bf31539a2",
       "type": "library",
       "name": "@rollup/rollup-android-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -4954,8 +4954,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-android-arm64:\\@rollup\\/rollup-android-arm64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-android-arm64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-android-arm64:\\@rollup\\/rollup-android-arm64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-android-arm64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -4975,39 +4975,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm64:\\@rollup\\/rollup_android_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android-arm64:\\@rollup\\/rollup_android_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm64:\\@rollup\\/rollup-android-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm64:\\@rollup\\/rollup-android-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm64:\\@rollup\\/rollup_android_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android_arm64:\\@rollup\\/rollup_android_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup-android-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup-android-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup_android_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-android:\\@rollup\\/rollup_android_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup-android-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup-android-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup_android_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_android:\\@rollup\\/rollup_android_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-android-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-android-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_android_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_android_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5016,10 +5016,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-darwin-arm64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-darwin-arm64%404.57.1%3Fpackage-id%3Dc0bf948cfb9b0271",
+      "bom-ref": "pkg:npm/%40rollup/rollup-darwin-arm64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-darwin-arm64%404.59.0%3Fpackage-id%3Ddf21f93ff75f439a",
       "type": "library",
       "name": "@rollup/rollup-darwin-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5027,8 +5027,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-darwin-arm64:\\@rollup\\/rollup-darwin-arm64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-darwin-arm64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-darwin-arm64:\\@rollup\\/rollup-darwin-arm64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-darwin-arm64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5048,39 +5048,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin-arm64:\\@rollup\\/rollup_darwin_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin-arm64:\\@rollup\\/rollup_darwin_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_arm64:\\@rollup\\/rollup-darwin-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_arm64:\\@rollup\\/rollup-darwin-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_arm64:\\@rollup\\/rollup_darwin_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_arm64:\\@rollup\\/rollup_darwin_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup-darwin-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup-darwin-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup_darwin_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup_darwin_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup-darwin-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup-darwin-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup_darwin_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup_darwin_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-darwin-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-darwin-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_darwin_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_darwin_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5089,10 +5089,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-darwin-x64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-darwin-x64%404.57.1%3Fpackage-id%3D2f5666e82b6d8ea6",
+      "bom-ref": "pkg:npm/%40rollup/rollup-darwin-x64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-darwin-x64%404.59.0%3Fpackage-id%3D3fbe0c0f4a7845cf",
       "type": "library",
       "name": "@rollup/rollup-darwin-x64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5100,8 +5100,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-darwin-x64:\\@rollup\\/rollup-darwin-x64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-darwin-x64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-darwin-x64:\\@rollup\\/rollup-darwin-x64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-darwin-x64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5121,39 +5121,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin-x64:\\@rollup\\/rollup_darwin_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin-x64:\\@rollup\\/rollup_darwin_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_x64:\\@rollup\\/rollup-darwin-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_x64:\\@rollup\\/rollup-darwin-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_x64:\\@rollup\\/rollup_darwin_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin_x64:\\@rollup\\/rollup_darwin_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup-darwin-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup-darwin-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup_darwin_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-darwin:\\@rollup\\/rollup_darwin_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup-darwin-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup-darwin-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup_darwin_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_darwin:\\@rollup\\/rollup_darwin_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-darwin-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-darwin-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_darwin_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_darwin_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5162,10 +5162,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-freebsd-arm64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-freebsd-arm64%404.57.1%3Fpackage-id%3Dcb4c09c980619a14",
+      "bom-ref": "pkg:npm/%40rollup/rollup-freebsd-arm64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-freebsd-arm64%404.59.0%3Fpackage-id%3D59f32f3849eb4183",
       "type": "library",
       "name": "@rollup/rollup-freebsd-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5173,8 +5173,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-arm64:\\@rollup\\/rollup-freebsd-arm64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-freebsd-arm64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-arm64:\\@rollup\\/rollup-freebsd-arm64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-freebsd-arm64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5194,39 +5194,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-arm64:\\@rollup\\/rollup_freebsd_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-arm64:\\@rollup\\/rollup_freebsd_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_arm64:\\@rollup\\/rollup-freebsd-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_arm64:\\@rollup\\/rollup-freebsd-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_arm64:\\@rollup\\/rollup_freebsd_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_arm64:\\@rollup\\/rollup_freebsd_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup-freebsd-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup-freebsd-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup_freebsd_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup_freebsd_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup-freebsd-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup-freebsd-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup_freebsd_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup_freebsd_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-freebsd-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-freebsd-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_freebsd_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_freebsd_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5235,10 +5235,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-freebsd-x64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-freebsd-x64%404.57.1%3Fpackage-id%3Da49059c973f3c793",
+      "bom-ref": "pkg:npm/%40rollup/rollup-freebsd-x64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-freebsd-x64%404.59.0%3Fpackage-id%3D3367e3f4aa178ddc",
       "type": "library",
       "name": "@rollup/rollup-freebsd-x64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5246,8 +5246,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-x64:\\@rollup\\/rollup-freebsd-x64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-freebsd-x64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-x64:\\@rollup\\/rollup-freebsd-x64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-freebsd-x64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5267,39 +5267,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-x64:\\@rollup\\/rollup_freebsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd-x64:\\@rollup\\/rollup_freebsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_x64:\\@rollup\\/rollup-freebsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_x64:\\@rollup\\/rollup-freebsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_x64:\\@rollup\\/rollup_freebsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd_x64:\\@rollup\\/rollup_freebsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup-freebsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup-freebsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup_freebsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-freebsd:\\@rollup\\/rollup_freebsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup-freebsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup-freebsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup_freebsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_freebsd:\\@rollup\\/rollup_freebsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-freebsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-freebsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_freebsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_freebsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5308,10 +5308,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm-gnueabihf@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm-gnueabihf%404.57.1%3Fpackage-id%3D60a697273449b3df",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm-gnueabihf@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm-gnueabihf%404.59.0%3Fpackage-id%3D5c3bb8663e72801b",
       "type": "library",
       "name": "@rollup/rollup-linux-arm-gnueabihf",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5319,8 +5319,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-gnueabihf:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm-gnueabihf@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-gnueabihf:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm-gnueabihf@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5340,55 +5340,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-gnueabihf:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-gnueabihf:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_gnueabihf:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_gnueabihf:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_gnueabihf:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_gnueabihf:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm-gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm-gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm_gnueabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm_gnueabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5397,10 +5397,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm-musleabihf@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm-musleabihf%404.57.1%3Fpackage-id%3Dd1d131bb282bbc52",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm-musleabihf@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm-musleabihf%404.59.0%3Fpackage-id%3D393dc7e4cd226385",
       "type": "library",
       "name": "@rollup/rollup-linux-arm-musleabihf",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5408,8 +5408,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-musleabihf:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm-musleabihf@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-musleabihf:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm-musleabihf@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5429,55 +5429,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-musleabihf:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm-musleabihf:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_musleabihf:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_musleabihf:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_musleabihf:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm_musleabihf:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm-musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm-musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm_musleabihf:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm_musleabihf:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5486,10 +5486,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm64-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm64-gnu%404.57.1%3Fpackage-id%3Dc5d9966886858e73",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm64-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm64-gnu%404.59.0%3Fpackage-id%3D9e85cd22dad6d05b",
       "type": "library",
       "name": "@rollup/rollup-linux-arm64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5497,8 +5497,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-gnu:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-gnu:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5518,55 +5518,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-gnu:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-gnu:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_gnu:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_gnu:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_gnu:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_gnu:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5575,10 +5575,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm64-musl@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm64-musl%404.57.1%3Fpackage-id%3Daadeaa188992243f",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-arm64-musl@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-arm64-musl%404.59.0%3Fpackage-id%3D095f746f2fcc1bbf",
       "type": "library",
       "name": "@rollup/rollup-linux-arm64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5586,8 +5586,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-musl:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-musl@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-musl:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-musl@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5607,55 +5607,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-musl:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64-musl:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_musl:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_musl:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_musl:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64_musl:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-arm64:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_arm64:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-arm64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_arm64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5664,10 +5664,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-loong64-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-loong64-gnu%404.57.1%3Fpackage-id%3Db46124ef2cfc09f0",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-loong64-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-loong64-gnu%404.59.0%3Fpackage-id%3D715050a5da843ee2",
       "type": "library",
       "name": "@rollup/rollup-linux-loong64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5675,8 +5675,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-gnu:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-gnu:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5696,55 +5696,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-gnu:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-gnu:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_gnu:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_gnu:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_gnu:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_gnu:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-loong64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-loong64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_loong64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_loong64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5753,10 +5753,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-loong64-musl@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-loong64-musl%404.57.1%3Fpackage-id%3Df2903faddc51fcba",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-loong64-musl@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-loong64-musl%404.59.0%3Fpackage-id%3Dd578a58f7b405f96",
       "type": "library",
       "name": "@rollup/rollup-linux-loong64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5764,8 +5764,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-musl:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-musl@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-musl:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-musl@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5785,55 +5785,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-musl:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64-musl:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_musl:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_musl:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_musl:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64_musl:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-loong64:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_loong64:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-loong64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-loong64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_loong64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_loong64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5842,10 +5842,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-ppc64-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-ppc64-gnu%404.57.1%3Fpackage-id%3D1f2a7d0e339299b0",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-ppc64-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-ppc64-gnu%404.59.0%3Fpackage-id%3D770fbc1b70d9d16e",
       "type": "library",
       "name": "@rollup/rollup-linux-ppc64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5853,8 +5853,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-gnu:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-gnu:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5874,55 +5874,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-gnu:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-gnu:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_gnu:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_gnu:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_gnu:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_gnu:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-ppc64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-ppc64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_ppc64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_ppc64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -5931,10 +5931,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-ppc64-musl@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-ppc64-musl%404.57.1%3Fpackage-id%3D22778fe00d0de750",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-ppc64-musl@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-ppc64-musl%404.59.0%3Fpackage-id%3D245532d0899241fb",
       "type": "library",
       "name": "@rollup/rollup-linux-ppc64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -5942,8 +5942,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-musl:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-musl@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-musl:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-musl@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -5963,55 +5963,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-musl:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64-musl:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_musl:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_musl:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_musl:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64_musl:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-ppc64:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_ppc64:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-ppc64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-ppc64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_ppc64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_ppc64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6020,10 +6020,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-riscv64-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-riscv64-gnu%404.57.1%3Fpackage-id%3D0ac94ba3ad5ba8f0",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-riscv64-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-riscv64-gnu%404.59.0%3Fpackage-id%3D74b38d32d0da6ee2",
       "type": "library",
       "name": "@rollup/rollup-linux-riscv64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6031,8 +6031,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-gnu:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-gnu:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6052,55 +6052,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-gnu:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-gnu:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_gnu:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_gnu:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_gnu:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_gnu:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-riscv64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-riscv64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_riscv64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_riscv64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6109,10 +6109,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-riscv64-musl@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-riscv64-musl%404.57.1%3Fpackage-id%3D06639ef5fc42345f",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-riscv64-musl@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-riscv64-musl%404.59.0%3Fpackage-id%3D12a72e36bdf98309",
       "type": "library",
       "name": "@rollup/rollup-linux-riscv64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6120,8 +6120,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-musl:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-musl@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-musl:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-musl@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6141,55 +6141,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-musl:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64-musl:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_musl:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_musl:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_musl:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64_musl:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-riscv64:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_riscv64:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-riscv64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-riscv64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_riscv64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_riscv64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6198,10 +6198,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-s390x-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-s390x-gnu%404.57.1%3Fpackage-id%3Daaa244e8836f76e2",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-s390x-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-s390x-gnu%404.59.0%3Fpackage-id%3Da95f9f3bb379fbd4",
       "type": "library",
       "name": "@rollup/rollup-linux-s390x-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6209,8 +6209,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x-gnu:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-s390x-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x-gnu:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-s390x-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6230,55 +6230,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x-gnu:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x-gnu:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x_gnu:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x_gnu:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x_gnu:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x_gnu:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-s390x:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_s390x:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-s390x-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-s390x-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_s390x_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_s390x_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6287,10 +6287,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-x64-gnu%404.57.1%3Fpackage-id%3Dcae36063bb5d5f0a",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-x64-gnu%404.59.0%3Fpackage-id%3Df177575c30b4e93d",
       "type": "library",
       "name": "@rollup/rollup-linux-x64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6298,8 +6298,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-gnu:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-gnu:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6319,55 +6319,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-gnu:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-gnu:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_gnu:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_gnu:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_gnu:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_gnu:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6376,10 +6376,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-x64-musl%404.57.1%3Fpackage-id%3D98b2ed38a7cce400",
+      "bom-ref": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-linux-x64-musl%404.59.0%3Fpackage-id%3Dfbdf0465ad777dc4",
       "type": "library",
       "name": "@rollup/rollup-linux-x64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6387,8 +6387,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-musl:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-musl:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6408,55 +6408,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-musl:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64-musl:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_musl:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_musl:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_musl:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64_musl:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux-x64:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux_x64:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-linux:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_linux:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-x64-musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-linux-x64-musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_x64_musl:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_linux_x64_musl:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6465,10 +6465,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-openbsd-x64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-openbsd-x64%404.57.1%3Fpackage-id%3D34479895e11127ca",
+      "bom-ref": "pkg:npm/%40rollup/rollup-openbsd-x64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-openbsd-x64%404.59.0%3Fpackage-id%3D0719d04d129ac341",
       "type": "library",
       "name": "@rollup/rollup-openbsd-x64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6476,8 +6476,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-openbsd-x64:\\@rollup\\/rollup-openbsd-x64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-openbsd-x64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-openbsd-x64:\\@rollup\\/rollup-openbsd-x64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-openbsd-x64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6497,39 +6497,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-openbsd-x64:\\@rollup\\/rollup_openbsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-openbsd-x64:\\@rollup\\/rollup_openbsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd_x64:\\@rollup\\/rollup-openbsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd_x64:\\@rollup\\/rollup-openbsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd_x64:\\@rollup\\/rollup_openbsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd_x64:\\@rollup\\/rollup_openbsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-openbsd:\\@rollup\\/rollup-openbsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-openbsd:\\@rollup\\/rollup-openbsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-openbsd:\\@rollup\\/rollup_openbsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-openbsd:\\@rollup\\/rollup_openbsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd:\\@rollup\\/rollup-openbsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd:\\@rollup\\/rollup-openbsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd:\\@rollup\\/rollup_openbsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openbsd:\\@rollup\\/rollup_openbsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-openbsd-x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-openbsd-x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_openbsd_x64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_openbsd_x64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6538,10 +6538,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-openharmony-arm64@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-openharmony-arm64%404.57.1%3Fpackage-id%3Ddf80a4ddb5cea03d",
+      "bom-ref": "pkg:npm/%40rollup/rollup-openharmony-arm64@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-openharmony-arm64%404.59.0%3Fpackage-id%3Dc89146092105e213",
       "type": "library",
       "name": "@rollup/rollup-openharmony-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6549,8 +6549,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-openharmony-arm64:\\@rollup\\/rollup-openharmony-arm64:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-openharmony-arm64@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-openharmony-arm64:\\@rollup\\/rollup-openharmony-arm64:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-openharmony-arm64@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6570,39 +6570,39 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-openharmony-arm64:\\@rollup\\/rollup_openharmony_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-openharmony-arm64:\\@rollup\\/rollup_openharmony_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony_arm64:\\@rollup\\/rollup-openharmony-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony_arm64:\\@rollup\\/rollup-openharmony-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony_arm64:\\@rollup\\/rollup_openharmony_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony_arm64:\\@rollup\\/rollup_openharmony_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-openharmony:\\@rollup\\/rollup-openharmony-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-openharmony:\\@rollup\\/rollup-openharmony-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-openharmony:\\@rollup\\/rollup_openharmony_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-openharmony:\\@rollup\\/rollup_openharmony_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony:\\@rollup\\/rollup-openharmony-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony:\\@rollup\\/rollup-openharmony-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony:\\@rollup\\/rollup_openharmony_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_openharmony:\\@rollup\\/rollup_openharmony_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-openharmony-arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-openharmony-arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_openharmony_arm64:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_openharmony_arm64:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6611,10 +6611,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-win32-arm64-msvc@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-arm64-msvc%404.57.1%3Fpackage-id%3D89ce5edc0c737d19",
+      "bom-ref": "pkg:npm/%40rollup/rollup-win32-arm64-msvc@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-arm64-msvc%404.59.0%3Fpackage-id%3D661459fe406a9b8c",
       "type": "library",
       "name": "@rollup/rollup-win32-arm64-msvc",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6622,8 +6622,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64-msvc:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-win32-arm64-msvc@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64-msvc:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-win32-arm64-msvc@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6643,55 +6643,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64-msvc:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64-msvc:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64_msvc:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64_msvc:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64_msvc:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64_msvc:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-arm64:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_arm64:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-arm64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-arm64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_arm64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_arm64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6700,10 +6700,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-win32-ia32-msvc@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-ia32-msvc%404.57.1%3Fpackage-id%3Dc5e82752d2d5cee7",
+      "bom-ref": "pkg:npm/%40rollup/rollup-win32-ia32-msvc@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-ia32-msvc%404.59.0%3Fpackage-id%3D8aa073d61bc13063",
       "type": "library",
       "name": "@rollup/rollup-win32-ia32-msvc",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6711,8 +6711,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32-msvc:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-win32-ia32-msvc@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32-msvc:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-win32-ia32-msvc@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6732,55 +6732,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32-msvc:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32-msvc:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32_msvc:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32_msvc:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32_msvc:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32_msvc:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-ia32:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_ia32:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-ia32-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-ia32-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_ia32_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_ia32_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6789,10 +6789,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-win32-x64-gnu@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-x64-gnu%404.57.1%3Fpackage-id%3D1c64114848edb43b",
+      "bom-ref": "pkg:npm/%40rollup/rollup-win32-x64-gnu@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-x64-gnu%404.59.0%3Fpackage-id%3D824f42275c9a3a49",
       "type": "library",
       "name": "@rollup/rollup-win32-x64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6800,8 +6800,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-gnu:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-win32-x64-gnu@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-gnu:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-win32-x64-gnu@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6821,55 +6821,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-gnu:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-gnu:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_gnu:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_gnu:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_gnu:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_gnu:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-x64-gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-x64-gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_x64_gnu:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_x64_gnu:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -6878,10 +6878,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/%40rollup/rollup-win32-x64-msvc@4.57.1?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-x64-msvc%404.57.1%3Fpackage-id%3D80ef4b2745dae265",
+      "bom-ref": "pkg:npm/%40rollup/rollup-win32-x64-msvc@4.59.0?package-id=pkg%3Anpm%2F%2540rollup%2Frollup-win32-x64-msvc%404.59.0%3Fpackage-id%3D42ffc26d7f95b645",
       "type": "library",
       "name": "@rollup/rollup-win32-x64-msvc",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -6889,8 +6889,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-msvc:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/%40rollup/rollup-win32-x64-msvc@4.57.1",
+      "cpe": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-msvc:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/%40rollup/rollup-win32-x64-msvc@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -6910,55 +6910,55 @@
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-msvc:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64-msvc:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_msvc:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_msvc:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_msvc:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64_msvc:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32-x64:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32_x64:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup-win32:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup_win32:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-x64-msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup-win32-x64-msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:cpe23",
-          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_x64_msvc:4.57.1:*:*:*:*:*:*:*"
+          "value": "cpe:2.3:a:\\@rollup\\/rollup:\\@rollup\\/rollup_win32_x64_msvc:4.59.0:*:*:*:*:*:*:*"
         },
         {
           "name": "syft:location:0:path",
@@ -19057,10 +19057,10 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/rollup@4.57.1?package-id=pkg%3Anpm%2Frollup%404.57.1%3Fpackage-id%3D60b4a1ddaf60f615",
+      "bom-ref": "pkg:npm/rollup@4.59.0?package-id=pkg%3Anpm%2Frollup%404.59.0%3Fpackage-id%3D5c6ef20c5be49ec1",
       "type": "library",
       "name": "rollup",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "licenses": [
         {
           "license": {
@@ -19068,8 +19068,8 @@
           }
         }
       ],
-      "cpe": "cpe:2.3:a:rollup:rollup:4.57.1:*:*:*:*:*:*:*",
-      "purl": "pkg:npm/rollup@4.57.1",
+      "cpe": "cpe:2.3:a:rollup:rollup:4.59.0:*:*:*:*:*:*:*",
+      "purl": "pkg:npm/rollup@4.59.0",
       "properties": [
         {
           "name": "syft:package:foundBy",
@@ -21899,7 +21899,7 @@
       ]
     },
     {
-      "ref": "pkg:npm/rollup@4.57.1?package-id=pkg%3Anpm%2Frollup%404.57.1%3Fpackage-id%3D60b4a1ddaf60f615",
+      "ref": "pkg:npm/rollup@4.59.0?package-id=pkg%3Anpm%2Frollup%404.59.0%3Fpackage-id%3D5c6ef20c5be49ec1",
       "dependsOn": [
         "pkg:npm/%40types/estree@1.0.8?package-id=pkg%3Anpm%2F%2540types%2Festree%401.0.8%3Fpackage-id%3Deaeecb2e8a2cdeab"
       ]
@@ -21995,7 +21995,7 @@
         "pkg:npm/fdir@6.5.0?package-id=pkg%3Anpm%2Ffdir%406.5.0%3Fpackage-id%3D4d9064c107e69a4e",
         "pkg:npm/picomatch@4.0.3?package-id=pkg%3Anpm%2Fpicomatch%404.0.3%3Fpackage-id%3Da0ad1a2fe5d5d793",
         "pkg:npm/postcss@8.5.6?package-id=pkg%3Anpm%2Fpostcss%408.5.6%3Fpackage-id%3Da16deb6076942246",
-        "pkg:npm/rollup@4.57.1?package-id=pkg%3Anpm%2Frollup%404.57.1%3Fpackage-id%3D60b4a1ddaf60f615",
+        "pkg:npm/rollup@4.59.0?package-id=pkg%3Anpm%2Frollup%404.59.0%3Fpackage-id%3D5c6ef20c5be49ec1",
         "pkg:npm/tinyglobby@0.2.15?package-id=pkg%3Anpm%2Ftinyglobby%400.2.15%3Fpackage-id%3D7ab9768b3a0c7084"
       ]
     },
@@ -22010,73 +22010,6 @@
       "ref": "pkg:npm/vscode-languageserver@9.0.1?package-id=pkg%3Anpm%2Fvscode-languageserver%409.0.1%3Fpackage-id%3Dfc1eb1a12ac3d23c",
       "dependsOn": [
         "pkg:npm/vscode-languageserver-protocol@3.17.5?package-id=pkg%3Anpm%2Fvscode-languageserver-protocol%403.17.5%3Fpackage-id%3D39528849d6581bbf"
-      ]
-    }
-  ],
-  "vulnerabilities": [
-    {
-      "bom-ref": "urn:uuid:7c03548c-a9dd-4fb7-bfd8-6b2cc9a9e0b8",
-      "id": "GHSA-mw96-cpmx-2vgc",
-      "source": {
-        "name": "github-language-javascript",
-        "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc"
-      },
-      "references": [
-        {
-          "id": "GHSA-mw96-cpmx-2vgc",
-          "source": {
-            "name": "github-language-javascript",
-            "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc"
-          }
-        }
-      ],
-      "ratings": [
-        {
-          "score": 8.8,
-          "severity": "high",
-          "method": "other",
-          "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:P"
-        },
-        {
-          "source": {
-            "name": "FIRST",
-            "url": "https://www.first.org/epss/"
-          },
-          "score": 0.0039,
-          "method": "other"
-        }
-      ],
-      "description": "Rollup 4 has Arbitrary File Write via Path Traversal",
-      "advisories": [
-        {
-          "url": "https://github.com/rollup/rollup/security/advisories/GHSA-mw96-cpmx-2vgc"
-        },
-        {
-          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27606"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/commit/c60770d7aaf750e512c1b2774989ea4596e660b2"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/commit/c8cf1f9c48c516285758c1e11f08a54f304fd44e"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/commit/d6dee5e99bb82aac0bee1df4ab9efbde455452c3"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/releases/tag/v2.80.0"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/releases/tag/v3.30.0"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/releases/tag/v4.59.0"
-        }
-      ],
-      "affects": [
-        {
-          "ref": "pkg:npm/rollup@4.57.1?package-id=pkg%3Anpm%2Frollup%404.57.1%3Fpackage-id%3D60b4a1ddaf60f615"
-        }
       ]
     }
   ]

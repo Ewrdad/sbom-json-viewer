@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:b9fb487f-ac93-4257-ac26-05e83cc8196d",
+  "serialNumber": "urn:uuid:0749ea0c-771b-4e6b-a806-2c1e275973c1",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-26T11:14:50+00:00",
+    "timestamp": "2026-02-28T14:09:15+00:00",
     "tools": {
       "components": [
         {
@@ -4916,15 +4916,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-android-arm-eabi@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-android-arm-eabi@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-android-arm-eabi",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "03a7a15154a249a6a5893c5a8b4e34669676cd37af1d86efbbf943a1e02d78723c4276a8b08ce6e2ac2d7b37d18358ce61a5269f32d7d40383e99f94263b627e"
+          "content": "ba99cd06403a647d952867018fd17297d20634f50b7235d1960d0b2de6a2a105ae787df4a7a217b4911b28082fcaffa625a3314a6d65eb1c035d88e910c88b32"
         }
       ],
       "licenses": [
@@ -4934,11 +4934,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-android-arm-eabi@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-android-arm-eabi@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -4947,15 +4947,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-android-arm64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-android-arm64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-android-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "75068075d098f5882414765c14d4bfeb4e84c68f2f70b1f002b159eefc57ab8ae2828d9b6f8f78ff128c330451416eae83b26ceb25e6059852051b81bc2090df"
+          "content": "859f99c63dd2c929b803f0f296c0ca6407958349af8befb43d855c795c97ee17a6930eceade29d0af5b6a10dd3d45319bc26905ea3931dbf2a9814a1a2a93af5"
         }
       ],
       "licenses": [
@@ -4965,11 +4965,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-android-arm64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-android-arm64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -4978,15 +4978,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-darwin-arm64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-darwin-arm64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-darwin-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "72b34faf024ead1c5a81461e327fc3670a8df3c4839b0689f02be2fd33751e758153b1b0927724ca8b02da077422a611b070c49d77f7dbca3dfc70ba3a43e03a"
+          "content": "5b63ec9db87527c649c34c4a01df3374d805f4744b91d5b0c1d5aab9b495934a54b909281e7bfbaf1e06885f6b4f8b790c864602c0a89d113703109d2789bcae"
         }
       ],
       "licenses": [
@@ -4996,11 +4996,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-darwin-arm64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-darwin-arm64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5009,15 +5009,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-darwin-x64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-darwin-x64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-darwin-x64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "262f20f028556caae116d8a0e50055ee231a26b1ada477a5901de5b1a2b369d1417b9f209a37c65c039f239155d2560c1fcc22aacc4a4350bd074613457572e3"
+          "content": "656d8a930952e25c13bfb655b180e20117c50a748687360f762394e083367c36cbf901a5c806e381216ea8d45b4ad8726cb6c827dd7952d641b66b8bad0013ff"
         }
       ],
       "licenses": [
@@ -5027,11 +5027,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-darwin-x64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-darwin-x64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5040,15 +5040,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-freebsd-arm64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-freebsd-arm64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-freebsd-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "47efd6c21b239b0a1d01ccfae60b8218546431be202964dc21e2f2eb424941b5eb27dec13971f19e43c5acff98c0595a4b49beb96253b2dad403da3e51c845ba"
+          "content": "12c29a279cad02ef632379689f39f70601bc8910635782f165ec7281c41ba62534c14d004f184d544a5729f51ad294b4e604dc48330aa67dd2c7e401f519534c"
         }
       ],
       "licenses": [
@@ -5058,11 +5058,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-freebsd-arm64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-freebsd-arm64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5071,15 +5071,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-freebsd-x64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-freebsd-x64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-freebsd-x64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "2044130877a24ce9c0502dc80d07734401a3de338060dafd90182e23b31000064addc69ecd1ae0d06c406fa1dc860e25c5d6442393aade2a2fff0fe19c5598f5"
+          "content": "7770ee662d8acd3323226af1a0720038351962851432cb94898e12451709cba349a19ea222a5a726ef4849c57d8d7cacc86315b96f8a37366f04b39ca5d97756"
         }
       ],
       "licenses": [
@@ -5089,11 +5089,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-freebsd-x64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-freebsd-x64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5102,15 +5102,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm-gnueabihf@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm-gnueabihf@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-arm-gnueabihf",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "17cb166e167bb72b847ec98ec70736822283433377fa4b812cfc30646c9590b94a19d5759ef9cdc180f47ca43cf974ba869f6763b07e65e2b4d4405413b6876b"
+          "content": "b7838d1dba178bfdc4d2b4fa399975a4a6e5d958317fdbc97d6826528084550571856e82c3f73c23a85b6eeec302f829f3644a887ed3a4bc319c978abf6a5bb3"
         }
       ],
       "licenses": [
@@ -5120,11 +5120,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm-gnueabihf@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm-gnueabihf@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5133,15 +5133,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm-musleabihf@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm-musleabihf@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-arm-musleabihf",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "ac67cd51f9f4188797b413f5c0be4c9f34a3f7cf8f65efc05da181091993d2db3cd255390804d81b15ee91e4d7dfd5c12acc7316911e2be32ba7d7da5ce966af"
+          "content": "0a29054fb6983c0dae7cc0f4f3a7153910581877df068e0af0c438b8f4bf667639e062a3dfa8b5f7abbc53e683553d8b5f879231bc87b723a1ec3ed9be4d95bc"
         }
       ],
       "licenses": [
@@ -5151,11 +5151,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm-musleabihf@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm-musleabihf@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5164,15 +5164,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm64-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm64-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-arm64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "30cb5e8f760759e83fd2494ad90a1d7f7cab373cfa0868e8d949ed2ef9364523e587380bbd8101ddfad1bdb105db044a8756767c3220f4a44f7b57dac2fec2fa"
+          "content": "8d88141a4e5a2ddd6751bd42b50f04fade4984b73dc7959d04a7b0f598005e0ec3064d191c4acb1dd5ccdb8adf5fe6caac57be5e9e58b89a39e08e4716318300"
         }
       ],
       "licenses": [
@@ -5182,11 +5182,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5195,15 +5195,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm64-musl@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-arm64-musl@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-arm64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "d5afea85a68e5e1a971a93053044fd56ac196a49258d61cb999397e3c47423f60b6e1771af59b882d1b51eaefef958555267fe2f7b1301ff68a78265850e6ed5"
+          "content": "a5e651544767156679061d8a7ae98a1bdb72eda097cf312c1d284e64416209094311ea4fd5da5497f4ab50d5cd835dd499997e8335433ec882c27575b88d1150"
         }
       ],
       "licenses": [
@@ -5213,11 +5213,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-musl@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-arm64-musl@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5226,15 +5226,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-loong64-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-loong64-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-loong64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "4163ba4504d9fdca98b4932dc619119227683465dcec444f6d937b7555b949d511b8b79553b97028ca68d7c5dd726a5661dd2ab0fd5bc0a3dfec33525229e1bc"
+          "content": "81b5125bff7b7fbfabe201f2dc996ea7ccc31b5f7402ea1db169cd89712ba7d993f74882cbd34a294d17c31e64f15951008576b94f42b0c9c4160ff15da39f5e"
         }
       ],
       "licenses": [
@@ -5244,11 +5244,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5257,15 +5257,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-loong64-musl@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-loong64-musl@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-loong64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "c6939b6087fef20a6b81668f3f7db188de515538bfb3914247e5cc5d22a685fa098eba510230aebaa417cb151afde25374013a789f8a0ca6a812a8d94318771b"
+          "content": "c9344e35eefd13ea341561628dab284e3b731bd10179d15724c97cf3c34110308357d236c066c515f25041eeb73a28db142519ab1a47cf51b3a5bb52162909e1"
         }
       ],
       "licenses": [
@@ -5275,11 +5275,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-musl@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-loong64-musl@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-musl/-/rollup-linux-loong64-musl-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-musl/-/rollup-linux-loong64-musl-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5288,15 +5288,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-ppc64-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-ppc64-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-ppc64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "e01ac282ba59a3886fccc0ca46a11a5b5cde79c49c0c247eda767ce804cb840a09e4543e95b1d50f7b6d29eef8fdceed353f5ce85daf8b0077b9fc29d353a1db"
+          "content": "b30d68ded7f2935da4dce12945d745ebc6b5ba767954237bce84cdb529f62a775413e79ade6dd138e291099c44a664fd9ec1a7a20a453fdc7a9a72d309aa0b90"
         }
       ],
       "licenses": [
@@ -5306,11 +5306,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5319,15 +5319,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-ppc64-musl@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-ppc64-musl@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-ppc64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "34e954bb37ac19ab84480c8460549edd04d482e2fe96facdd47b70104b14dab3b07540de4cc25d3b9754625ff684a7fd8d6c9d26b3bd38bfd74927fae51e7e5f"
+          "content": "fb690bb50e314f70222319331551577ec9a56621b9157616ed9c8822f180ec175eba1f59d1a378855c974bf1b513d6d33ffbeab3334837fa5428293f0531ec28"
         }
       ],
       "licenses": [
@@ -5337,11 +5337,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-musl@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-ppc64-musl@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-musl/-/rollup-linux-ppc64-musl-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-musl/-/rollup-linux-ppc64-musl-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5350,15 +5350,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-riscv64-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-riscv64-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-riscv64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "a6d03cf21b55a74030514aa15608700c82a5bc9303fdf98bff0ad08fdf4f447151006e99e676d6a161b8a3cd4db7d153f88baa5108be2f7d5928015e27922cf8"
+          "content": "34360ca6c5d82496a3f88ed477022e1c73715d9fdbfcdda1475e4dc87de6daa02d6ff8473c0e20e12baebeb7717ad4dd9dd7e3f5bd563a6cbbde470f46811152"
         }
       ],
       "licenses": [
@@ -5368,11 +5368,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5381,15 +5381,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-riscv64-musl@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-riscv64-musl@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-riscv64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "4b9d6deda30c4cd76600c3e9060ece3ac4dd9f8b7249142f92598bdd1a4347292793cefe4a9df16ae9a56ad53ea6943ee6b698eec493702d9b78682f84435fbb"
+          "content": "9cb72407c58ea8721fd5b8729a4fa81f1bccf43dedc8f9dd647f22f3edf9a7fd58895a15b303e2776c8bce05fb6493f4290be79213381fa419e66d0bcdbc8802"
         }
       ],
       "licenses": [
@@ -5399,11 +5399,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-musl@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-riscv64-musl@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5412,15 +5412,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-s390x-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-s390x-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-s390x-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "065d343859d51642fcd851db12acb793909408a1fa38424be78282cb1da8aac9999c54d1f08a0da8117e9a3415711093e6c07ac8ebcaf00dfb2cd9bf90f26266"
+          "content": "a05f3b21edee008bce445069c270af53375e614aa2db063a8d1156240cb5aaeb3fb9d1c5608929958456fb0a3e19150fe2c2b361d984d58dfead8e4673864efb"
         }
       ],
       "licenses": [
@@ -5430,11 +5430,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-s390x-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-s390x-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5443,15 +5443,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-x64-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-x64-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-x64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "00171ae1c793e0df93bff1ada2d9d601e5d9519b8cffd010c82c8a6322a7a64e32a00ed0200b81b7a1e4829c3c90072d6257b0da6bdc91792fc7415fa089e72e"
+          "content": "dc01e6b50abfa6936e52ca4a025bc0f07b4bc9b9037e590cb8b2b80cfa3bec37ed8516fbd55f38fdce0c9562578b1673e2eaee207e2e69ad3b22aa00906eb87e"
         }
       ],
       "licenses": [
@@ -5461,11 +5461,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-x64-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5474,15 +5474,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-linux-x64-musl@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-linux-x64-musl@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-linux-x64-musl",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "1c5a6cd09786b6e391d9ca27be045190709e903ee3fa0740b9733efe2ea41b342d161942b50929c2d37390d8fa421083a7b0d127bfaa0bfd558368ede6248e17"
+          "content": "d94762c12ffd713031eea214641fdf5ad4e8270bedd156e8d339a762dec40f7e4a3e0d77434ca6d60e38d931cb0bb57223a25f6133f83e248e5b2a0c755dbfc6"
         }
       ],
       "licenses": [
@@ -5492,11 +5492,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-linux-x64-musl@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5505,15 +5505,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-openbsd-x64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-openbsd-x64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-openbsd-x64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "1fe85712ff6075542e0d3827a83f9241f7e85a873439fe7d012b52cd3123fdf7964c102749f483dfe0ea97566bb894319b2913fc9558d1d13c29aef3d031f587"
+          "content": "3376cb440564e863b01653d32315414982946aa7cbae7f25d29b0a8a7902171978950bce4b3f19aca0f3da0c5c0701c5a5c8b407aaedb72748e08a52e084bf8d"
         }
       ],
       "licenses": [
@@ -5523,11 +5523,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-openbsd-x64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-openbsd-x64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-openbsd-x64/-/rollup-openbsd-x64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-openbsd-x64/-/rollup-openbsd-x64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5536,15 +5536,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-openharmony-arm64@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-openharmony-arm64@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-openharmony-arm64",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "e306280e9360ea8fe83f18a6c9cfcd1be99851e8d9ac2536abedb0e9866aac0b3651c3540a12195e3b5a7c08a265251cece9fcbf9372363df82b38ff2ed93a75"
+          "content": "b6df4a049a9aaa9e62e47519ce869f1d95fc6f943615eed48d8111003965f373b87c6a89e3d3b516c2fa2e977354541ca70be7c9dd22f8afd54b0bbfa3f9d694"
         }
       ],
       "licenses": [
@@ -5554,11 +5554,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-openharmony-arm64@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-openharmony-arm64@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5567,15 +5567,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-win32-arm64-msvc@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-win32-arm64-msvc@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-win32-arm64-msvc",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "3b9e26b6c57fe8b5b73fca9d4dc6a6426b82f7dd070df47bd65a38e2864c6655d4e2dccbadbbd38a2f3b362f68a6aeb476cd18cee02512bfc6370b8d96e67231"
+          "content": "57907a986eceac64f09f168d5336530d38c34bb17be4f3b569ee8c25876232eeb4b2ad02a8de4255e56c6e13f16a5ba9bd35fc81755253d82af91c75fe1beee8"
         }
       ],
       "licenses": [
@@ -5585,11 +5585,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-win32-arm64-msvc@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-win32-arm64-msvc@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5598,15 +5598,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-win32-ia32-msvc@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-win32-ia32-msvc@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-win32-ia32-msvc",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "3f774b4be21eaf1093ffb0f6ab6158711756465db674d6eb6c112dc5d5a15eb7c830f3fd95085be61e03bb4e26765e56a2ad398d50833c2305ed46f43408c87b"
+          "content": "50a14c1cfb8cf51d2205e830cca178cb40b827dbbc0ba30426016e5d305eacc93b109f761855456017ce65a4862eee8239fec5c6940daa1352e1ce227143eac4"
         }
       ],
       "licenses": [
@@ -5616,11 +5616,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-win32-ia32-msvc@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-win32-ia32-msvc@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5629,15 +5629,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-win32-x64-gnu@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-win32-x64-gnu@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-win32-x64-gnu",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "54c047d9e38e68a1ad209625797b22d81f023d5003ae1f93c8dc49e2658f9ca7cb07f0c1526cd6fb99b5c54adcc16a0c7d22da8084698d415e5b908ee61c9c89"
+          "content": "95a064625492d67d8bf1f4a8d6d843346ac24d0326c63618e46d161568c515866428f8ec301b2025f19fe132f15eb17a472848eb42fc4cc3a304cbd789373178"
         }
       ],
       "licenses": [
@@ -5647,11 +5647,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-win32-x64-gnu@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-win32-x64-gnu@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -5660,15 +5660,15 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/@rollup/rollup-win32-x64-msvc@4.57.1",
+      "bom-ref": "pkg:npm/@rollup/rollup-win32-x64-msvc@4.59.0",
       "type": "library",
       "group": "@rollup",
       "name": "rollup-win32-x64-msvc",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "9b14450dd1c8591c60dd47c8200c029ba373bf11b48c35ffc0137a2ac4054ef285aaa83dbd3ad6504ebca848c7b75f40e70c31e57e5a522db3b994fb611d23ac"
+          "content": "d874429a5e8eced617c895c0bdd0d73ca71ac2e9166361a9479fe7c4aa788818223b7c1ca041a401aa9cb486d970d07a2a5510048aadf156243528f6dfdec47c"
         }
       ],
       "licenses": [
@@ -5678,11 +5678,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40rollup/rollup-win32-x64-msvc@4.57.1",
+      "purl": "pkg:npm/%40rollup/rollup-win32-x64-msvc@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -18278,7 +18278,7 @@
       "properties": [
         {
           "name": "ImportedModules",
-          "value": "lucide-react,Upload,lucide-react/Upload,Download,lucide-react/Download,Globe,lucide-react/Globe,LayoutDashboard,lucide-react/LayoutDashboard,ShieldAlert,lucide-react/ShieldAlert,Scale,lucide-react/Scale,Search,lucide-react/Search,Network,lucide-react/Network,Info,lucide-react/Info,BarChart3,lucide-react/BarChart3,GitGraph,lucide-react/GitGraph,Wrench,lucide-react/Wrench,HelpCircle,lucide-react/HelpCircle,FileText,lucide-react/FileText,CheckCircle,lucide-react/CheckCircle,Lightbulb,lucide-react/Lightbulb,ShieldCheck,lucide-react/ShieldCheck,CircleHelp,lucide-react/CircleHelp,Terminal,lucide-react/Terminal,Copy,lucide-react/Copy,Check,lucide-react/Check,ChevronDown,lucide-react/ChevronDown,Settings,lucide-react/Settings,ExternalLink,lucide-react/ExternalLink,ChevronRight,lucide-react/ChevronRight,List,lucide-react/List,ScrollText,lucide-react/ScrollText,lucide-react/X,Package,lucide-react/Package,ChevronLeft,lucide-react/ChevronLeft,ArrowUpDown,lucide-react/ArrowUpDown,Fingerprint,lucide-react/Fingerprint,Layers,lucide-react/Layers,RefreshCw,lucide-react/RefreshCw,AlertTriangle,lucide-react/AlertTriangle,Maximize2,lucide-react/Maximize2,Minimize2,lucide-react/Minimize2,Settings2,lucide-react/Settings2,Boxes,lucide-react/Boxes,FileCheck,lucide-react/FileCheck,BookOpen,lucide-react/BookOpen,Calendar,lucide-react/Calendar,User,lucide-react/User,Building2,lucide-react/Building2,Hash,lucide-react/Hash,ArrowRight,lucide-react/ArrowRight,Filter,lucide-react/Filter,ChevronUp,lucide-react/ChevronUp,AlertCircle,lucide-react/AlertCircle,Building,lucide-react/Building,FileJson,lucide-react/FileJson,CheckCircle2,lucide-react/CheckCircle2,XCircle,lucide-react/XCircle,FileImage,lucide-react/FileImage"
+          "value": "lucide-react,ChevronRight,lucide-react/ChevronRight,Home,lucide-react/Home,Package,lucide-react/Package,ShieldAlert,lucide-react/ShieldAlert,Copy,lucide-react/Copy,Check,lucide-react/Check,Search,lucide-react/Search,Command,lucide-react/Command,CornerDownLeft,lucide-react/CornerDownLeft,HelpCircle,lucide-react/HelpCircle,FileText,lucide-react/FileText,Info,lucide-react/Info,CheckCircle,lucide-react/CheckCircle,Lightbulb,lucide-react/Lightbulb,ShieldCheck,lucide-react/ShieldCheck,CircleHelp,lucide-react/CircleHelp,Terminal,lucide-react/Terminal,ChevronDown,lucide-react/ChevronDown,Settings,lucide-react/Settings,ExternalLink,lucide-react/ExternalLink,Download,lucide-react/Download,Globe,lucide-react/Globe,LayoutDashboard,lucide-react/LayoutDashboard,Scale,lucide-react/Scale,Network,lucide-react/Network,BarChart3,lucide-react/BarChart3,GitGraph,lucide-react/GitGraph,Wrench,lucide-react/Wrench,Menu,lucide-react/Menu,lucide-react/X,List,lucide-react/List,ScrollText,lucide-react/ScrollText,ChevronLeft,lucide-react/ChevronLeft,lucide-react/Eye,Upload,lucide-react/Upload,Database,lucide-react/Database,ArrowUpDown,lucide-react/ArrowUpDown,Filter,lucide-react/Filter,Fingerprint,lucide-react/Fingerprint,ArrowRight,lucide-react/ArrowRight,Layers,lucide-react/Layers,RefreshCw,lucide-react/RefreshCw,AlertTriangle,lucide-react/AlertTriangle,Settings2,lucide-react/Settings2,Boxes,lucide-react/Boxes,FileCheck,lucide-react/FileCheck,BookOpen,lucide-react/BookOpen,Calendar,lucide-react/Calendar,User,lucide-react/User,Building2,lucide-react/Building2,Hash,lucide-react/Hash,Trophy,lucide-react/Trophy,CheckCircle2,lucide-react/CheckCircle2,SearchX,lucide-react/SearchX,lucide-react/Zap,ChevronUp,lucide-react/ChevronUp,AlertCircle,lucide-react/AlertCircle,EyeOff,lucide-react/EyeOff,ShieldQuestion,lucide-react/ShieldQuestion,History,lucide-react/History,FileJson,lucide-react/FileJson,Building,lucide-react/Building,XCircle,lucide-react/XCircle,ListTodo,lucide-react/ListTodo,ArrowUpCircle,lucide-react/ArrowUpCircle,FileImage,lucide-react/FileImage"
         },
         {
           "name": "ResolvedUrl",
@@ -21591,14 +21591,14 @@
       ]
     },
     {
-      "bom-ref": "pkg:npm/rollup@4.57.1",
+      "bom-ref": "pkg:npm/rollup@4.59.0",
       "type": "library",
       "name": "rollup",
-      "version": "4.57.1",
+      "version": "4.59.0",
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "a102fa9602b77b6419790ee07202244b66193e0e6c970dfb858b9f27779d2a57d04861a6f080a8c6cc0ad799ed4b317f6bcfa1ede911cbb93ba16737050ef2f0"
+          "content": "da832997aedadf3087f47efd2de31c6c38575bf526586ff2db3baa9c5da342ae6eabd4db33d4d5c97bc0e3eb7e9ded8822405dacba40691400be8ed823f6327a"
         }
       ],
       "licenses": [
@@ -21608,11 +21608,11 @@
           }
         }
       ],
-      "purl": "pkg:npm/rollup@4.57.1",
+      "purl": "pkg:npm/rollup@4.59.0",
       "properties": [
         {
           "name": "ResolvedUrl",
-          "value": "https://registry.npmjs.org/rollup/-/rollup-4.57.1.tgz"
+          "value": "https://registry.npmjs.org/rollup/-/rollup-4.59.0.tgz"
         },
         {
           "name": "SrcFile",
@@ -26616,103 +26616,103 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-android-arm-eabi@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-android-arm-eabi@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-android-arm64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-android-arm64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-darwin-arm64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-darwin-arm64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-darwin-x64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-darwin-x64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-freebsd-arm64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-freebsd-arm64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-freebsd-x64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-freebsd-x64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-arm-gnueabihf@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-arm-gnueabihf@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-arm-musleabihf@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-arm-musleabihf@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-arm64-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-arm64-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-arm64-musl@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-arm64-musl@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-loong64-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-loong64-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-loong64-musl@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-loong64-musl@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-ppc64-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-ppc64-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-ppc64-musl@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-ppc64-musl@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-riscv64-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-riscv64-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-riscv64-musl@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-riscv64-musl@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-s390x-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-s390x-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-x64-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-x64-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-linux-x64-musl@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-linux-x64-musl@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-openbsd-x64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-openbsd-x64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-openharmony-arm64@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-openharmony-arm64@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-win32-arm64-msvc@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-win32-arm64-msvc@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-win32-ia32-msvc@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-win32-ia32-msvc@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-win32-x64-gnu@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-win32-x64-gnu@4.59.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/@rollup/rollup-win32-x64-msvc@4.57.1",
+      "ref": "pkg:npm/@rollup/rollup-win32-x64-msvc@4.59.0",
       "dependsOn": []
     },
     {
@@ -29847,33 +29847,33 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/rollup@4.57.1",
+      "ref": "pkg:npm/rollup@4.59.0",
       "dependsOn": [
-        "pkg:npm/@rollup/rollup-android-arm-eabi@4.57.1",
-        "pkg:npm/@rollup/rollup-android-arm64@4.57.1",
-        "pkg:npm/@rollup/rollup-darwin-arm64@4.57.1",
-        "pkg:npm/@rollup/rollup-darwin-x64@4.57.1",
-        "pkg:npm/@rollup/rollup-freebsd-arm64@4.57.1",
-        "pkg:npm/@rollup/rollup-freebsd-x64@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-arm-gnueabihf@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-arm-musleabihf@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-arm64-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-arm64-musl@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-loong64-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-loong64-musl@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-ppc64-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-ppc64-musl@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-riscv64-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-riscv64-musl@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-s390x-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-x64-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-linux-x64-musl@4.57.1",
-        "pkg:npm/@rollup/rollup-openbsd-x64@4.57.1",
-        "pkg:npm/@rollup/rollup-openharmony-arm64@4.57.1",
-        "pkg:npm/@rollup/rollup-win32-arm64-msvc@4.57.1",
-        "pkg:npm/@rollup/rollup-win32-ia32-msvc@4.57.1",
-        "pkg:npm/@rollup/rollup-win32-x64-gnu@4.57.1",
-        "pkg:npm/@rollup/rollup-win32-x64-msvc@4.57.1",
+        "pkg:npm/@rollup/rollup-android-arm-eabi@4.59.0",
+        "pkg:npm/@rollup/rollup-android-arm64@4.59.0",
+        "pkg:npm/@rollup/rollup-darwin-arm64@4.59.0",
+        "pkg:npm/@rollup/rollup-darwin-x64@4.59.0",
+        "pkg:npm/@rollup/rollup-freebsd-arm64@4.59.0",
+        "pkg:npm/@rollup/rollup-freebsd-x64@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-arm-gnueabihf@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-arm-musleabihf@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-arm64-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-arm64-musl@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-loong64-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-loong64-musl@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-ppc64-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-ppc64-musl@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-riscv64-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-riscv64-musl@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-s390x-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-x64-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-linux-x64-musl@4.59.0",
+        "pkg:npm/@rollup/rollup-openbsd-x64@4.59.0",
+        "pkg:npm/@rollup/rollup-openharmony-arm64@4.59.0",
+        "pkg:npm/@rollup/rollup-win32-arm64-msvc@4.59.0",
+        "pkg:npm/@rollup/rollup-win32-ia32-msvc@4.59.0",
+        "pkg:npm/@rollup/rollup-win32-x64-gnu@4.59.0",
+        "pkg:npm/@rollup/rollup-win32-x64-msvc@4.59.0",
         "pkg:npm/@types/estree@1.0.8",
         "pkg:npm/fsevents@2.3.2"
       ]
@@ -29961,6 +29961,7 @@
         "pkg:npm/react-virtuoso@4.18.1",
         "pkg:npm/react@19.2.4",
         "pkg:npm/recharts@3.7.0",
+        "pkg:npm/rollup@4.59.0",
         "pkg:npm/shadcn@3.8.5",
         "pkg:npm/tailwind-merge@3.4.0",
         "pkg:npm/tailwindcss@4.1.18",
@@ -30498,7 +30499,7 @@
         "pkg:npm/lightningcss@1.30.2",
         "pkg:npm/picomatch@4.0.3",
         "pkg:npm/postcss@8.5.6",
-        "pkg:npm/rollup@4.57.1",
+        "pkg:npm/rollup@4.59.0",
         "pkg:npm/tinyglobby@0.2.15"
       ]
     },
@@ -30711,7 +30712,7 @@
   ],
   "vulnerabilities": [
     {
-      "id": "CVE-2026-27606",
+      "id": "CVE-2026-27903",
       "source": {
         "name": "ghsa",
         "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
@@ -30719,74 +30720,127 @@
       "ratings": [
         {
           "source": {
-            "name": "nvd"
+            "name": "ghsa"
           },
-          "score": 9.8,
-          "severity": "critical",
+          "score": 7.5,
+          "severity": "high",
           "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
         },
         {
           "source": {
             "name": "redhat"
           },
-          "score": 9.1,
-          "severity": "high",
+          "score": 5.9,
+          "severity": "medium",
           "method": "CVSSv31",
-          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N"
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
         }
       ],
       "cwes": [
-        22
+        407
       ],
-      "description": "Rollup is a module bundler for JavaScript. Versions prior to 2.80.0, 3.30.0, and 4.59.0 of the Rollup module bundler (specifically v4.x and present in current source) is vulnerable to an Arbitrary File Write via Path Traversal. Insecure file name sanitization in the core engine allows an attacker to control output filenames (e.g., via CLI named inputs, manual chunk aliases, or malicious plugins) and use traversal sequences (`../`) to overwrite files anywhere on the host filesystem that the build process has permissions for. This can lead to persistent Remote Code Execution (RCE) by overwriting critical system or user configuration files. Versions 2.80.0, 3.30.0, and 4.59.0 contain a patch for the issue.",
-      "recommendation": "Upgrade rollup to version 2.80.0, 3.30.0, 4.59.0",
+      "description": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Prior to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.3, `matchOne()` performs unbounded recursive backtracking when a glob pattern contains multiple non-adjacent `**` (GLOBSTAR) segments and the input path does not match. The time complexity is O(C(n, k)) -- binomial -- where `n` is the number of path segments and `k` is the number of globstars. With k=11 and n=30, a call to the default `minimatch()` API stalls for roughly 5 seconds. With k=13, it exceeds 15 seconds. No memoization or call budget exists to bound this behavior. Any application where an attacker can influence the glob pattern passed to `minimatch()` is vulnerable. The realistic attack surface includes build tools and task runners that accept user-supplied glob arguments (ESLint, Webpack, Rollup config), multi-tenant systems where one tenant configures glob-based rules that run in a shared process, admin or developer interfaces that accept ignore-rule or filter configuration as globs, and CI/CD pipelines that evaluate user-submitted config files containing glob patterns. An attacker who can place a crafted pattern into any of these paths can stall the Node.js event loop for tens of seconds per invocation. The pattern is 56 bytes for a 5-second stall and does not require authentication in contexts where pattern input is part of the feature. Versions 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.3 fix the issue.",
+      "recommendation": "Upgrade minimatch to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, 3.1.3",
       "advisories": [
         {
-          "url": "https://avd.aquasec.com/nvd/cve-2026-27606"
+          "url": "https://avd.aquasec.com/nvd/cve-2026-27903"
         },
         {
-          "url": "https://access.redhat.com/security/cve/CVE-2026-27606"
+          "url": "https://access.redhat.com/security/cve/CVE-2026-27903"
         },
         {
-          "url": "https://github.com/rollup/rollup"
+          "url": "https://github.com/isaacs/minimatch"
         },
         {
-          "url": "https://github.com/rollup/rollup/commit/c60770d7aaf750e512c1b2774989ea4596e660b2"
+          "url": "https://github.com/isaacs/minimatch/commit/0bf499aa45f5059b56809cc3b75ff3eafeb8d748"
         },
         {
-          "url": "https://github.com/rollup/rollup/commit/c8cf1f9c48c516285758c1e11f08a54f304fd44e"
+          "url": "https://github.com/isaacs/minimatch/security/advisories/GHSA-7r86-cg39-jmmj"
         },
         {
-          "url": "https://github.com/rollup/rollup/commit/d6dee5e99bb82aac0bee1df4ab9efbde455452c3"
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27903"
         },
         {
-          "url": "https://github.com/rollup/rollup/releases/tag/v2.80.0"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/releases/tag/v3.30.0"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/releases/tag/v4.59.0"
-        },
-        {
-          "url": "https://github.com/rollup/rollup/security/advisories/GHSA-mw96-cpmx-2vgc"
-        },
-        {
-          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27606"
-        },
-        {
-          "url": "https://www.cve.org/CVERecord?id=CVE-2026-27606"
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-27903"
         }
       ],
-      "published": "2026-02-25T03:16:04+00:00",
-      "updated": "2026-02-25T16:05:11+00:00",
+      "published": "2026-02-26T02:16:21+00:00",
+      "updated": "2026-02-27T17:21:22+00:00",
       "affects": [
         {
-          "ref": "pkg:npm/rollup@4.57.1",
+          "ref": "pkg:npm/minimatch@10.2.2",
           "versions": [
             {
-              "version": "4.57.1",
+              "version": "10.2.2",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-27904",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "ghsa"
+          },
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "source": {
+            "name": "redhat"
+          },
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        }
+      ],
+      "cwes": [
+        1333
+      ],
+      "description": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Prior to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.4, nested `*()` extglobs produce regexps with nested unbounded quantifiers (e.g. `(?:(?:a|b)*)*`), which exhibit catastrophic backtracking in V8. With a 12-byte pattern `*(*(*(a|b)))` and an 18-byte non-matching input, `minimatch()` stalls for over 7 seconds. Adding a single nesting level or a few input characters pushes this to minutes. This is the most severe finding: it is triggered by the default `minimatch()` API with no special options, and the minimum viable pattern is only 12 bytes. The same issue affects `+()` extglobs equally. Versions 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.4 fix the issue.",
+      "recommendation": "Upgrade minimatch to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, 3.1.4",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2026-27904"
+        },
+        {
+          "url": "https://access.redhat.com/security/cve/CVE-2026-27904"
+        },
+        {
+          "url": "https://github.com/isaacs/minimatch"
+        },
+        {
+          "url": "https://github.com/isaacs/minimatch/commit/11d0df6165d15a955462316b26d52e5efae06fce"
+        },
+        {
+          "url": "https://github.com/isaacs/minimatch/security/advisories/GHSA-23c5-xmqv-rm74"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27904"
+        },
+        {
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-27904"
+        }
+      ],
+      "published": "2026-02-26T02:16:21+00:00",
+      "updated": "2026-02-27T17:16:23+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/minimatch@10.2.2",
+          "versions": [
+            {
+              "version": "10.2.2",
               "status": "affected"
             }
           ]
