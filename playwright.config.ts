@@ -17,7 +17,7 @@ export default defineConfig({
   webServer: {
     command: "npm run preview -- --host 127.0.0.1 --port 4175",
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     stdout: "pipe",
     stderr: "pipe",
   },

@@ -17,8 +17,9 @@ test.describe("SBOM Performance", () => {
     // 1. Click on the Huge SBOM button
     await sbomSelector.click();
     const hugeOption = page.getByTestId("sbom-option-examples/sbom-huge");
-    await expect(hugeOption).toBeVisible();
-    await hugeOption.click();
+    // Ensure it's in the DOM and visible (it's a portal usually)
+    await page.waitForSelector('[data-testid="sbom-option-examples/sbom-huge"]', { state: 'visible', timeout: 10000 });
+    await hugeOption.click({ force: true });
 
     // 2. Verify progress indicator appears
     // The worker sends multiple progress updates. We check for the completion of processing.

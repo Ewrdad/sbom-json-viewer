@@ -7,9 +7,24 @@ const tasks = [
     args: ["run", "test:unit"],
   },
   {
-    name: "e2e",
+    name: "e2e:core",
     command: "npm",
-    args: ["run", "test:e2e"],
+    args: ["run", "test:e2e:core"],
+  },
+  {
+    name: "e2e:features",
+    command: "npm",
+    args: ["run", "test:e2e:features"],
+  },
+  {
+    name: "e2e:audit",
+    command: "npm",
+    args: ["run", "test:e2e:audit"],
+  },
+  {
+    name: "e2e:perf",
+    command: "npm",
+    args: ["run", "test:e2e:perf"],
   },
   {
     name: "perf",
@@ -73,7 +88,11 @@ const handleExit = (signal) => {
 process.on("SIGINT", () => handleExit("SIGINT"));
 process.on("SIGTERM", () => handleExit("SIGTERM"));
 
-const results = await Promise.all(tasks.map((task) => runTask(task)));
+const results = [];
+for (const task of tasks) {
+  const result = await runTask(task);
+  results.push(result);
+}
 
 let hasFailures = false;
 
