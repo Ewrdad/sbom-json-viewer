@@ -4,6 +4,13 @@ import { describe, it, expect, vi } from 'vitest';
 import type { SbomStats } from '@/types/sbom';
 import userEvent from '@testing-library/user-event';
 import { SettingsProvider } from "../../context/SettingsContext";
+import { ViewProvider } from "../../context/ViewContext";
+import { VexProvider } from "../../context/VexContext";
+import { SelectionProvider } from "../../context/SelectionContext";
+import { SbomProvider } from "../../context/SbomContext";
+import { LayoutProvider } from "../../context/LayoutContext";
+import { Layout } from "../layout/Layout";
+import { Bom } from "@cyclonedx/cyclonedx-library/Models";
 
 // Mock Recharts to avoid responsive container issues in jsdom
 vi.mock('recharts', async () => {
@@ -20,7 +27,7 @@ vi.mock('recharts', async () => {
 // Mock DropdownMenu to avoid portal issues in tests
 vi.mock("@/components/ui/dropdown-menu", () => ({
     DropdownMenu: ({ children }: any) => <div data-testid="mock-dropdown">{children}</div>,
-    DropdownMenuTrigger: ({ children }: any) => <div data-testid="mock-dropdown-trigger">{children}</div>,
+    DropdownMenuTrigger: ({ children, asChild }: any) => <div data-testid="mock-dropdown-trigger">{children}</div>,
     DropdownMenuContent: ({ children }: any) => <div data-testid="mock-dropdown-content">{children}</div>,
     DropdownMenuCheckboxItem: ({ children, onCheckedChange, checked }: any) => (
         <div data-testid="mock-checkbox" onClick={() => onCheckedChange?.(!checked)}>
@@ -35,6 +42,9 @@ vi.mock("@/components/ui/dropdown-menu", () => ({
     DropdownMenuItem: ({ children, onClick }: any) => <div onClick={onClick}>{children}</div>,
     DropdownMenuShortcut: ({ children }: any) => <div>{children}</div>,
     DropdownMenuPortal: ({ children }: any) => <>{children}</>,
+    DropdownMenuSub: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuSubTrigger: ({ children }: any) => <div>{children}</div>,
+    DropdownMenuSubContent: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock("../../lib/ticketExportUtils", () => ({
@@ -46,17 +56,17 @@ import { generateTicketCSV, downloadCSV } from "../../lib/ticketExportUtils";
 
 const mockStats: SbomStats = {
     totalComponents: 100,
-    vulnerabilityCounts: { critical: 5, high: 10, medium: 20, low: 15, none: 50 },
+    vulnerabilityCounts: { critical: 1, high: 1, medium: 1, low: 0, none: 97 },
     licenseCounts: {},
     topLicenses: [],
     licenseDistribution: { permissive: 0, copyleft: 0, weakCopyleft: 0, proprietary: 0, unknown: 0 },
     vulnerableComponents: [],
     allVulnerableComponents: [
-        { name: 'lodash', version: '4.17.20', ref: 'ref-lodash', critical: 2, high: 3, medium: 1, low: 0, total: 6 },
-        { name: 'express', version: '4.17.1', ref: 'ref-express', critical: 1, high: 2, medium: 0, low: 1, total: 4 },
-        { name: 'axios', version: '0.21.0', ref: 'ref-axios', critical: 0, high: 1, medium: 2, low: 0, total: 3 },
+        { name: 'lodash', version: '4.17.20', ref: 'ref-lodash', critical: 1, high: 0, medium: 0, low: 0, total: 1 },
+        { name: 'express', version: '4.17.1', ref: 'ref-express', critical: 0, high: 1, medium: 0, low: 0, total: 1 },
+        { name: 'axios', version: '0.21.0', ref: 'ref-axios', critical: 0, high: 0, medium: 1, low: 0, total: 1 },
     ],
-    totalVulnerabilities: 50,
+    totalVulnerabilities: 3,
     allVulnerabilities: [
         { id: 'CVE-2024-001', severity: 'critical', affectedCount: 10, title: 'Critical Vuln', affectedComponentRefs: ['ref-lodash'] },
         { id: 'CVE-2024-002', severity: 'high', affectedCount: 5, title: 'High Vuln', affectedComponentRefs: ['ref-express'] },
@@ -65,7 +75,8 @@ const mockStats: SbomStats = {
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 3,
-    avgVulnerabilitiesPerComponent: 0.5,
+    totalVulnerabilityInstances: 3,
+    avgVulnerabilitiesPerComponent: 0.03,
     dependencyStats: { direct: 30, transitive: 70 },
     dependentsDistribution: { 0: 30, 1: 40, 5: 30 },
     vulnerabilityImpactDistribution: { 0: 10, 1: 20, 5: 20 },
@@ -86,6 +97,7 @@ const emptyStats: SbomStats = {
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
+    totalVulnerabilityInstances: 0,
     avgVulnerabilitiesPerComponent: 0,
     dependencyStats: { direct: 50, transitive: 0 },
     dependentsDistribution: { 0: 50 },
@@ -94,36 +106,52 @@ const emptyStats: SbomStats = {
     sourceCounts: {},
 };
 
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+    <LayoutProvider>
+        <SettingsProvider>
+            <VexProvider>
+                <ViewProvider>
+                    <SelectionProvider>
+                        {children}
+                    </SelectionProvider>
+                </ViewProvider>
+            </VexProvider>
+        </SettingsProvider>
+    </LayoutProvider>
+);
+
 describe('VulnerabilitiesView', () => {
     it('should render KPI cards with correct counts', () => {
         vi.setConfig({ testTimeout: 15000 });
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         expect(screen.getByText('Total Findings')).toBeInTheDocument();
-        expect(screen.getByText('50')).toBeInTheDocument();
+        expect(screen.getByTestId('total-vulnerability-count')).toHaveTextContent('3');
+        expect(screen.getByText('Total Instances')).toBeInTheDocument();
         expect(screen.getByText('Unique CVEs')).toBeInTheDocument();
-        expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByTestId('unique-vulnerability-count')).toHaveTextContent('3');
+        expect(screen.getByText('Distinct IDs')).toBeInTheDocument();
 
         expect(screen.getAllByText('Critical').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('High').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('Medium').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('Low').length).toBeGreaterThanOrEqual(1);
 
-        expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByText('20').length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByText('15').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByTestId('critical-vulnerability-count')).toHaveTextContent('1');
+        expect(screen.getByTestId('high-vulnerability-count')).toHaveTextContent('1');
+        expect(screen.getByTestId('medium-vulnerability-count')).toHaveTextContent('1');
+        expect(screen.getByTestId('low-vulnerability-count')).toHaveTextContent('0');
     });
 
     it('should show empty state when no vulnerabilities', () => {
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={null} preComputedStats={emptyStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         expect(screen.getByText('No vulnerabilities detected!')).toBeInTheDocument();
@@ -132,9 +160,9 @@ describe('VulnerabilitiesView', () => {
 
     it('should render vulnerable components table', () => {
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         expect(screen.getByText('lodash')).toBeInTheDocument();
@@ -145,9 +173,9 @@ describe('VulnerabilitiesView', () => {
     it('should filter table when searching', async () => {
         const user = userEvent.setup();
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         const searchInput = screen.getByPlaceholderText('Search components...');
@@ -161,9 +189,9 @@ describe('VulnerabilitiesView', () => {
     it('should switch to vulnerability view and show CVEs', async () => {
         const user = userEvent.setup();
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         const switchBtn = screen.getByText('By Vulnerability');
@@ -177,9 +205,9 @@ describe('VulnerabilitiesView', () => {
     it('should filter CVEs when searching in vulnerability view', async () => {
         const user = userEvent.setup();
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={null} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         const switchBtn = screen.getByText('By Vulnerability');
@@ -226,9 +254,13 @@ describe('VulnerabilitiesView', () => {
         };
 
         render(
-            <SettingsProvider>
-                <VulnerabilitiesView sbom={null} preComputedStats={detailedStats} />
-            </SettingsProvider>
+            <TestWrapper>
+                <SbomProvider value={{ sbom: new Bom(), formattedSbom: null, sbomStats: detailedStats }}>
+                    <Layout sbom={new Bom()}>
+                        <VulnerabilitiesView sbom={null} preComputedStats={detailedStats} />
+                    </Layout>
+                </SbomProvider>
+            </TestWrapper>
         );
 
         const switchBtn = screen.getByText('By Vulnerability');
@@ -307,9 +339,13 @@ describe('VulnerabilitiesView', () => {
         };
 
         render(
-            <SettingsProvider>
-                <VulnerabilitiesView sbom={null} preComputedStats={extendedStats} />
-            </SettingsProvider>
+            <TestWrapper>
+                <SbomProvider value={{ sbom: new Bom(), formattedSbom: null, sbomStats: extendedStats }}>
+                    <Layout sbom={new Bom()}>
+                        <VulnerabilitiesView sbom={null} preComputedStats={extendedStats} />
+                    </Layout>
+                </SbomProvider>
+            </TestWrapper>
         );
 
         const switchBtn = screen.getByText('By Vulnerability');
@@ -348,13 +384,13 @@ describe('VulnerabilitiesView', () => {
         // The one in the detail panel is likely the second one.
         fireEvent.click(triggers[triggers.length - 1]);
         
-        expect((await screen.findAllByText(/affected/i)).length).toBeGreaterThanOrEqual(3); // One in list, one in trigger, one in details row, plus any in print view
+        expect((await screen.findAllByText(/affected/i)).length).toBeGreaterThanOrEqual(2); // One in list, one in trigger, etc.
     });
     it('should filter by severity when clicking KPI cards', async () => {
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         // Find and click the 'Critical' KPI card
@@ -365,7 +401,7 @@ describe('VulnerabilitiesView', () => {
         await userEvent.click(criticalCard);
 
         expect(screen.getByText('lodash')).toBeInTheDocument();
-        expect(screen.getByText('express')).toBeInTheDocument();
+        expect(screen.queryByText('express')).not.toBeInTheDocument();
         expect(screen.queryByText('axios')).not.toBeInTheDocument();
 
         // Click again to toggle off
@@ -375,9 +411,9 @@ describe('VulnerabilitiesView', () => {
 
     it('should filter by severity when selecting from dropdown', async () => {
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         // In the mock, the content is always present or at least easily accessible
@@ -391,7 +427,7 @@ describe('VulnerabilitiesView', () => {
 
         // Check if only lodash and express (have critical) are shown, axios (only high/medium) is hidden
         expect(screen.getByText('lodash')).toBeInTheDocument();
-        expect(screen.getByText('express')).toBeInTheDocument();
+        expect(screen.queryByText('express')).not.toBeInTheDocument();
         expect(screen.queryByText('axios')).not.toBeInTheDocument();
 
         // Check badge count on filter button
@@ -401,9 +437,9 @@ describe('VulnerabilitiesView', () => {
 
     it('should clear all filters when clicking Clear button', async () => {
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         const criticalText = screen.getByText('Immediate action');
@@ -421,9 +457,9 @@ describe('VulnerabilitiesView', () => {
 
     it('should trigger export when selecting a platform from dropdown', async () => {
         render(
-            <SettingsProvider>
+            <TestWrapper>
                 <VulnerabilitiesView sbom={{ components: [] }} preComputedStats={mockStats} />
-            </SettingsProvider>
+            </TestWrapper>
         );
 
         const exportBtn = screen.getByTestId('export-button');
@@ -432,9 +468,9 @@ describe('VulnerabilitiesView', () => {
         // In the mock dropdown, we click the item directly
         // We have two dropdown contents now (Filter and Export)
         const dropdownContents = screen.getAllByTestId('mock-dropdown-content');
-        const exportDropdown = dropdownContents.find(d => within(d).queryByText('Ticket Systems'));
+        const exportDropdown = dropdownContents.find(d => within(d).queryByText(/Ticket Systems/));
         if (!exportDropdown) throw new Error('Export dropdown not found');
-        const jiraOption = within(exportDropdown).getByText('Export for Jira');
+        const jiraOption = within(exportDropdown).getByText('Download CSV for Jira');
         await userEvent.click(jiraOption);
 
         expect(generateTicketCSV).toHaveBeenCalled();

@@ -16,7 +16,7 @@ import React, { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 
 const Mermaid = React.lazy(() => import("@/components/ui/mermaid").then(module => ({ default: module.Mermaid })));
-import { HelpCircle, FileText, Info, CheckCircle, Lightbulb } from "lucide-react";
+import { HelpCircle, FileText, Info, CheckCircle, Lightbulb, ShieldCheck, Command } from "lucide-react";
 
 export function HelpGuide() {
   return (
@@ -155,6 +155,129 @@ export function HelpGuide() {
                       style SBOM fill:#8b5cf6,color:#fff
                   `} />
                 </Suspense>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="privacy-security" className="border rounded-lg px-4 bg-card shadow-sm overflow-hidden">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Privacy & Provable Security
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4 space-y-4 pt-2">
+              <p className="font-semibold text-green-700 dark:text-green-400">Your data never leaves your browser.</p>
+              <p className="text-sm text-muted-foreground">
+                This application is designed with a "local-first" privacy model. All processing, parsing, and analysis are performed entirely by your browser's JavaScript engine (Web Workers).
+              </p>
+              <ul className="list-disc pl-5 text-sm space-y-2 text-muted-foreground">
+                <li><strong>No Server Uploads:</strong> No SBOM content is ever uploaded to our servers.</li>
+                <li><strong>Session-Only:</strong> Refreshing or closing this tab permanently clears all processed data from memory.</li>
+                <li><strong>No Local Storage:</strong> SBOM data is never saved to disk or persistent storage.</li>
+              </ul>
+
+              <div className="bg-muted/50 p-4 rounded-lg border border-primary/10">
+                <h4 className="text-xs font-bold uppercase mb-2 flex items-center gap-2">
+                   <CheckCircle className="h-3 w-3" /> Privacy Verification (3-Step Guide)
+                </h4>
+                <p className="text-[10px] text-muted-foreground mb-3">Technical users can verify our privacy claims in seconds:</p>
+                <ol className="list-decimal pl-4 text-xs space-y-2 text-muted-foreground">
+                  <li>Open Browser DevTools (<code>F12</code> or <code>Ctrl+Shift+I</code>).</li>
+                  <li>Go to the <strong>Network</strong> tab and click the "XHR/Fetch" filter.</li>
+                  <li>Upload a local SBOM. You will see <strong>zero</strong> network requests leaving the browser during processing.</li>
+                </ol>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="shortcuts" className="border rounded-lg px-4 bg-card shadow-sm overflow-hidden">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="flex items-center gap-2">
+                <Command className="h-4 w-4 text-primary" />
+                Keyboard Shortcuts
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4 space-y-4 pt-2 text-sm text-muted-foreground">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
+                  <span>Global Search</span>
+                  <kbd className="px-2 py-1 bg-background border rounded text-xs font-mono font-bold">Cmd/Ctrl + K</kbd>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
+                  <span>Navigate Views</span>
+                  <kbd className="px-2 py-1 bg-background border rounded text-xs font-mono font-bold">Alt + 1-9</kbd>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
+                  <span>Close Detail Panels</span>
+                  <kbd className="px-2 py-1 bg-background border rounded text-xs font-mono font-bold">Esc</kbd>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="transparency" className="border rounded-lg px-4 bg-card shadow-sm overflow-hidden">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <span className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-primary" />
+                Transparency & Methodology
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4 space-y-4 pt-2">
+              <div className="space-y-4">
+                <section>
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary" /> Multi-SBOM Merging
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    When merging multiple SBOMs, we use a <strong>"First-Wins"</strong> strategy for component metadata. If a component exists in both, License, Version, and Description are taken from the first source encountered. Vulnerabilities and Licenses from all sources are unioned.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary" /> Deduplication Policy
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Primary deduplication requires an <strong>Exact PURL match</strong>. If PURLs are missing, the system falls back to matching by <strong>Name + Version</strong>. Inconsistent naming across tools may lead to duplicate entries if PURLs are absent.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary" /> Severity Attribution
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    The "Top Severity" shown is the <strong>worst-case</strong> (highest) rating found across all providers (NVD, GitHub, Vendor) within the SBOM. The detail panel identifies which source provided that specific rating.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary" /> Dependency Root Detection
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Direct vs Transitive statistics rely on identifying a "Root" component in the metadata. If missing, the application makes a best guess based on the dependency graph. Results for fragmented SBOMs may vary.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary" /> CWE Chart Inflation
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    One vulnerability may map to multiple CWE categories. Therefore, the sum of all CWE counts in charts may exceed the total number of unique vulnerabilities.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary" /> VEX-Enriched SBOM Export
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Local Vulnerability Exploitability eXchange (VEX) assessments are injected directly into the exported CycloneDX file. Status and justifications are mapped to the vulnerability's <code>analysis.state</code> and <code>analysis.detail</code> fields, alongside custom <code>properties</code> (e.g., <code>vex:status</code>, <code>vex:justification</code>) to ensure data portability.
+                  </p>
+                </section>
               </div>
             </AccordionContent>
           </AccordionItem>

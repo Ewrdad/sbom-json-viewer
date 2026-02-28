@@ -372,6 +372,17 @@ export const Formatter = async ({
     };
     comp.transitiveLicenseDistribution = trans.licenses;
 
+    // Track which component introduced each transitive vulnerability
+    const sources = new Map<string, string>();
+    Object.values(trans.vulns).forEach(list => {
+      list.forEach(entry => {
+        if (entry.vuln.id) {
+          sources.set(entry.vuln.id, entry.sourceRef);
+        }
+      });
+    });
+    comp._transitiveSources = sources;
+
     if (index % 100 === 0) {
       const percent = 50 + Math.round((index / totalComponents) * 50);
       setProgress(() => ({ 

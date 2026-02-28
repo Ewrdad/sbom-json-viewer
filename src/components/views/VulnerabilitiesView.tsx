@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,35 +31,19 @@ import {
   ChevronRight,
   ArrowUpDown,
   X,
-  Network,
-  ExternalLink,
-  BookOpen,
+  Download,
   Info,
   Layers,
-  User,
-  Building,
-  Download,
-  FileJson,
+  ExternalLink,
+  EyeOff
 } from "lucide-react";
+import { useVex } from "../../context/VexContext";
+import { useSelection } from "../../context/SelectionContext";
+import { Skeleton } from "@/components/ui/skeleton";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { ComponentDetailPanel } from "./ComponentDetailPanel";
-import { exportVulnerabilityToPdf, exportVulnerabilityToPng } from "@/lib/exportUtils";
-import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
-import { SearchButton } from "@/components/common/SearchButton";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
+import { CopyButton } from "@/components/common/CopyButton";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -70,7 +54,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { generateTicketCSV, downloadCSV, type ExportPlatform } from "../../lib/ticketExportUtils";
+import { generateTicketCSV, downloadCSV, type ExportPlatform, type VulnerabilityItem, type ComponentItem } from "../../lib/ticketExportUtils";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -86,20 +70,12 @@ const SEVERITY_COLORS = {
   None: "#16a34a",
 };
 
-const getSeverityColor = (sev?: string) => {
-  if (!sev) return SEVERITY_COLORS.None;
-  try {
-    const normalized = sev.charAt(0).toUpperCase() + sev.slice(1).toLowerCase();
-    return SEVERITY_COLORS[normalized as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.None;
-  } catch {
-    return SEVERITY_COLORS.None;
-  }
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; preComputedStats?: SbomStats }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
+  const { assessments } = useVex();
+  const [showMuted, setShowMuted] = useState(false);
   
   // High-defensive initialization
   const fallbackStats: SbomStats = {
@@ -115,6 +91,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
+    totalVulnerabilityInstances: 0,
     avgVulnerabilitiesPerComponent: 0,
     dependencyStats: { direct: 0, transitive: 0 },
     dependentsDistribution: {},
@@ -123,19 +100,43 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     sourceCounts: {},
   };
 
-  const displayStats: SbomStats = {
-    ...fallbackStats,
-    ...(preComputedStats ?? stats ?? {}),
-  } as SbomStats;
+  const displayStats: SbomStats = useMemo(() => {
+    const base = {
+      ...fallbackStats,
+      ...(preComputedStats ?? (stats || {} as SbomStats)),
+    };
 
-  // Final safety check to ensure vulnerabilityCounts is never undefined
-  if (!displayStats.vulnerabilityCounts) {
-    displayStats.vulnerabilityCounts = fallbackStats.vulnerabilityCounts;
-  }
+    if (showMuted) return base;
+
+    // Recalculate counts excluding muted ones
+    const activeVulns = base.allVulnerabilities.filter(v => 
+      assessments[v.id]?.status !== 'not_affected'
+    );
+
+    const counts = { critical: 0, high: 0, medium: 0, low: 0, none: 0 };
+    activeVulns.forEach(v => {
+      const s = v.severity.toLowerCase();
+      if (s === 'critical') counts.critical++;
+      else if (s === 'high') counts.high++;
+      else if (s === 'medium') counts.medium++;
+      else if (s === 'low') counts.low++;
+      else counts.none++;
+    });
+
+    return {
+      ...base,
+      allVulnerabilities: activeVulns,
+      totalVulnerabilities: activeVulns.length,
+      vulnerabilityCounts: counts
+    };
+  }, [stats, preComputedStats, assessments, showMuted]);
+  
+  // Use cn to avoid unused error if needed, but it is used below.
+  // The error might be a red herring if tsc is confused.
   
   // Debug log (only in dev)
   if (import.meta.env.DEV && !isLoadingStats) {
-    console.log('[VulnerabilitiesView] displayStats:', displayStats);
+    // Stats loaded
   }
 
   const [viewMode, setViewMode] = useState<ViewMode>("components");
@@ -146,11 +147,43 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [cveSortDir, setCveSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
-  const [selectedComponent, setSelectedComponent] = useState<unknown | null>(null);
-  const [selectedVulnerability, setSelectedVulnerability] = useState<any>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { 
+    setSelectedComponent, 
+    setSelectedVulnerability,
+    viewFilters,
+    setViewFilters
+  } = useSelection();
+
+  const toggleItemSelection = (id: string) => {
+    setSelectedItems(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItems.length === pageItems.length) {
+      setSelectedItems([]);
+    } else {
+      const ids = pageItems.map((item: any) => viewMode === "components" ? item.ref : item.id);
+      setSelectedItems(ids);
+    }
+  };
   const [selectedSeverities, setSelectedSeverities] = useState<string[]>([]);
 
-  const { analysis } = useDependencyAnalysis(sbom);
+  useEffect(() => {
+    if (viewFilters.vulnerabilities) {
+      const filters = viewFilters.vulnerabilities;
+      if (filters.viewMode) setViewMode(filters.viewMode);
+      if (filters.selectedSeverities) setSelectedSeverities(filters.selectedSeverities);
+      if (filters.searchQuery) setSearchQuery(filters.searchQuery);
+      
+      // Clear filters after applying so they don't persist forever
+      // but only if we want them to be "one-shot" from dashboard.
+      // For now let's keep them one-shot.
+      setViewFilters('vulnerabilities', null);
+    }
+  }, [viewFilters, setViewFilters]);
 
   const handleSort = (key: SortKey) => {
     if (viewMode === "components") {
@@ -337,59 +370,119 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
     );
   };
 
-  const handleExport = (platform: ExportPlatform) => {
+  const handleExport = (platform: ExportPlatform | 'VEX') => {
+    if (platform === 'VEX') {
+      const baseSbom = sbom?._raw || {};
+      const enrichedSbom = JSON.parse(JSON.stringify(baseSbom));
+      
+      if (!enrichedSbom.vulnerabilities) enrichedSbom.vulnerabilities = [];
+      
+      // Inject VEX data as properties/analysis
+      enrichedSbom.vulnerabilities.forEach((v: any) => {
+        const vex = assessments[v.id];
+        if (vex) {
+          if (!v.analysis) v.analysis = {};
+          v.analysis.state = vex.status === 'not_affected' ? 'not_affected' : 
+                            vex.status === 'affected' ? 'in_triage' : 
+                            vex.status === 'fixed' ? 'resolved' : 'under_investigation';
+          v.analysis.detail = vex.justification;
+          
+          if (!v.properties) v.properties = [];
+          v.properties.push({ name: 'vex:status', value: vex.status });
+          v.properties.push({ name: 'vex:justification', value: vex.justification });
+          v.properties.push({ name: 'vex:updatedAt', value: vex.updatedAt });
+        }
+      });
+
+      const blob = new Blob([JSON.stringify(enrichedSbom, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vex-enriched-sbom-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    }
+
     // We export activeList because it respects the current UI filter and search state,
     // ensuring the export matches exactly what the user sees in the table.
-    const csv = generateTicketCSV(activeList as (VulnerabilityItem | ComponentItem)[], viewMode, platform);
+    let exportList = activeList as (VulnerabilityItem | ComponentItem)[];
+    if (selectedItems.length > 0) {
+      exportList = (activeList as any[]).filter((item: any) => 
+        viewMode === "components" ? selectedItems.includes(item.ref) : selectedItems.includes(item.id)
+      );
+    }
+
+    const csv = generateTicketCSV(exportList, viewMode, platform);
     const filename = `sbom-tickets-${platform.toLowerCase()}-${viewMode}-${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csv, filename);
   };
 
+  const getRowClass = (item: any) => {
+    if (viewMode === "components") {
+      if (item.critical > 0) return "bg-red-500/5 hover:bg-red-500/10";
+      if (item.high > 0) return "bg-orange-500/5 hover:bg-orange-500/10";
+      return "hover:bg-muted/50";
+    } else {
+      const s = item.severity?.toLowerCase();
+      if (s === "critical") return "bg-red-500/5 hover:bg-red-500/10";
+      if (s === "high") return "bg-orange-500/5 hover:bg-orange-500/10";
+      return "hover:bg-muted/50";
+    }
+  };
+
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="h-full"
-      key={selectedComponent || selectedVulnerability ? "split" : "single"}
-    >
-      <ResizablePanel
-        defaultSize={selectedComponent || selectedVulnerability ? 60 : 100}
-        minSize={30}
-      >
-        <ScrollArea className="h-full min-h-0 pr-2">
+    <ScrollArea className="h-full min-h-0 pr-2">
       <div className="pb-6 space-y-6 animate-in fade-in duration-500">
-        <div className="flex items-center gap-3">
-          <ShieldAlert className="h-7 w-7 text-destructive" />
-          <h2 className="text-3xl font-bold tracking-tight">Vulnerabilities</h2>
-          {isLoadingStats && (
+        {isLoadingStats && (
+          <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               Computing stats…
             </Badge>
-          )}
+          </div>
+        )}
+
+        {/* Data Source Notice */}
+        <div className="flex flex-col gap-2 bg-muted/30 p-3 rounded border border-dashed">
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <Info className="h-3 w-3" />
+            <span>Vulnerability and component data is derived directly from the SBOM metadata. No external scanning is performed.</span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <ExternalLink className="h-3 w-3" />
+            <span>Clicking vulnerability or CWE links will open external databases (NVD, MITRE, GitHub) and share the ID with those providers for lookup.</span>
+          </div>
         </div>
 
         {/* KPI Cards Row */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mb-6">
           <Card className="border-l-4 border-l-destructive/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Total Findings
+                <HelpTooltip text="The total number of vulnerability instances across all components. One CVE affecting three packages counts as three findings." />
               </CardTitle>
               <ShieldAlert className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{totalVulns}</div>
-              <p className="text-xs text-muted-foreground mt-1">Total package hits</p>
+              <div className="text-3xl font-bold" data-testid="total-vulnerability-count">{displayStats.totalVulnerabilityInstances || totalVulns}</div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1">Total Instances</p>
             </CardContent>
           </Card>
 
           <Card className="border-l-4 border-l-blue-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Unique CVEs</CardTitle>
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                Unique CVEs
+                <HelpTooltip text="The number of distinct security vulnerabilities identified by their unique IDs (e.g., CVE-2023-XYZ)." />
+              </CardTitle>
               <ShieldCheck className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{displayStats.uniqueVulnerabilityCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">Distinct IDs</p>
+              <div className="text-3xl font-bold" data-testid="unique-vulnerability-count">{displayStats.uniqueVulnerabilityCount}</div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1">Distinct IDs</p>
             </CardContent>
           </Card>
 
@@ -405,7 +498,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
               <AlertTriangle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600">{critical}</div>
+              <div className="text-3xl font-bold text-red-600" data-testid="critical-vulnerability-count">{critical}</div>
               <p className="text-xs text-muted-foreground mt-1">Immediate action</p>
             </CardContent>
           </Card>
@@ -422,7 +515,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
               <AlertCircle className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">{high}</div>
+              <div className="text-3xl font-bold text-orange-600" data-testid="high-vulnerability-count">{high}</div>
               <p className="text-xs text-muted-foreground mt-1">High priority</p>
             </CardContent>
           </Card>
@@ -439,7 +532,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
               <ShieldAlert className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-yellow-600">{medium}</div>
+              <div className="text-3xl font-bold text-yellow-600" data-testid="medium-vulnerability-count">{medium}</div>
               <p className="text-xs text-muted-foreground mt-1">Should be fixed</p>
             </CardContent>
           </Card>
@@ -456,7 +549,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
               <ShieldCheck className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600">{low}</div>
+              <div className="text-3xl font-bold text-blue-600" data-testid="low-vulnerability-count">{low}</div>
               <p className="text-xs text-muted-foreground mt-1">Minor issues</p>
             </CardContent>
           </Card>
@@ -477,17 +570,29 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 {severityPieData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie
-                        data={severityPieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={55}
-                        outerRadius={75}
-                        paddingAngle={4}
-                        dataKey="value"
-                      >
-                        {severityPieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                                              <Pie
+                                                data={severityPieData}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={55}
+                                                outerRadius={75}
+                                                paddingAngle={4}
+                                                dataKey="value"
+                                                className="cursor-pointer"
+                                                onClick={(data) => {
+                                                  if (data && data.name) {
+                                                    toggleSeverity(String(data.name));
+                                                  }
+                                                }}
+                                              >                        {severityPieData.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.color} 
+                            className={cn(
+                              "transition-opacity duration-300",
+                              selectedSeverities.length > 0 && !selectedSeverities.includes(entry.name) && "opacity-30"
+                            )}
+                          />
                         ))}
                       </Pie>
                       <Tooltip
@@ -508,7 +613,14 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
               </div>
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {severityPieData.map((entry) => (
-                  <div key={entry.name} className="flex items-center gap-2">
+                  <div 
+                    key={entry.name} 
+                    className={cn(
+                      "flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1 rounded transition-colors",
+                      selectedSeverities.includes(entry.name) && "bg-muted font-bold"
+                    )}
+                    onClick={() => toggleSeverity(entry.name)}
+                  >
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
                     <span className="text-[10px] font-medium">{entry.name}</span>
                     <span className="text-[10px] text-muted-foreground ml-auto">
@@ -528,6 +640,11 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                    {viewMode === "vulnerabilities" ? "Top CWE Types" : "Vulnerability Distribution"}
                    <HelpTooltip text={viewMode === "vulnerabilities" ? "Most common vulnerability types (CWEs) detected." : "Count of findings per severity level."} />
                 </CardTitle>
+                {viewMode === "vulnerabilities" && (
+                  <p className="text-[10px] text-muted-foreground italic mt-1 leading-tight">
+                    Note: One vulnerability may map to multiple CWE categories.
+                  </p>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="h-[260px] w-full">
@@ -573,18 +690,35 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     )
                   ) : (
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={barData}>
-                        <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
-                        <YAxis {...CHART_AXIS_PROPS} />
-                        <Tooltip
-                          cursor={CHART_CURSOR}
-                          contentStyle={CHART_TOOLTIP_STYLE}
-                          labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                          itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                        />
-                        <Bar dataKey="count" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
+                                                              <BarChart 
+                                                                data={barData}
+                                                                onClick={(data) => {
+                                                                  if (data && data.activeLabel) {
+                                                                    toggleSeverity(String(data.activeLabel));
+                                                                  }
+                                                                }}
+                                                                className="cursor-pointer"
+                                                              >                                            <XAxis dataKey="name" {...CHART_AXIS_PROPS} />
+                                            <YAxis {...CHART_AXIS_PROPS} />
+                                            <Tooltip
+                                              cursor={CHART_CURSOR}
+                                              contentStyle={CHART_TOOLTIP_STYLE}
+                                              labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                                              itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                                            />
+                                            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                                              {barData.map((entry, index) => (
+                                                <Cell 
+                                                  key={`cell-${index}`} 
+                                                  fill={entry.fill}
+                                                  className={cn(
+                                                    "transition-opacity duration-300",
+                                                    selectedSeverities.length > 0 && !selectedSeverities.includes(entry.name) && "opacity-30"
+                                                  )}
+                                                />
+                                              ))}
+                                            </Bar>
+                                          </BarChart>                    </ResponsiveContainer>
                   )}
                 </div>
               </CardContent>
@@ -685,6 +819,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     setViewMode("components");
                     setPage(0);
                   }}
+                  data-testid="vulnerabilities-mode-components"
                 >
                   By Component
                 </Button>
@@ -696,6 +831,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     setViewMode("vulnerabilities");
                     setPage(0);
                   }}
+                  data-testid="vulnerabilities-mode-vulnerabilities"
                 >
                   By Vulnerability
                 </Button>
@@ -741,33 +877,62 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                   </DropdownMenuContent>
                 </DropdownMenu>
 
+                {selectedItems.length > 0 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setSelectedItems([])} 
+                    className="text-xs h-8 text-destructive hover:text-destructive hover:bg-destructive/5"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Clear Selection ({selectedItems.length})
+                  </Button>
+                )}
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 text-xs gap-2" data-testid="export-button">
+                    <Button variant="outline" size="sm" className={cn("h-8 text-xs gap-2", selectedItems.length > 0 && "border-primary bg-primary/5 text-primary")} data-testid="export-button">
                       <Download className="h-3.5 w-3.5" />
-                      Export
+                      {selectedItems.length > 0 ? `Export Selected (${selectedItems.length})` : "Export"}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuGroup>
-                      <DropdownMenuLabel>Ticket Systems</DropdownMenuLabel>
+                      <DropdownMenuLabel className="flex items-center gap-2">
+                        Ticket Systems
+                        <HelpTooltip text="Generates a localized CSV file for manual import. No network connections to these platforms are made." />
+                      </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => handleExport("Jira")}>
-                        Export for Jira
+                        Download CSV for Jira
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleExport("GitLab")}>
-                        Export for GitLab
+                        Download CSV for GitLab
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleExport("GitHub")}>
-                        Export for GitHub
+                        Download CSV for GitHub
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => handleExport("Generic")}>
-                        Generic CSV
+                        Download Generic CSV
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleExport("VEX")}>
+                        VEX-Enriched CycloneDX
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                <Button
+                  variant={showMuted ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setShowMuted(!showMuted)}
+                  className="h-8 gap-2 text-xs"
+                >
+                  {showMuted ? <EyeOff className="h-3.5 w-3.5" /> : <Filter className="h-3.5 w-3.5" />}
+                  {showMuted ? "Showing Muted" : "Hide Muted"}
+                </Button>
 
                 <div className="relative w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -790,6 +955,14 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     <>
                     <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
                       <tr>
+                        <th className="px-4 py-3 w-10">
+                          <input 
+                            type="checkbox" 
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                            checked={pageItems.length > 0 && pageItems.every((item: any) => selectedItems.includes(item.ref))}
+                            onChange={toggleSelectAll}
+                          />
+                        </th>
                         <th className="px-4 py-3">
                           <div className="flex items-center gap-1">
                             {renderSortHeader("Component", "name")}
@@ -819,36 +992,49 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                       {pageItems.map((comp: any, i) => (
                         <tr
                           key={`${comp.ref}-${i}`}
-                          className="border-b hover:bg-muted/50 transition-colors"
+                          className={cn("border-b transition-colors", getRowClass(comp), selectedItems.includes(comp.ref) && "bg-primary/5")}
                         >
+                          <td className="px-4 py-3">
+                            <input 
+                              type="checkbox" 
+                              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                              checked={selectedItems.includes(comp.ref)}
+                              onChange={() => toggleItemSelection(comp.ref)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </td>
                           <td className="px-4 py-3 font-medium max-w-[200px] truncate" title={comp.name}>
                             {comp.name}
                           </td>
                           <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
                           <td className="px-4 py-3 text-center">
                             {comp.critical > 0 ? (
-                              <Badge variant="destructive" className="h-5 min-w-[20px] justify-center">
+                              <Badge variant="destructive" className="h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
+                                <ShieldAlert className="h-3 w-3 shrink-0" />
                                 {comp.critical}
                               </Badge>
                             ) : "—"}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {comp.high > 0 ? (
-                              <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center">
+                              <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
+                                <AlertTriangle className="h-3 w-3 shrink-0" />
                                 {comp.high}
                               </Badge>
                             ) : "—"}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {comp.medium > 0 ? (
-                              <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center">
+                              <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
+                                <Info className="h-3 w-3 shrink-0" />
                                 {comp.medium}
                               </Badge>
                             ) : "—"}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {comp.low > 0 ? (
-                              <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white border-0 h-5 min-w-[20px] justify-center">
+                              <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white border-0 h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
+                                <Info className="h-3 w-3 shrink-0 opacity-70" />
                                 {comp.low}
                               </Badge>
                             ) : "—"}
@@ -877,6 +1063,14 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                     <>
                     <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
                       <tr>
+                        <th className="px-4 py-3 w-10">
+                          <input 
+                            type="checkbox" 
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                            checked={pageItems.length > 0 && pageItems.every((item: any) => selectedItems.includes(item.id))}
+                            onChange={toggleSelectAll}
+                          />
+                        </th>
                         <th className="px-4 py-3">
                           <div className="flex items-center gap-1">
                             {renderSortHeader("Vulnerability ID", "id")}
@@ -895,46 +1089,88 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                       </tr>
                     </thead>
                     <tbody>
-                      {pageItems.map((vuln: any, i) => (
-                        <tr
-                          key={`${vuln.id}-${i}`}
-                          className="border-b hover:bg-muted/50 transition-colors"
-                        >
-                          <td className="px-4 py-3 font-bold font-mono text-xs text-destructive">
-                            <VulnerabilityLink id={vuln.id} />
-                          </td>
-                          <td className="px-4 py-3">
-                            <Badge 
-                              variant="secondary" 
-                              className="text-white border-0 h-5"
-                              style={{ 
-                                backgroundColor: SEVERITY_COLORS[vuln.severity.charAt(0).toUpperCase() + vuln.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666'
-                              }}
-                            >
-                              {vuln.severity}
-                            </Badge>
-                          </td>
-                          <td className="px-4 py-3 text-center font-bold">
-                            {vuln.affectedCount}
-                          </td>
-                          <td className="px-4 py-3 max-w-[300px] truncate text-muted-foreground italic text-xs" title={vuln.title}>
-                            {vuln.title || "No description provided"}
-                          </td>
-                          <td className="px-4 py-3 text-right pr-6">
-                            <Button 
-                              variant="outline" 
-                              size="xs" 
-                              className="h-7 text-[10px]"
-                              onClick={() => {
-                                setSelectedVulnerability(vuln);
-                                setSelectedComponent(null);
-                              }}
-                            >
-                              Details
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
+                      {pageItems.map((vuln: any, i) => {
+                        const vex = assessments[vuln.id];
+                        const isMuted = vex?.status === 'not_affected';
+                        
+                        return (
+                          <tr
+                            key={`${vuln.id}-${i}`}
+                            className={cn(
+                              "border-b transition-colors",
+                              getRowClass(vuln),
+                              isMuted && "opacity-40",
+                              selectedItems.includes(vuln.id) && "bg-primary/5"
+                            )}
+                          >
+                            <td className="px-4 py-3">
+                              <input 
+                                type="checkbox" 
+                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                checked={selectedItems.includes(vuln.id)}
+                                onChange={() => toggleItemSelection(vuln.id)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </td>
+                            <td className={cn(
+                              "px-4 py-3 font-bold font-mono text-xs text-destructive flex items-center gap-2",
+                              isMuted && "line-through text-muted-foreground"
+                            )}>
+                              <div className="flex items-center gap-1 group/vulnid">
+                                <VulnerabilityLink id={vuln.id} />
+                                <CopyButton value={vuln.id} tooltip="Copy ID" className="h-5 w-5 opacity-0 group-hover/vulnid:opacity-100" />
+                              </div>
+                              {vex && (
+                                <Badge variant="outline" className="h-4 text-[8px] py-0 px-1 border-primary/20 bg-primary/5">
+                                  {vex.status.replace('_', ' ')}
+                                </Badge>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              <Badge 
+                                variant="secondary" 
+                                className="text-white border-0 h-5 flex items-center gap-1 px-1.5"
+                                style={{ 
+                                  backgroundColor: isMuted ? '#94a3b8' : (SEVERITY_COLORS[vuln.severity.charAt(0).toUpperCase() + vuln.severity.slice(1) as keyof typeof SEVERITY_COLORS] || '#666')
+                                }}
+                              >
+                                {(() => {
+                                  switch (vuln.severity?.toLowerCase()) {
+                                    case 'critical': return <ShieldAlert className="h-3 w-3 shrink-0" />;
+                                    case 'high': return <AlertTriangle className="h-3 w-3 shrink-0" />;
+                                    case 'medium': return <Info className="h-3 w-3 shrink-0" />;
+                                    case 'low': return <Info className="h-3 w-3 shrink-0 opacity-70" />;
+                                    default: return null;
+                                  }
+                                })()}
+                                {vuln.severity}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3 text-center font-bold">
+                              {vuln.affectedCount}
+                            </td>
+                            <td className={cn(
+                              "px-4 py-3 max-w-[300px] truncate text-muted-foreground italic text-xs",
+                              isMuted && "line-through"
+                            )} title={vuln.title}>
+                              {vuln.title || "No description provided"}
+                            </td>
+                            <td className="px-4 py-3 text-right pr-6">
+                              <Button 
+                                variant="outline" 
+                                size="xs" 
+                                className="h-7 text-[10px]"
+                                onClick={() => {
+                                  setSelectedVulnerability(vuln);
+                                  setSelectedComponent(null);
+                                }}
+                              >
+                                Details
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                     </>
                   )}
@@ -990,555 +1226,33 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
           </ErrorBoundary>
         </Card>
       </div>
-        </ScrollArea>
-      </ResizablePanel>
+    </ScrollArea>
+  );
+}
 
-      {(selectedComponent || selectedVulnerability) && (
-        <>
-          <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/50 transition-colors" />
-          <ResizablePanel defaultSize={40} minSize={20}>
-            <div className="h-full pl-2">
-              <ErrorBoundary 
-                resetKeys={[selectedComponent, selectedVulnerability]} 
-                fallback={<div className="h-full border-l flex items-center justify-center p-6 text-center text-muted-foreground text-sm">Details panel failed to load.</div>}
-              >
-                {selectedComponent ? (
-                  <ComponentDetailPanel
-                    component={selectedComponent as any}
-                    analysis={analysis}
-                    onClose={() => setSelectedComponent(null)}
-                  />
-                ) : (
-                  <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
-                    <div className="flex items-center justify-between p-4 border-b flex-none bg-background sticky top-0 z-20">
-                      <div className="flex items-center gap-2">
-                        <ShieldAlert className="h-5 w-5 text-destructive" />
-                        <h3 className="font-semibold text-lg">Vulnerability Details</h3>
-                      </div>
-                      <Button aria-label="Close" variant="ghost" size="icon" onClick={() => setSelectedVulnerability(null)}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <ScrollArea className="flex-1 min-h-0">
-                      {(() => {
-                        const v = selectedVulnerability as any;
-                        if (!v) return null;
-                        return (
-                          <div className="p-4 space-y-6">
-                            {/* Sticky Header with ID and Severity */}
-                            <div className="flex items-center justify-between p-4 bg-muted/40 rounded-xl border border-primary/10 sticky top-0 z-10 backdrop-blur-md">
-                              <div>
-                                <div data-testid="vuln-id-label" className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">ID:</div>
-                                <div className="text-2xl font-black font-mono text-destructive flex items-center gap-2">
-                                  <VulnerabilityLink id={v.id} />
-                                  {v.source?.url && (
-                                    <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="inline-flex p-1 hover:bg-muted rounded text-muted-foreground transition-colors">
-                                      <ExternalLink className="h-4 w-4" />
-                                    </a>
-                                  )}
-                                </div>
-                                <div className="flex gap-2 mt-2">
-                                  <SearchButton query={v.id} size="sm" />
-                                </div>
-                                
-                                <div className="flex gap-2 mt-4">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-7 text-[10px]"
-                                    onClick={() => exportVulnerabilityToPdf(v, displayStats.allVulnerableComponents)}
-                                  >
-                                    <Download className="mr-1 h-3 w-3" /> PDF Card
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-7 text-[10px]"
-                                    onClick={() => exportVulnerabilityToPng(v, displayStats.allVulnerableComponents)}
-                                  >
-                                    <Download className="mr-1 h-3 w-3" /> PNG Card
-                                  </Button>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Severity:</div>
-                                <Badge 
-                                  variant="outline" 
-                                  className="text-white border-none py-1.5 px-3 text-sm font-bold shadow-sm"
-                                  style={{ backgroundColor: getSeverityColor(v.severity) }}
-                                >
-                                  {v.severity}
-                                </Badge>
-                              </div>
-                            </div>
-
-                            <Accordion multiple defaultValue={["overview", "technical"]} className="w-full space-y-4">
-
-                              {/* 1. Overview Section */}
-                              <AccordionItem value="overview" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                      <Layers className="h-4 w-4 text-primary" />
-                                    </div>
-                                    <span className="font-bold">Overview</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4 space-y-6 pt-2">
-                                  {v.recommendation && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
-                                        <ShieldCheck className="h-3 w-3 text-emerald-500" /> Recommendation
-                                      </h4>
-                                      <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-sm leading-relaxed text-foreground/90 font-medium">
-                                        {v.recommendation}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.cwes && v.cwes.length > 0 && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">CWE Classification</h4>
-                                      <div className="flex flex-wrap gap-2">
-                                        {v.cwes.map((cwe: number) => (
-                                          <Badge key={cwe} variant="secondary" className="font-mono text-[10px] py-0 px-2 h-6 border-primary/10 bg-muted/60">
-                                            <VulnerabilityLink id={`CWE-${cwe}`} />
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.advisories && v.advisories.length > 0 && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Primary Advisories</h4>
-                                      <div className="grid grid-cols-1 gap-2">
-                                        {v.advisories.map((adv: any, i: number) => (
-                                          <a 
-                                            key={i}
-                                            href={adv.url} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="flex flex-col p-3 bg-muted/40 hover:bg-muted/80 rounded-lg text-xs transition-colors border border-transparent hover:border-primary/20 group"
-                                          >
-                                            <div className="flex items-center justify-between mb-1">
-                                              <span className="font-bold text-primary group-hover:underline line-clamp-1">{adv.title || (adv.url ? new URL(adv.url).hostname : 'Advisory')}</span>
-                                              <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
-                                            <span className="text-[10px] text-muted-foreground line-clamp-1 opacity-70">{adv.url}</span>
-                                          </a>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-
-                              {/* 2. Technical Details Section */}
-                              <AccordionItem value="technical" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                      <Info className="h-4 w-4 text-primary" />
-                                    </div>
-                                    <span className="font-bold">Technical Details</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4 space-y-6 pt-2">
-                                  {v.description && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Description</h4>
-                                      <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
-                                        {v.description}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.detail && v.description !== v.detail && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">In-Depth Analysis</h4>
-                                      <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/80 p-4 bg-muted/30 rounded-lg border border-primary/5">
-                                        {v.detail}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.ratings && v.ratings.length > 0 && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Scoring & System Ratings</h4>
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {v.ratings.map((rating: any, i: number) => (
-                                          <div key={i} className="p-3 bg-muted/40 rounded-lg border border-primary/10 shadow-sm">
-                                            <div className="flex items-center justify-between mb-2">
-                                              <span className="text-[10px] font-black uppercase text-muted-foreground">{rating.method || 'Score'}</span>
-                                              <Badge 
-                                                variant="outline" 
-                                                className="text-[9px] font-bold py-0 h-4"
-                                                style={{ borderColor: SEVERITY_COLORS[rating.severity as keyof typeof SEVERITY_COLORS] || '#666', color: SEVERITY_COLORS[rating.severity as keyof typeof SEVERITY_COLORS] || '#666' }}
-                                              >
-                                                {rating.severity}
-                                              </Badge>
-                                            </div>
-                                            <div className="text-2xl font-black text-primary">{rating.score}</div>
-                                            {rating.vector && <div className="text-[9px] font-mono text-muted-foreground mt-2 break-all opacity-80" title={rating.vector}>{rating.vector}</div>}
-                                            {rating.source?.name && <div className="text-[9px] text-muted-foreground mt-2 text-right italic font-medium">Source: {rating.source.name}</div>}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.analysis && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
-                                        <Search className="h-3 w-3" /> Status Analysis
-                                      </h4>
-                                      <div className="p-4 bg-muted/30 rounded-lg border border-primary/10 grid grid-cols-2 gap-4">
-                                        {v.analysis.state && (
-                                          <div>
-                                            <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">State</div>
-                                            <Badge variant="outline" className="uppercase font-bold text-[10px] border-primary/30">{v.analysis.state}</Badge>
-                                          </div>
-                                        )}
-                                        {v.analysis.justification && (
-                                          <div className="col-span-2 sm:col-span-1">
-                                            <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Justification</div>
-                                            <div className="text-xs font-medium">{v.analysis.justification}</div>
-                                          </div>
-                                        )}
-                                        {v.analysis.response && (
-                                          <div className="col-span-2">
-                                            <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Response</div>
-                                            <div className="flex flex-wrap gap-1">
-                                              {v.analysis.response.map((r: string, i: number) => (
-                                                <Badge key={i} variant="secondary" className="text-[9px] py-0">{r}</Badge>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.tools && v.tools.length > 0 && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2">Detection Tools</h4>
-                                      <div className="flex flex-wrap gap-2">
-                                        {v.tools.map((tool: any, i: number) => (
-                                          <Badge key={i} variant="outline" className="text-[10px] bg-muted/20">
-                                            {tool.name || tool.vendor} {tool.version}
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-
-                              {/* 3. Remediation & Evidence */}
-                              <AccordionItem value="remediation" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                      <ShieldAlert className="h-4 w-4 text-primary" />
-                                    </div>
-                                    <span className="font-bold">Remediation & Evidence</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4 space-y-6 pt-2">
-                                  {v.recommendation && (
-                                    <div>
-                                      <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
-                                        <ShieldCheck className="h-3 w-3 text-emerald-500" /> Recommendation
-                                      </h4>
-                                      <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-sm leading-relaxed text-foreground/90 font-medium">
-                                        {v.recommendation}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.workaround && (
-                                    <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-lg">
-                                      <h4 className="text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                        <AlertTriangle className="h-3 w-3" /> Workaround
-                                      </h4>
-                                      <div className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-                                        {v.workaround}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.proofOfConcept && (
-                                    <div className="bg-orange-500/5 border border-orange-500/20 p-4 rounded-lg">
-                                      <h4 className="text-xs font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                        <ShieldAlert className="h-3 w-3" /> Proof of Concept
-                                      </h4>
-                                      {v.proofOfConcept.reproductionSteps && (
-                                        <div className="mt-2">
-                                          <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Reproduction Steps</div>
-                                          <div className="text-xs p-3 bg-muted/40 rounded border border-primary/5 whitespace-pre-wrap font-mono leading-tight">
-                                            {v.proofOfConcept.reproductionSteps}
-                                          </div>
-                                        </div>
-                                      )}
-                                      {v.proofOfConcept.environment && (
-                                        <div className="mt-3">
-                                          <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Target Environment</div>
-                                          <p className="text-xs italic text-foreground/80">{v.proofOfConcept.environment}</p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {!v.recommendation && !v.workaround && !v.proofOfConcept && (
-                                    <div className="text-xs text-muted-foreground italic text-center py-4 bg-muted/20 rounded-lg">
-                                      No specific recommendation, workaround or proof of concept evidence provided.
-                                    </div>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-
-                              {/* 4. Affected Components */}
-                              <AccordionItem value="affected" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                      <Network className="h-4 w-4 text-primary" />
-                                    </div>
-                                    <span className="font-bold">Affected Components ({v.affectedCount})</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4 space-y-3 pt-2">
-                                  {displayStats.allVulnerableComponents
-                                    .filter(c => v.affectedComponentRefs?.includes(c.ref))
-                                    .slice(0, 15).map((comp: any, i: number) => {
-                                      const affect = v.affects?.find((a: any) => (a.ref?.value || a.ref) === comp.ref);
-                                      const status = affect?.versions?.[0]?.status || 'affected';
-                                      
-                                      return (
-                                        <div key={i} className="flex flex-col p-3 rounded-xl bg-muted/30 border border-primary/5 hover:border-primary/20 transition-all text-sm gap-2">
-                                          <div className="flex items-center justify-between">
-                                            <div className="flex flex-col truncate pr-2">
-                                              <span className="font-bold truncate text-foreground/90">{comp.name}</span>
-                                              <span className="text-[9px] text-muted-foreground truncate opacity-70 font-mono" title={comp.ref}>{comp.ref}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 shrink-0">
-                                              <Badge 
-                                                variant={status === 'affected' ? 'destructive' : 'outline'} 
-                                                className="text-[9px] py-0 h-5 px-2 uppercase font-black"
-                                              >
-                                                {status}
-                                              </Badge>
-                                              <Badge variant="secondary" className="text-[10px] shrink-0 font-mono h-5 font-bold border-primary/10">{comp.version}</Badge>
-                                            </div>
-                                          </div>
-                                          {affect?.versions && affect.versions.length > 1 && (
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                              {affect.versions.slice(1).map((ver: any, vi: number) => (
-                                                <Badge key={vi} variant="outline" className="text-[8px] py-0 opacity-60 font-mono">
-                                                  {ver.version}: {ver.status}
-                                                </Badge>
-                                              ))}
-                                            </div>
-                                          )}
-                                        </div>
-                                      );
-                                    })
-                                  }
-                                  {v.affectedCount > 15 && (
-                                    <div className="text-center pt-2">
-                                      <Badge variant="ghost" className="text-[10px] text-muted-foreground italic">
-                                        + {v.affectedCount - 15} more components affected
-                                      </Badge>
-                                    </div>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-
-                              {/* 5. Metadata & Provenance */}
-                              <AccordionItem value="metadata" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                      <Fingerprint className="h-4 w-4 text-primary" />
-                                    </div>
-                                    <span className="font-bold">Metadata & Provenance</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4 space-y-6 pt-2">
-                                  <div className="grid grid-cols-2 gap-4">
-                                    {v.created && (
-                                      <div>
-                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Created</div>
-                                        <div className="text-xs font-medium">{new Date(v.created).toLocaleDateString()}</div>
-                                      </div>
-                                    )}
-                                    {v.published && (
-                                      <div>
-                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Published</div>
-                                        <div className="text-xs font-medium">{new Date(v.published).toLocaleDateString()}</div>
-                                      </div>
-                                    )}
-                                    {v.updated && (
-                                      <div>
-                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Last Updated</div>
-                                        <div className="text-xs font-medium">{new Date(v.updated).toLocaleDateString()}</div>
-                                      </div>
-                                    )}
-                                    {v.rejected && (
-                                      <div>
-                                        <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Rejected</div>
-                                        <div className="text-xs font-medium text-destructive">{new Date(v.rejected).toLocaleDateString()}</div>
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {v.source && (
-                                    <div className="pt-2 border-t border-primary/5">
-                                      <div className="text-[10px] font-black uppercase text-muted-foreground mb-2">Primary Source</div>
-                                      <div className="flex items-center gap-3 p-3 bg-muted/40 rounded-lg">
-                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary text-xs">
-                                          {v.source.name?.charAt(0) || '?'}
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-sm font-bold">{v.source.name || 'Unknown Provider'}</span>
-                                          {v.source.url && <a href={v.source.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-500 hover:underline line-clamp-1">{v.source.url}</a>}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.credits && (
-                                    <div className="pt-2 border-t border-primary/5">
-                                      <div className="text-[10px] font-black uppercase text-muted-foreground mb-2">Credits</div>
-                                      <div className="space-y-2">
-                                        {v.credits.individuals?.map((ind: any, i: number) => (
-                                          <div key={i} className="text-xs flex items-center gap-2">
-                                            <User className="h-3 w-3 text-muted-foreground" />
-                                            <span className="font-medium">{ind.name}</span>
-                                            {ind.email && <span className="text-muted-foreground opacity-60">({ind.email})</span>}
-                                          </div>
-                                        ))}
-                                        {v.credits.organizations?.map((org: any, i: number) => (
-                                          <div key={i} className="text-xs flex items-center gap-2">
-                                            <Building className="h-3 w-3 text-muted-foreground" />
-                                            <span className="font-medium">{org.name}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {v.properties && v.properties.length > 0 && (
-                                    <div className="pt-2 border-t border-primary/5">
-                                      <div className="text-[10px] font-black uppercase text-muted-foreground mb-2">Extended Properties</div>
-                                      <div className="grid grid-cols-1 gap-1">
-                                        {v.properties.map((prop: any, i: number) => (
-                                          <div key={i} className="flex items-center justify-between p-2 bg-muted/20 rounded text-[10px]">
-                                            <span className="font-mono text-muted-foreground">{prop.name}</span>
-                                            <span className="font-bold">{prop.value}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-
-                              {/* 6. Raw JSON Data */}
-                              {(v._raw || (v._rawSources && v._rawSources.length > 0)) ? (
-                                <AccordionItem value="raw" className="border rounded-xl px-4 bg-card shadow-sm overflow-hidden">
-                                  <AccordionTrigger className="hover:no-underline py-4">
-                                    <div className="flex items-center gap-3">
-                                      <div className="p-2 bg-primary/10 rounded-lg">
-                                        <FileJson className="h-4 w-4 text-primary" />
-                                      </div>
-                                      <span className="font-bold flex items-center gap-2">
-                                        Raw JSON Data
-                                        <HelpTooltip text="The complete, underlying CycloneDX JSON structure for this vulnerability." />
-                                      </span>
-                                    </div>
-                                  </AccordionTrigger>
-                                  <AccordionContent className="pb-4 pt-2">
-                                    <Tabs defaultValue={v._rawSources && v._rawSources.length > 0 ? v._rawSources[0].name : "combined"} className="w-full">
-                                      {(v._rawSources && v._rawSources.length > 1) || v._raw ? (
-                                        <TabsList className="mb-2 w-full justify-start overflow-x-auto h-auto min-h-9 flex-wrap">
-                                          {v._rawSources?.map((src: {name: string, json: unknown}) => (
-                                            <TabsTrigger key={src.name} value={src.name} className="text-xs">
-                                              {src.name}
-                                            </TabsTrigger>
-                                          ))}
-                                          {v._raw && (
-                                            <TabsTrigger value="combined" className="text-xs">
-                                              Combined
-                                            </TabsTrigger>
-                                          )}
-                                        </TabsList>
-                                      ) : null}
-
-                                      {v._rawSources?.map((src: {name: string, json: unknown}) => (
-                                        <TabsContent key={src.name} value={src.name} className="mt-0">
-                                          <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
-                                            <pre className="whitespace-pre-wrap break-all">
-                                              {JSON.stringify(src.json, null, 2)}
-                                            </pre>
-                                          </div>
-                                        </TabsContent>
-                                      ))}
-
-                                      {v._raw && (
-                                        <TabsContent value="combined" className="mt-0">
-                                          <div className="rounded-md border p-2 text-[10px] font-mono bg-muted/50 overflow-auto max-h-[400px]">
-                                            <pre className="whitespace-pre-wrap break-all">
-                                              {JSON.stringify(v._raw, null, 2)}
-                                            </pre>
-                                          </div>
-                                        </TabsContent>
-                                      )}
-                                    </Tabs>
-                                  </AccordionContent>
-                                </AccordionItem>
-                              ) : null}
-                            </Accordion>
-
-                            {v.references && v.references.length > 0 && (
-                              <div className="pt-6 border-t border-primary/10">
-                                <h4 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
-                                  <BookOpen className="h-3 w-3" /> External References
-                                </h4>
-                                <div className="space-y-2">
-                                  {v.references.map((ref: any, i: number) => (
-                                    <a 
-                                      key={i} 
-                                      href={ref.url} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="block p-3 bg-muted/30 hover:bg-muted/60 rounded-lg text-xs border border-transparent hover:border-primary/10 transition-all group"
-                                    >
-                                      <div className="flex items-center justify-between mb-1">
-                                        <span className="font-bold text-primary group-hover:underline line-clamp-1">{ref.url}</span>
-                                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                      </div>
-                                      {ref.comment && <p className="text-[10px] text-muted-foreground italic leading-relaxed">{ref.comment}</p>}
-                                    </a>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                      </div>
-                        );
-                      })()}
-                    </ScrollArea>
-                  </div>
-                )}
-                
-
-              </ErrorBoundary>
-            </div>
-          </ResizablePanel>
-        </>
-      )}
-    </ResizablePanelGroup>
+export function VulnerabilitiesSkeleton() {
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <Card key={i} className="h-24">
+            <CardHeader className="pb-2"><Skeleton className="h-4 w-16" /></CardHeader>
+            <CardContent><Skeleton className="h-8 w-12" /></CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="h-[250px]">
+            <CardHeader><Skeleton className="h-6 w-32" /></CardHeader>
+            <CardContent><Skeleton className="h-full w-full" /></CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card className="h-[400px]">
+        <CardHeader><Skeleton className="h-8 w-48" /></CardHeader>
+        <CardContent><Skeleton className="h-full w-full" /></CardContent>
+      </Card>
+    </div>
   );
 }

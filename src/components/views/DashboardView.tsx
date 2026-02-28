@@ -16,10 +16,50 @@ import {
   PieChart,
   Cell,
 } from "recharts";
-import { ShieldAlert, ShieldCheck, Package, Fingerprint, Scale } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Package, Fingerprint, Wrench, Info, ArrowRight } from "lucide-react";
+import { useView } from "../../context/ViewContext";
+import { useSelection } from "../../context/SelectionContext";
+import { useSbom } from "../../context/SbomContext";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
+
+function Sparkline({ data }: { data: number[] }) {
+  if (data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const width = 40;
+  const height = 15;
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((d - min) / range) * height;
+    return `${x},${y}`;
+  }).join(" ");
+
+  return (
+    <div className="flex items-center gap-1 bg-muted/50 px-1 rounded border border-border/50">
+      <svg width={width} height={height} className="overflow-visible">
+        <polyline
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-primary/50"
+          points={points}
+        />
+        <circle 
+          cx={width} 
+          cy={height - ((data[data.length-1] - min) / range) * height} 
+          r="2" 
+          className="fill-primary"
+        />
+      </svg>
+    </div>
+  );
+}
 
 export function DashboardView({ 
   sbom, 
@@ -28,10 +68,13 @@ export function DashboardView({
   sbom: any; 
   preComputedStats?: SbomStats; 
 }) {
+  const { setActiveView } = useView();
+  const { setViewFilters } = useSelection();
+  const { scoreHistory } = useSbom();
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
   const displayStats: SbomStats = preComputedStats ?? stats ?? {
-    totalComponents: sbom ? (Array.isArray(sbom.components) ? sbom.components.length : (sbom.components?.size ?? 0)) : 0,
+    totalComponents: Number(sbom ? (Array.isArray(sbom.components) ? sbom.components.length : (sbom.components?.size ?? 0)) : 0),
     vulnerabilityCounts: {
       critical: 0,
       high: 0,
@@ -55,6 +98,7 @@ export function DashboardView({
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
+    totalVulnerabilityInstances: 0,
     avgVulnerabilitiesPerComponent: 0,
     dependencyStats: { direct: 0, transitive: 0 },
     dependentsDistribution: {},
@@ -123,113 +167,160 @@ export function DashboardView({
     },
   ].filter(d => d.value > 0);
 
+  const hasVulnData = vulnData.some(d => d.count > 0);
+
   return (
     <ScrollArea className="h-full">
       <div className="pb-6 space-y-6 animate-in fade-in duration-500">
-        <div className="flex items-center gap-2">
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          {isLoadingStats && (
+        {isLoadingStats && (
+          <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               Computing stats…
             </Badge>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* KPI Cards */}
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6 text-center">
-          <Card>
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5 text-center">
+          <Card 
+            className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group"
+            onClick={() => setActiveView('explorer')}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Total Components
                 <HelpTooltip text="Total number of components found in the SBOM file." />
               </CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+              <Package className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {displayStats.totalComponents}
               </div>
-              <p className="text-xs text-muted-foreground">in current SBOM</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Vulnerability Findings
-              </CardTitle>
-              <ShieldAlert className="h-4 w-4 text-destructive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">
-                {displayStats.totalVulnerabilities}
-              </div>
-              <p className="text-xs text-muted-foreground">Total package hits</p>
+              <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 group-hover:text-primary transition-colors">
+                View explorer <ArrowRight className="h-3 w-3" />
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer hover:border-destructive/50 hover:shadow-md transition-all group"
+            onClick={() => {
+              setViewFilters('vulnerabilities', { viewMode: 'components' });
+              setActiveView('vulnerabilities');
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Unique CVEs
+              <CardTitle className="text-sm font-medium flex items-center gap-2 text-destructive">
+                Vulnerability Findings
+                <HelpTooltip text="The total number of vulnerability instances across all components. One CVE affecting three packages counts as three findings." />
               </CardTitle>
-              <Fingerprint className="h-4 w-4 text-orange-500" />
+              <ShieldAlert className="h-4 w-4 text-destructive group-hover:scale-110 transition-transform" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">
+                {displayStats.totalVulnerabilityInstances || displayStats.totalVulnerabilities}
+              </div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1 flex items-center justify-center gap-1 group-hover:text-destructive transition-colors">
+                Analyze findings <ArrowRight className="h-3 w-3" />
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:border-orange-500/50 hover:shadow-md transition-all group"
+            onClick={() => {
+              setViewFilters('vulnerabilities', { viewMode: 'vulnerabilities' });
+              setActiveView('vulnerabilities');
+            }}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2 text-orange-500">
+                Unique CVEs
+                <HelpTooltip text="The number of distinct security vulnerabilities identified by their unique IDs (e.g., CVE-2023-XYZ)." />
+              </CardTitle>
+              <Fingerprint className="h-4 w-4 text-orange-500 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-orange-500">
                 {displayStats.uniqueVulnerabilityCount}
               </div>
-              <p className="text-xs text-muted-foreground">Distinct issues</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1 flex items-center justify-center gap-1 group-hover:text-orange-500 transition-colors">
+                View distinct IDs <ArrowRight className="h-3 w-3" />
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group"
+            onClick={() => setActiveView('developer')}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                Secure Components
-                <HelpTooltip text="Number of components with no known vulnerabilities." />
+                Metadata Health
+                <HelpTooltip text="Score based on the completeness of SBOM metadata (purls, hashes, licenses, etc.). Higher is better for security automation." />
               </CardTitle>
-              <ShieldCheck className="h-4 w-4 text-sky-600" />
+              <Wrench className="h-4 w-4 text-primary group-hover:rotate-12 transition-transform" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {Math.max(0, displayStats.totalComponents - displayStats.allVulnerableComponents.length)}
+              <div className="flex items-center gap-2 justify-center">
+                <div className={`text-2xl font-bold ${
+                  displayStats.developerStats?.metadataQuality.grade === 'A' ? 'text-green-600' :
+                  displayStats.developerStats?.metadataQuality.grade === 'B' ? 'text-blue-600' :
+                  displayStats.developerStats?.metadataQuality.grade === 'C' ? 'text-yellow-600' :
+                  'text-red-600'
+                }`}>
+                  {displayStats.developerStats?.metadataQuality.grade || 'N/A'}
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="text-xs font-semibold text-muted-foreground">
+                    ({displayStats.developerStats?.metadataQuality.score || 0}/100)
+                  </div>
+                  {scoreHistory && scoreHistory.length > 1 && (
+                    <div className="mt-0.5" title="Score history in this session">
+                      <Sparkline data={scoreHistory} />
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground">No known issues</p>
+              <div className="text-[10px] text-primary group-hover:underline font-medium flex items-center justify-center gap-1 mt-1">
+                View health breakdown <ArrowRight className="h-3 w-3" />
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Unique Licenses
-              </CardTitle>
-              <Scale className="h-4 w-4 text-indigo-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {displayStats.allLicenses.length}
-              </div>
-              <p className="text-xs text-muted-foreground">License variations</p>
-            </CardContent>
-          </Card>
-
-          <Card className={sbom.signature ? "border-green-500/50 bg-green-500/5" : ""}>
+          <Card 
+            className={sbom.signature ? "border-green-500/50 bg-green-500/5 cursor-pointer hover:shadow-md transition-all group" : "cursor-pointer hover:shadow-md transition-all group"}
+            onClick={() => setActiveView('metadata')}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Signature
-                <HelpTooltip text={sbom.signature ? `Digital signature detected using ${sbom.signature.algorithm}.` : "No digital signature detected in this SBOM."} />
+                <HelpTooltip text={sbom.signature ? `Digital signature detected (${sbom.signature.algorithm}). This verifies the SBOM was created by a trusted source and hasn't been tampered with.` : "No digital signature detected. There is no cryptographic assurance of this SBOM's origin or integrity."} />
               </CardTitle>
-              <ShieldCheck className={`h-4 w-4 ${sbom.signature ? "text-green-500" : "text-muted-foreground"}`} />
+              <ShieldCheck className={`h-4 w-4 ${sbom.signature ? "text-green-500" : "text-muted-foreground"} group-hover:scale-110 transition-transform`} />
             </CardHeader>
             <CardContent>
               <div className={`text-2xl font-bold ${sbom.signature ? "text-green-500" : "text-muted-foreground"}`}>
                 {sbom.signature ? "Verified" : "Unsigned"}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {sbom.signature ? sbom.signature.algorithm : "No assurance"}
+              <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 group-hover:text-primary transition-colors">
+                {sbom.signature ? sbom.signature.algorithm : "View raw metadata"} <ArrowRight className="h-3 w-3" />
               </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Data Source Notice */}
+        <div className="flex flex-col gap-2 bg-muted/30 p-3 rounded border border-dashed">
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <Info className="h-3 w-3" />
+            <span>Vulnerability and component data is derived directly from the SBOM metadata. No external scanning is performed.</span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <Info className="h-3 w-3" />
+            <span>Direct/Transitive breakdown is based on the SBOM's defined root. Results may vary if the root is not explicitly specified.</span>
+          </div>
         </div>
 
         {/* Charts Section */}
@@ -245,25 +336,35 @@ export function DashboardView({
               </CardHeader>
               <CardContent className="pl-2">
                 <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={vulnData}>
-                      <XAxis
-                        dataKey="name"
-                        {...CHART_AXIS_PROPS}
-                      />
-                      <YAxis
-                        {...CHART_AXIS_PROPS}
-                        tickFormatter={(value) => `${value}`}
-                      />
-                      <Tooltip
-                        cursor={CHART_CURSOR}
-                        contentStyle={CHART_TOOLTIP_STYLE}
-                        labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                        itemStyle={CHART_TOOLTIP_ITEM_STYLE}
-                      />
-                      <Bar dataKey="count" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {hasVulnData ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={vulnData}>
+                        <XAxis
+                          dataKey="name"
+                          {...CHART_AXIS_PROPS}
+                        />
+                        <YAxis
+                          {...CHART_AXIS_PROPS}
+                          tickFormatter={(value) => `${value}`}
+                        />
+                        <Tooltip
+                          cursor={CHART_CURSOR}
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                          itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                        />
+                        <Bar dataKey="count" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-muted/10 rounded-lg border-2 border-dashed border-muted">
+                      <ShieldCheck className="h-12 w-12 text-green-500/50 mb-3" />
+                      <p className="text-sm font-medium text-foreground">No Vulnerabilities Detected</p>
+                      <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">
+                        Clean scan results! This SBOM contains no known security vulnerabilities in its metadata.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </ErrorBoundary>
@@ -445,9 +546,9 @@ export function DashboardView({
 
         {/* Most Vulnerable Components Table */}
         <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
-          <Card className="shadow-sm border-muted-foreground/10">
+          <Card className="shadow-sm border-muted-foreground/10 overflow-hidden">
             <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">Components table unavailable due to a rendering error.</div>}>
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-3">
                 <CardTitle className="text-xl">
                   Most Vulnerable Components
                 </CardTitle>
@@ -455,63 +556,63 @@ export function DashboardView({
                   Top 5 by Severity
                 </Badge>
               </CardHeader>
-              <CardContent>
-                <div className="relative overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-muted-foreground uppercase border-b bg-muted/30">
+              <CardContent className="p-0 sm:p-6">
+                <div className="relative overflow-x-auto scrollbar-thin">
+                  <table className="w-full text-sm text-left border-collapse min-w-[600px] md:min-w-0">
+                    <thead className="text-[10px] md:text-xs text-muted-foreground uppercase border-y bg-muted/30">
                       <tr>
-                        <th className="px-4 py-3">Component</th>
-                        <th className="px-4 py-3">Version</th>
-                        <th className="px-4 py-3 text-center">Critical</th>
-                        <th className="px-4 py-3 text-center">High</th>
-                        <th className="px-4 py-3 text-center">Medium</th>
-                        <th className="px-4 py-3 text-center font-bold">Total</th>
+                        <th className="px-4 py-3 font-bold">Component</th>
+                        <th className="px-4 py-3 font-bold">Version</th>
+                        <th className="px-4 py-3 font-bold text-center">Critical</th>
+                        <th className="px-4 py-3 font-bold text-center">High</th>
+                        <th className="px-4 py-3 font-bold text-center">Medium</th>
+                        <th className="px-4 py-3 font-bold text-center">Total</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y">
                       {displayStats.vulnerableComponents.map((comp, i) => (
                         <tr
                           key={i}
-                          className="border-b hover:bg-muted/50 transition-colors"
+                          className="hover:bg-muted/50 transition-colors"
                         >
-                          <td className="px-4 py-3 font-medium">{comp.name}</td>
-                          <td className="px-4 py-3 font-mono text-xs">
+                          <td className="px-4 py-3 font-medium truncate max-w-[200px]" title={comp.name}>{comp.name}</td>
+                          <td className="px-4 py-3 font-mono text-[10px] md:text-xs whitespace-nowrap">
                             {comp.version}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {comp.critical > 0 ? (
                               <Badge
                                 variant="destructive"
-                                className="h-5 min-w-[20px] justify-center"
+                                className="h-5 min-w-[20px] justify-center text-[10px] px-1"
                               >
                                 {comp.critical}
                               </Badge>
                             ) : (
-                              "-"
+                              <span className="text-muted-foreground/30">—</span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {comp.high > 0 ? (
                               <Badge
                                 variant="secondary"
-                                className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center"
+                                className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center text-[10px] px-1"
                               >
                                 {comp.high}
                               </Badge>
                             ) : (
-                              "-"
+                              <span className="text-muted-foreground/30">—</span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {comp.medium > 0 ? (
                               <Badge
                                 variant="secondary"
-                                className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center"
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center text-[10px] px-1"
                               >
                                 {comp.medium}
                               </Badge>
                             ) : (
-                              "-"
+                              <span className="text-muted-foreground/30">—</span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-center font-bold">
@@ -523,9 +624,21 @@ export function DashboardView({
                         <tr>
                           <td
                             colSpan={6}
-                            className="px-4 py-8 text-center text-muted-foreground italic"
+                            className="px-4 py-12 text-center text-muted-foreground"
                           >
-                            No vulnerabilities detected in any components.
+                            <div className="flex flex-col items-center gap-3">
+                              <ShieldCheck className="h-12 w-12 text-green-500 opacity-50" />
+                              <div>
+                                <p className="font-bold text-foreground">No vulnerabilities detected</p>
+                                <p className="text-sm">Your components appear to be secure based on current SBOM metadata.</p>
+                              </div>
+                              <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/10 max-w-md">
+                                <p className="text-[10px] uppercase font-black text-primary mb-1 tracking-widest text-left">Pro-tip</p>
+                                <p className="text-xs text-left leading-relaxed">
+                                  Try uploading multiple SBOMs from different scanners (e.g., Syft + Trivy) to see a combined security posture and discover hidden risks.
+                                </p>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       )}
@@ -539,5 +652,32 @@ export function DashboardView({
         <ReportGenerator stats={displayStats} />
       </div>
     </ScrollArea>
+  );
+}
+
+export function DashboardSkeleton() {
+  return (
+    <div className="p-6 space-y-6 animate-in fade-in duration-500">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Card key={i} className="h-24">
+            <CardHeader className="pb-2">
+              <Skeleton className="h-4 w-24" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-16" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="h-[300px]">
+            <CardHeader className="pb-2"><Skeleton className="h-6 w-32" /></CardHeader>
+            <CardContent><Skeleton className="h-full w-full" /></CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 }

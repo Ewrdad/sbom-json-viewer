@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 import { ComponentExplorer } from "./ComponentExplorer";
+import { SelectionProvider } from "../../context/SelectionContext";
 
 // Mock data
 const mockSbom = {
@@ -26,7 +27,11 @@ const mockSbom = {
 
 describe("Component Search Logic", () => {
   it("filters by name in basic search", async () => {
-    render(<ComponentExplorer sbom={mockSbom} />);
+    render(
+      <SelectionProvider>
+        <ComponentExplorer sbom={mockSbom} />
+      </SelectionProvider>
+    );
     
     const searchInput = screen.getByPlaceholderText("Search components...");
     fireEvent.change(searchInput, { target: { value: "react" } });

@@ -11,29 +11,29 @@ test.describe("SBOM Performance", () => {
     await expect(page.getByText(/Preparing viewer|Loading analysis/)).not.toBeVisible({ timeout: 20000 });
     
     // Verify we are actually in the app
-    const sbomSelector = page.getByPlaceholder("Self Scan (Latest)");
+    const sbomSelector = page.getByTestId("sbom-selector-trigger");
     await expect(sbomSelector).toBeVisible();
     
     // 1. Click on the Huge SBOM button
     await sbomSelector.click();
-    const hugeOption = page.getByRole("option", { name: "Huge Example (20k)" });
+    const hugeOption = page.getByTestId("sbom-option-examples/sbom-huge");
     await expect(hugeOption).toBeVisible();
     await hugeOption.click();
 
     // 2. Verify progress indicator appears
     // The worker sends multiple progress updates. We check for the completion of processing.
     await expect(page.getByText(/20,00\d components/)).toBeVisible({ timeout: 60000 });
-    await expect(page.getByText("Large SBOM mode")).toBeVisible();
+    await expect(page.getByTestId("large-sbom-badge")).toBeVisible();
 
     // 3. Switch to Dependency Tree
-    await page.getByRole("button", { name: "Dependency Tree" }).click();
+    await page.getByTestId("sidebar-link-tree").click();
     
     // Large SBOMs require a manual click to render the tree for performance safety
     const renderButton = page.getByRole("button", { name: "Render tree anyway" });
     await expect(renderButton).toBeVisible({ timeout: 20000 });
     await renderButton.click();
     
-    await expect(page.getByRole("heading", { name: "Dependency Tree" })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByTestId("view-title")).toContainText("Dependency Tree", { timeout: 20000 });
     
     // 4. Verify tree content is rendered (virtuoso should handle this)
     // We check for root child

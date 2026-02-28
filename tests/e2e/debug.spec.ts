@@ -1,11 +1,21 @@
 import { test, expect } from "@playwright/test";
 
 test("debug home page", async ({ page }) => {
+  // Set a fixed viewport size for stability
+  await page.setViewportSize({ width: 1280, height: 800 });
+  
   console.log("Navigating to /");
   await page.goto("/");
   
   console.log("Waiting for load state...");
   await page.waitForLoadState("domcontentloaded");
+  
+  // Wait for loading spinner to disappear
+  console.log("Waiting for loading to finish...");
+  await page.waitForSelector(".animate-spin", { state: "detached", timeout: 30000 });
+  
+  // Wait for dashboard content to appear
+  await page.waitForSelector("text=Vulnerability Severity", { timeout: 10000 });
   
   console.log("Page title:", await page.title());
   

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ComponentDetailPanel } from "./ComponentDetailPanel";
 import { type EnhancedComponent } from "../../types/sbom";
 import { SettingsProvider } from "../../context/SettingsContext";
+import { ViewProvider } from "../../context/ViewContext";
 
 // Mock handles
 vi.stubGlobal('navigator', {
@@ -53,11 +54,13 @@ describe("ComponentDetailPanel", () => {
   it("renders basic component information", () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -69,11 +72,13 @@ describe("ComponentDetailPanel", () => {
   it("renders vulnerability breakdown", () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -86,11 +91,13 @@ describe("ComponentDetailPanel", () => {
   it("renders license badge", () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -103,11 +110,13 @@ describe("ComponentDetailPanel", () => {
   it("copies JSON to clipboard", async () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -126,11 +135,13 @@ describe("ComponentDetailPanel", () => {
   it("renders additional details (properties)", () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -149,11 +160,13 @@ describe("ComponentDetailPanel", () => {
   it("renders hashes", () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -166,11 +179,13 @@ describe("ComponentDetailPanel", () => {
     mockComponent.name = "my-special-component";
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -190,11 +205,13 @@ describe("ComponentDetailPanel", () => {
   it("renders origin and contact information", () => {
     render(
       <SettingsProvider>
-        <ComponentDetailPanel
-          component={mockComponent}
-          analysis={null}
-          onClose={mockOnClose}
-        />
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
       </SettingsProvider>
     );
 
@@ -206,5 +223,58 @@ describe("ComponentDetailPanel", () => {
     expect(screen.getByText("<alice@example.com>")).toBeDefined();
     expect(screen.getByText("Bob")).toBeDefined();
     expect(screen.getByText("https://example.com/supplier")).toBeDefined();
+  });
+
+  it("renders Introduced by for transitive vulnerabilities", () => {
+    const analysis = {
+      componentMap: new Map([
+        ["pkg:npm/direct-dep@1.0.0", { name: "direct-dep" } as any]
+      ]),
+      inverseDependencyMap: new Map(),
+    } as any;
+
+    mockComponent._transitiveSources = new Map([
+      ["CVE-2", "pkg:npm/direct-dep@1.0.0"]
+    ]) as any;
+
+    render(
+      <SettingsProvider>
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={analysis}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
+      </SettingsProvider>
+    );
+
+    expect(screen.getByText("via")).toBeDefined();
+    expect(screen.getByText("direct-dep")).toBeDefined();
+  });
+
+  it("renders Data Source when multiple sources exist", () => {
+    mockComponent._rawSources = [
+      { name: "SBOM-1", json: {} },
+      { name: "SBOM-2", json: {} }
+    ] as any;
+
+    render(
+      <SettingsProvider>
+        <ViewProvider>
+          <ComponentDetailPanel
+            component={mockComponent}
+            analysis={null}
+            onClose={mockOnClose}
+          />
+        </ViewProvider>
+      </SettingsProvider>
+    );
+
+    expect(screen.getByText("Data Source")).toBeDefined();
+    expect(screen.getByText("Primary:")).toBeDefined();
+    expect(screen.getByText("SBOM-1")).toBeDefined();
+    expect(screen.getByText(/Matched in/)).toBeDefined();
+    expect(screen.getByText(/SBOM-2/)).toBeDefined();
   });
 });

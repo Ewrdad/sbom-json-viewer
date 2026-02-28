@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { DependencyTree } from "./DependencyTree";
 import * as useDependencyAnalysisHook from "../../hooks/useDependencyAnalysis";
+import { SelectionProvider } from "../../context/SelectionContext";
 import type { EnhancedComponent, formattedSBOM } from "../../types/sbom";
 
 // Mock Virtuoso since it can be tricky in tests
@@ -109,15 +110,17 @@ describe("DependencyTree Search", () => {
     });
 
     render(
-      <DependencyTree 
-        sbom={{ 
-          components: [
-            { name: "parent-pkg", version: "1.0.0", bomRef: { value: "parent-ref" } },
-            { name: "child-pkg", version: "2.0.0", bomRef: { value: "child-ref" } },
-          ] 
-        } as any} 
-        formattedSbom={mockFormattedSbom} 
-      />
+      <SelectionProvider>
+        <DependencyTree 
+          sbom={{ 
+            components: [
+              { name: "parent-pkg", version: "1.0.0", bomRef: { value: "parent-ref" } },
+              { name: "child-pkg", version: "2.0.0", bomRef: { value: "child-ref" } },
+            ] 
+          } as any} 
+          formattedSbom={mockFormattedSbom} 
+        />
+      </SelectionProvider>
     );
     
     expect(screen.getByText("parent-pkg")).toBeInTheDocument();
@@ -145,18 +148,20 @@ describe("DependencyTree Search", () => {
     });
 
     render(
-      <DependencyTree 
-        sbom={{ 
-          components: [
-            { name: "parent-pkg", version: "1.0.0", bomRef: { value: "parent-ref" } },
-            { name: "child-pkg", version: "2.0.0", bomRef: { value: "child-ref" } },
-          ],
-          vulnerabilities: [
-            { id: "CVE-SEARCH-TEST", affects: [{ ref: "child-ref" }] }
-          ]
-        } as any} 
-        formattedSbom={mockFormattedSbom} 
-      />
+      <SelectionProvider>
+        <DependencyTree 
+          sbom={{ 
+            components: [
+              { name: "parent-pkg", version: "1.0.0", bomRef: { value: "parent-ref" } },
+              { name: "child-pkg", version: "2.0.0", bomRef: { value: "child-ref" } },
+            ],
+            vulnerabilities: [
+              { id: "CVE-SEARCH-TEST", affects: [{ ref: "child-ref" }] }
+            ]
+          } as any} 
+          formattedSbom={mockFormattedSbom} 
+        />
+      </SelectionProvider>
     );
     
     const searchInput = screen.getByPlaceholderText("Search name, group or CVE...");
@@ -172,7 +177,11 @@ describe("DependencyTree Search", () => {
       status: "idle",
     });
 
-    render(<DependencyTree sbom={{ components: [] } as any} formattedSbom={mockFormattedSbom} />);
+    render(
+      <SelectionProvider>
+        <DependencyTree sbom={{ components: [] } as any} formattedSbom={mockFormattedSbom} />
+      </SelectionProvider>
+    );
     
     const searchInput = screen.getByPlaceholderText("Search name, group or CVE...");
     fireEvent.change(searchInput, { target: { value: "xyz-no-match-xyz" } });
@@ -188,16 +197,18 @@ describe("DependencyTree Search", () => {
     });
 
     render(
-      <DependencyTree 
-        sbom={{ 
-          components: [
-            { name: "root-pkg", version: "1.0.0", bomRef: { value: "root-ref" } },
-            { name: "mid-pkg", version: "1.1.0", bomRef: { value: "mid-ref" } },
-            { name: "leaf-pkg", version: "1.2.0", bomRef: { value: "leaf-ref" } },
-          ] 
-        } as any} 
-        formattedSbom={mockFormattedSbomDeep} 
-      />
+      <SelectionProvider>
+        <DependencyTree 
+          sbom={{ 
+            components: [
+              { name: "root-pkg", version: "1.0.0", bomRef: { value: "root-ref" } },
+              { name: "mid-pkg", version: "1.1.0", bomRef: { value: "mid-ref" } },
+              { name: "leaf-pkg", version: "1.2.0", bomRef: { value: "leaf-ref" } },
+            ] 
+          } as any} 
+          formattedSbom={mockFormattedSbomDeep} 
+        />
+      </SelectionProvider>
     );
 
     const searchInput = screen.getByPlaceholderText("Search name, group or CVE...");
@@ -239,17 +250,19 @@ describe("DependencyTree Search", () => {
     };
 
     render(
-      <DependencyTree 
-        sbom={{ 
-          metadata: {
-            component: { name: "metadata-root", version: "1.0.0", bomRef: { value: "root-ref" } }
-          },
-          components: [
-            { name: "child-pkg", version: "2.0.0", bomRef: { value: "child-ref" } },
-          ] 
-        } as any} 
-        formattedSbom={mockFormattedMetadata} 
-      />
+      <SelectionProvider>
+        <DependencyTree 
+          sbom={{ 
+            metadata: {
+              component: { name: "metadata-root", version: "1.0.0", bomRef: { value: "root-ref" } }
+            },
+            components: [
+              { name: "child-pkg", version: "2.0.0", bomRef: { value: "child-ref" } },
+            ] 
+          } as any} 
+          formattedSbom={mockFormattedMetadata} 
+        />
+      </SelectionProvider>
     );
 
     const searchInput = screen.getByPlaceholderText("Search name, group or CVE...");

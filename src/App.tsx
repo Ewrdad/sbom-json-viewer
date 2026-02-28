@@ -1,20 +1,24 @@
 import {
   Suspense,
   lazy,
-  useRef,
+  useEffect,
+  useState,
 } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SettingsProvider } from "./context/SettingsContext";
+import { VexProvider } from "./context/VexContext";
+import { SelectionProvider } from "./context/SelectionContext";
+import { SbomProvider } from "./context/SbomContext";
 import { Layout } from "./components/layout/Layout";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
-import { HelpGuide } from "./components/common/HelpGuide";
+import { Breadcrumbs } from "./components/common/Breadcrumbs";
 const DashboardView = lazy(() =>
   import("./components/views/DashboardView").then((module) => ({
     default: module.DashboardView,
   })),
 );
+import { DashboardSkeleton } from "./components/views/DashboardView";
 const ComponentExplorer = lazy(() =>
   import("./components/views/ComponentExplorer").then((module) => ({
     default: module.ComponentExplorer,
@@ -35,6 +39,7 @@ const VulnerabilitiesView = lazy(() =>
     default: module.VulnerabilitiesView,
   })),
 );
+import { VulnerabilitiesSkeleton } from "./components/views/VulnerabilitiesView";
 const LicensesView = lazy(() =>
   import("./components/views/LicensesView").then((module) => ({
     default: module.LicensesView,
@@ -57,15 +62,16 @@ const MultiSbomStatsView = lazy(() =>
   })),
 );
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
-import { Upload, Download } from "lucide-react";
 import {
   type SbomStats,
   type formattedSBOM,
 } from "./types/sbom";
-import { getSbomSizeProfile } from "./lib/sbomSizing";
 import { KeepAliveView } from "./components/common/KeepAliveView";
-import { SbomSelector } from "./components/common/SbomSelector";
 import { useSbomLoader } from "./hooks/useSbomLoader";
+import { ProcessingLog } from "./components/common/ProcessingLog";
+import { Header } from "./components/layout/Header";
+
+import { LayoutProvider, useLayout } from "./context/LayoutContext";
 
 // Define generic interface for Manifest since it's used in props
 interface ManifestFile {
@@ -87,6 +93,7 @@ function AppContent({
   currentFile,
   onImport,
   manifest,
+  processingLogs,
 }: {
   sbom: Bom;
   formattedSbom: formattedSBOM | null;
@@ -94,100 +101,57 @@ function AppContent({
   currentFile: string;
   onImport: (files: File[]) => void;
   manifest: Manifest | null;
+  processingLogs: string[];
 }) {
-  const { activeView } = useView();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { componentCount, isLarge } = getSbomSizeProfile(sbom);
+  const { activeView, setIsMultiSbom } = useView();
+  const { setSidebarOpen } = useLayout();
 
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
+  useEffect(() => {
+    if (sbomStats?.multiSbomStats?.sources) {
+      setIsMultiSbom(sbomStats.multiSbomStats.sources.length > 1);
+    } else {
+      setIsMultiSbom(false);
+    }
+  }, [sbomStats, setIsMultiSbom]);
+
+  const viewLabels: Record<string, string> = {
+    dashboard: "Dashboard",
+    vulnerabilities: "Vulnerabilities",
+    licenses: "Licenses",
+    explorer: "Component Explorer",
+    tree: "Dependency Tree",
+    graph: "Dependency Graph",
+    "reverse-tree": "Reverse Tree",
+    metadata: "Metadata",
+    developer: "Developer Insights",
+    "multi-stats": "Multi-SBOM Stats"
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    if (files.length > 0) {
-      onImport(files);
+  const getSkeleton = () => {
+    switch (activeView) {
+      case "dashboard": return <DashboardSkeleton />;
+      case "vulnerabilities": return <VulnerabilitiesSkeleton />;
+      default: return (
+        <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+          Preparing {viewLabels[activeView]}...
+        </div>
+      );
     }
   };
-  return (
-    <div className="flex flex-col h-full p-6 pb-0">
-      <header className="flex items-center justify-between pb-6 border-b mb-6 flex-none">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            {activeView.charAt(0).toUpperCase() + activeView.slice(1)}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Viewing: {currentFile}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[10px]">
-            {componentCount.toLocaleString()} components
-          </Badge>
-          {isLarge && (
-            <Badge variant="outline" className="text-[10px]">
-              Large SBOM mode
-            </Badge>
-          )}
-          <input
-            type="file"
-            multiple
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".json"
-            className="hidden"
-          />
-          <Button variant="outline" size="sm" onClick={handleImportClick}>
-            <Upload className="h-4 w-4 mr-2" />
-            Upload SBOM
-          </Button>
-          {sbom && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const blob = new Blob([JSON.stringify(sbom, null, 2)], {
-                  type: "application/json",
-                });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                // Sanitize currentFile for filename
-                const safeName = currentFile
-                  .replace("Local: ", "")
-                  .replace(/\//g, "_");
-                a.download = `${safeName}.sbom.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-              }}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download
-            </Button>
-          )}
-          <div className="w-px h-8 bg-border mx-2" />
-          <SbomSelector
-            manifest={manifest}
-            currentFile={currentFile}
-            onSelect={(fileId) => {
-              window.location.hash = `#/${fileId}`;
-            }}
-          />
-          <div className="w-px h-8 bg-border mx-2" />
-          <HelpGuide />
-        </div>
-      </header>
 
-      <div className="flex-1 overflow-hidden relative">
-        <Suspense
-          fallback={
-            <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
-              Preparing view...
-            </div>
-          }
-        >
+  return (
+    <div className="flex flex-col h-full p-2 md:p-6 pb-0">
+      <Header
+        sbom={sbom}
+        currentFile={currentFile}
+        processingLogs={processingLogs}
+        onMenuClick={() => setSidebarOpen(true)}
+      />
+
+      <div className="flex-1 overflow-hidden relative flex flex-col">
+        <Breadcrumbs />
+        <div className="flex-1 min-h-0">
+          <Suspense fallback={getSkeleton()}>
           <KeepAliveView activeView={activeView} viewKey="dashboard">
             <ErrorBoundary resetKeys={[sbom]}>
               <DashboardView sbom={sbom} preComputedStats={sbomStats || undefined} />
@@ -248,6 +212,7 @@ function AppContent({
             </ErrorBoundary>
           </KeepAliveView>
         </Suspense>
+        </div>
       </div>
     </div>
   );
@@ -262,9 +227,25 @@ export function App() {
     currentFile,
     loadingState,
     manifest,
+    processingLogs,
     handleImport,
     retry,
   } = useSbomLoader();
+
+  const [scoreHistory, setScoreHistory] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (sbomStats?.developerStats?.metadataQuality.score !== undefined) {
+      const currentScore = sbomStats.developerStats.metadataQuality.score;
+      setScoreHistory(prev => {
+        // Only add if it's different from the last one or we have no history
+        if (prev.length === 0 || prev[prev.length - 1] !== currentScore) {
+          return [...prev, currentScore].slice(-10); // Keep last 10
+        }
+        return prev;
+      });
+    }
+  }, [sbomStats]);
 
   const progressWidth =
     typeof loadingState.progress === "number"
@@ -287,6 +268,9 @@ export function App() {
           />
         </div>
       )}
+      <div className="mt-4">
+        <ProcessingLog logs={processingLogs} />
+      </div>
     </div>
   );
 
@@ -310,16 +294,34 @@ export function App() {
       currentFile={currentFile}
       onImport={handleImport}
       manifest={manifest}
+      processingLogs={processingLogs}
     />
   );
 
   return (
     <ErrorBoundary>
-      <SettingsProvider>
-        <ViewProvider>
-          <Layout>{mainContent}</Layout>
-        </ViewProvider>
-      </SettingsProvider>
+      <LayoutProvider>
+        <SettingsProvider>
+          <VexProvider>
+            <ViewProvider>
+              <SelectionProvider>
+                <SbomProvider value={{ 
+                  sbom, 
+                  formattedSbom, 
+                  sbomStats, 
+                  scoreHistory,
+                  currentFile,
+                  manifest,
+                  onImport: handleImport,
+                  processingLogs
+                }}>
+                  <Layout sbom={sbom}>{mainContent}</Layout>
+                </SbomProvider>
+              </SelectionProvider>
+            </ViewProvider>
+          </VexProvider>
+        </SettingsProvider>
+      </LayoutProvider>
     </ErrorBoundary>
   );
 }

@@ -32,6 +32,7 @@ export function useSbomLoader() {
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [formattedSbom, setFormattedSbom] = useState<formattedSBOM | null>(null);
   const [sbomStats, setSbomStats] = useState<SbomStats | null>(null);
+  const [processingLogs, setProcessingLogs] = useState<string[]>([]);
 
   const loadSequence = useRef(0);
 
@@ -83,6 +84,8 @@ export function useSbomLoader() {
               return;
             }
 
+            setProcessingLogs(result.logs || []);
+
             // Revive Maps from plain objects sent by worker
             const formatted = result.formatted;
             if (formatted) {
@@ -128,6 +131,7 @@ export function useSbomLoader() {
             worker.terminate();
             resolve();
           } else if (type === "error") {
+            setProcessingLogs(e.data.logs || []);
             setError(message);
             resetLoading();
             worker.terminate();
@@ -288,6 +292,7 @@ export function useSbomLoader() {
     setCurrentFile,
     loadingState,
     manifest,
+    processingLogs,
     handleImport,
     retry,
   };

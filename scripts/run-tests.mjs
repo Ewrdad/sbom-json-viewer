@@ -20,6 +20,7 @@ const tasks = [
 
 const runTask = (task) =>
   new Promise((resolve) => {
+    process.stdout.write(`Starting ${task.name} tests...\n`);
     const child = spawn(task.command, task.args, {
       stdio: ["ignore", "pipe", "pipe"],
       env: process.env,
@@ -37,6 +38,11 @@ const runTask = (task) =>
     });
 
     child.on("close", (code, signal) => {
+      if (code === 0) {
+        process.stdout.write(`✓ ${task.name} tests passed\n`);
+      } else {
+        process.stdout.write(`✗ ${task.name} tests failed (exit code: ${code})\n`);
+      }
       resolve({
         name: task.name,
         command: `${task.command} ${task.args.join(" ")}`,
@@ -48,6 +54,7 @@ const runTask = (task) =>
     });
 
     child.on("error", (error) => {
+      process.stdout.write(`! ${task.name} tests error: ${error?.message ?? error}\n`);
       stderr += `${error?.message ?? error}\n`;
     });
 

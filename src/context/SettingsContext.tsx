@@ -44,24 +44,43 @@ interface SettingsContextType {
   setDefaultSearchEngine: (id: SearchEngineId) => void;
   performSearch: (query: string, engineId?: SearchEngineId) => void;
   getSearchUrl: (query: string, engineId?: SearchEngineId) => string;
+  highContrast: boolean;
+  setHighContrast: (enabled: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [defaultSearchEngine, setDefaultSearchEngineState] = useState<SearchEngineId>('google');
+  const [highContrast, setHighContrastState] = useState(false);
 
   // Load from local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('sbom-viewer-default-search-engine');
-    if (saved && SEARCH_ENGINES.some(e => e.id === saved)) {
-      setDefaultSearchEngineState(saved as SearchEngineId);
+    const savedEngine = localStorage.getItem('sbom-viewer-default-search-engine');
+    if (savedEngine && SEARCH_ENGINES.some(e => e.id === savedEngine)) {
+      setDefaultSearchEngineState(savedEngine as SearchEngineId);
+    }
+
+    const savedContrast = localStorage.getItem('sbom-viewer-high-contrast');
+    if (savedContrast === 'true') {
+      setHighContrastState(true);
+      document.documentElement.classList.add('high-contrast');
     }
   }, []);
 
   const setDefaultSearchEngine = (id: SearchEngineId) => {
     setDefaultSearchEngineState(id);
     localStorage.setItem('sbom-viewer-default-search-engine', id);
+  };
+
+  const setHighContrast = (enabled: boolean) => {
+    setHighContrastState(enabled);
+    localStorage.setItem('sbom-viewer-high-contrast', String(enabled));
+    if (enabled) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
   };
 
   const getSearchUrl = (query: string, engineId?: SearchEngineId) => {
@@ -79,7 +98,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       defaultSearchEngine, 
       setDefaultSearchEngine, 
       performSearch,
-      getSearchUrl
+      getSearchUrl,
+      highContrast,
+      setHighContrast
     }}>
       {children}
     </SettingsContext.Provider>

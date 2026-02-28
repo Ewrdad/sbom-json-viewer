@@ -31,6 +31,7 @@ export function calculateSbomStats(bom: any): SbomStats {
     allLicenses: [],
     allLicenseComponents: [],
     uniqueVulnerabilityCount: 0,
+    totalVulnerabilityInstances: 0,
     avgVulnerabilitiesPerComponent: 0,
     dependencyStats: { direct: 0, transitive: 0 },
     dependentsDistribution: {},
@@ -54,6 +55,7 @@ export function calculateSbomStats(bom: any): SbomStats {
   const vulnSummaryMap = new Map<string, { 
     id: string; 
     severity: string; 
+    severitySource?: string;
     affectedRefs: Set<string>; 
     title?: string;
     description?: string;
@@ -89,6 +91,8 @@ export function calculateSbomStats(bom: any): SbomStats {
     tools?: any[];
     properties?: any[];
     affects?: any[];
+    _raw?: any;
+    _rawSources?: any[];
   }>();
 
   // Helper to normalize severity string
@@ -100,6 +104,7 @@ export function calculateSbomStats(bom: any): SbomStats {
   const components = Array.isArray(bom.components) ? bom.components : Array.from(bom.components || []);
   const vulnerabilities = Array.isArray(bom.vulnerabilities) ? bom.vulnerabilities : Array.from(bom.vulnerabilities || []);
 
+  let totalInstances = 0;
   // 1. Process vulnerabilities (Finding-based counting)
   for (const vuln of vulnerabilities) {
     let maxSeverity = "none";
@@ -115,6 +120,7 @@ export function calculateSbomStats(bom: any): SbomStats {
     const existingSummary = vulnSummaryMap.get(vulnId) || {
       id: vulnId,
       severity: maxSeverity,
+      severitySource: vuln.ratings?.[0]?.source?.name || vuln.source?.name,
       affectedRefs: new Set<string>(),
       title: vuln.description || vuln.detail, // Fallback for simple title
       description: vuln.description,
@@ -136,17 +142,26 @@ export function calculateSbomStats(bom: any): SbomStats {
       tools: vuln.tools,
       properties: vuln.properties,
       affects: vuln.affects,
+      _raw: vuln._raw,
+      _rawSources: vuln._rawSources,
     };
 
     if (maxSeverity !== "none" && (existingSummary.severity === "none" || severityOrder.indexOf(maxSeverity as any) < severityOrder.indexOf(existingSummary.severity as any))) {
       existingSummary.severity = maxSeverity;
+      // Update the source if we found a higher severity
+      const higherRating = ensureArray<any>(vuln.ratings).find(r => normalizeSeverity(r.severity?.toString()) === maxSeverity);
+      if (higherRating?.source?.name) {
+        existingSummary.severitySource = higherRating.source.name;
+      }
     }
 
-    for (const affect of ensureArray<any>(vuln.affects)) {
+  let totalInstances = 0;
+  for (const affect of ensureArray<any>(vuln.affects)) {
       const ref = affect.ref?.value || affect.ref;
       if (!ref) continue;
       
       existingSummary.affectedRefs.add(ref);
+      totalInstances++;
       
       const current = compVulnMap.get(ref) || { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
       
@@ -185,6 +200,7 @@ export function calculateSbomStats(bom: any): SbomStats {
       stats.sourceCounts['GHSA'] = (stats.sourceCounts['GHSA'] || 0) + 1;
     }
   }
+  stats.totalVulnerabilityInstances = totalInstances;
 
   // 2. Process licenses
   for (const component of components) {
@@ -282,6 +298,8 @@ export function calculateSbomStats(bom: any): SbomStats {
     stats.vulnerabilityCounts.high +
     stats.vulnerabilityCounts.medium +
     stats.vulnerabilityCounts.low;
+
+  stats.totalVulnerabilityInstances = Array.from(compVulnMap.values()).reduce((sum, v) => sum + v.total, 0);
 
   if (stats.totalComponents > 0) {
     stats.avgVulnerabilitiesPerComponent = parseFloat((stats.totalVulnerabilities / stats.totalComponents).toFixed(2));
@@ -402,6 +420,7 @@ export function calculateSbomStats(bom: any): SbomStats {
     .map((v) => ({
       id: v.id,
       severity: v.severity,
+      severitySource: (v as any).severitySource,
       affectedCount: v.affectedRefs.size,
       affectedComponentRefs: Array.from(v.affectedRefs),
       title: v.title,
@@ -424,6 +443,8 @@ export function calculateSbomStats(bom: any): SbomStats {
       tools: v.tools || [],
       properties: v.properties || [],
       affects: v.affects || [],
+      _raw: v._raw,
+      _rawSources: v._rawSources,
     }))
     .sort((a, b) => b.affectedCount - a.affectedCount || a.id.localeCompare(b.id));
 

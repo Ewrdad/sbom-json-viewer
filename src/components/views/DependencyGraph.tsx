@@ -8,7 +8,7 @@ import { buildMermaidDiagram } from "../../lib/mermaid/sbomToMermaid";
 import { Mermaid } from "@/components/ui/mermaid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Layers, RefreshCw } from "lucide-react";
+import { Download, Layers, RefreshCw, AlertTriangle } from "lucide-react";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import {
   Select,
@@ -41,6 +41,7 @@ export function DependencyGraph({
 
   const [mermaidChart, setMermaidChart] = useState<string>("");
   const [generationProgress, setGenerationProgress] = useState<string>("");
+  const [isTruncated, setIsTruncated] = useState(false);
 
   useEffect(() => {
     if (preFormattedSbom) {
@@ -131,6 +132,7 @@ export function DependencyGraph({
         const result = await buildMermaidDiagram(formattedData, options);
         if (mounted) {
           setMermaidChart(result.diagram);
+          setIsTruncated(result.truncated);
           setGenerationProgress("");
         }
       } catch (error) {
@@ -229,20 +231,18 @@ export function DependencyGraph({
 
   return (
     <div className="space-y-4 h-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between flex-none">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Dependency Graph
-          </h2>
-          <p className="text-sm text-muted-foreground">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 flex-none">
+        <div className="flex flex-col">
+          <p className="hidden md:block text-sm text-muted-foreground">
             Visualization of component relationships
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-md border border-muted-foreground/10">
              <Button
               variant={enableGrouping ? "secondary" : "ghost"}
               size="sm"
+              className="h-8 text-[11px] px-2 md:px-3"
               onClick={() => setEnableGrouping(!enableGrouping)}
               title="Toggle Grouping"
             >
@@ -251,18 +251,22 @@ export function DependencyGraph({
             <Button
               variant={showVulnerableOnly ? "destructive" : "ghost"}
               size="sm"
+              className="h-8 text-[11px] px-2 md:px-3"
               onClick={() => setShowVulnerableOnly(!showVulnerableOnly)}
               title="Show Vulnerable Only"
             >
               Vuln Only
             </Button>
-            <Layers className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Depth:</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Layers className="hidden sm:block h-4 w-4 text-muted-foreground" />
+            <span className="hidden sm:block text-sm font-medium">Depth:</span>
             <Select
               value={maxDepth.toString()}
               onValueChange={(val) => val && setMaxDepth(parseInt(val))}
             >
-              <SelectTrigger className="w-[80px]">
+              <SelectTrigger className="w-[70px] md:w-[80px] h-8 md:h-10">
                 <SelectValue placeholder="Depth" />
               </SelectTrigger>
               <SelectContent>
@@ -274,23 +278,40 @@ export function DependencyGraph({
               </SelectContent>
             </Select>
           </div>
+          
           <Button
             variant="outline"
             size="sm"
             onClick={handleDownloadSVG}
             disabled={!mermaidChart}
-            className="gap-2"
+            className="h-8 md:h-9 gap-2 px-2 md:px-3"
           >
             <Download className="h-4 w-4" />
-            Export SVG
+            <span className="hidden sm:inline">Export SVG</span>
           </Button>
         </div>
 
       </div>
 
-      <Card className="flex-1 overflow-hidden bg-card border flex flex-col shadow-sm">
+      <Card className="flex-1 overflow-hidden bg-card border flex flex-col shadow-sm relative">
         {mermaidChart ? (
           <div className="flex-1 overflow-auto relative">
+            {isTruncated && (
+              <div className="absolute top-4 left-4 z-10 animate-in fade-in slide-in-from-left-2 duration-500">
+                <div className="flex flex-col gap-1.5 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-[10px] font-semibold shadow-md dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-200 max-w-xs">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-3.5 w-3.5 flex-none" />
+                    <span>Visual Truncation Active</span>
+                  </div>
+                  <p className="font-normal opacity-90 leading-relaxed">
+                    To maintain browser performance and prevent crashes, the graph is limited to <strong>320 nodes</strong> and <strong>640 edges</strong>. 
+                  </p>
+                  <p className="font-normal opacity-90 leading-relaxed">
+                    Current view is limited by depth ({maxDepth}) or these safety thresholds. Try reducing depth or filtering by "Vuln Only".
+                  </p>
+                </div>
+              </div>
+            )}
             <Mermaid chart={mermaidChart} />
           </div>
         ) : (

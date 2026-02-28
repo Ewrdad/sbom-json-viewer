@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DependencyTree } from "./DependencyTree";
 import { createMockBom } from "../../test/mockData";
+import { SelectionProvider } from "../../context/SelectionContext";
 
 const formatterSpy = vi.hoisted(() => vi.fn());
 
@@ -19,7 +20,11 @@ vi.mock("../../hooks/useDependencyAnalysis", () => ({
 
 describe("DependencyTree", () => {
   it("shows large SBOM guard and skips formatting", async () => {
-    render(<DependencyTree sbom={createMockBom({ components: [] })} />);
+    render(
+      <SelectionProvider>
+        <DependencyTree sbom={createMockBom({ components: [] })} />
+      </SelectionProvider>
+    );
 
     expect(screen.getByText("Large SBOM detected")).toBeInTheDocument();
     expect(

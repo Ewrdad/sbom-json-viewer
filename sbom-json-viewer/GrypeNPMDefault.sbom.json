@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:e7e364d1-c62f-44e1-948a-688b89228376",
+  "serialNumber": "urn:uuid:84601c77-43ae-436d-91eb-cf4c4722d645",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-24T21:10:00Z",
+    "timestamp": "2026-02-26T11:14:59Z",
     "tools": {
       "components": [
         {
@@ -21537,6 +21537,73 @@
       "ref": "pkg:npm/zod-validation-error@4.0.2?package-id=zod-validation-error%404.0.2",
       "dependsOn": [
         "pkg:npm/zod@4.3.6?package-id=zod%404.3.6"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "bom-ref": "urn:uuid:9908d447-66bb-40e6-9da4-c922fe5ee6cb",
+      "id": "GHSA-mw96-cpmx-2vgc",
+      "source": {
+        "name": "github-language-javascript",
+        "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc"
+      },
+      "references": [
+        {
+          "id": "GHSA-mw96-cpmx-2vgc",
+          "source": {
+            "name": "github-language-javascript",
+            "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc"
+          }
+        }
+      ],
+      "ratings": [
+        {
+          "score": 8.8,
+          "severity": "high",
+          "method": "other",
+          "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:P"
+        },
+        {
+          "source": {
+            "name": "FIRST",
+            "url": "https://www.first.org/epss/"
+          },
+          "score": 0.0039,
+          "method": "other"
+        }
+      ],
+      "description": "Rollup 4 has Arbitrary File Write via Path Traversal",
+      "advisories": [
+        {
+          "url": "https://github.com/rollup/rollup/security/advisories/GHSA-mw96-cpmx-2vgc"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27606"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/c60770d7aaf750e512c1b2774989ea4596e660b2"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/c8cf1f9c48c516285758c1e11f08a54f304fd44e"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/d6dee5e99bb82aac0bee1df4ab9efbde455452c3"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v2.80.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v3.30.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v4.59.0"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "pkg:npm/rollup@4.57.1?package-id=rollup%404.57.1"
+        }
       ]
     }
   ]

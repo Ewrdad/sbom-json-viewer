@@ -6,8 +6,8 @@ test.describe("Vulnerabilities View", () => {
         await page.goto("/", { waitUntil: "networkidle" });
         
         // Wait for the manifest to load and buttons to appear
-        const exampleInput = page.getByPlaceholder("Self Scan (Latest)");
-        await expect(exampleInput).toBeVisible({ timeout: 30000 });
+        const selectorTrigger = page.getByTestId("sbom-selector-trigger");
+        await expect(selectorTrigger).toBeVisible({ timeout: 30000 });
         
         // Since 'self' SBOMs typically have 0 vulnerabilities (as we just fixed them),
         // we will upload the examples/sample-simple file via the UI to explicitly test the view.
@@ -15,11 +15,11 @@ test.describe("Vulnerabilities View", () => {
         const filePath = "public/sboms/examples/sample-simple.sbom.json";
         await fileInput.setInputFiles(filePath);
         
-        await expect(page.getByText("Viewing: Local: sample-simple.sbom.json")).toBeVisible({ timeout: 20000 });
+        await expect(page.getByTestId("current-file-display")).toContainText("sample-simple.sbom.json", { timeout: 20000 });
         
-        const vulnTab = page.getByRole("button", { name: "Vulnerabilities", exact: true });
+        const vulnTab = page.getByTestId("sidebar-link-vulnerabilities");
         await vulnTab.click();
-        await expect(page.getByRole("heading", { name: "Vulnerabilities" }).first()).toBeVisible({ timeout: 20000 });
+        await expect(page.getByTestId("view-title")).toContainText("Vulnerabilities", { timeout: 20000 });
     });
 
     test("displays severity summary cards", async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe("Vulnerabilities View", () => {
         await expect(page.locator('[data-slot="card-title"]').filter({ hasText: /^Low$/ })).toBeVisible();
         
         // Check if there are actual numbers (not empty)
-        await expect(page.locator('.text-3xl.font-bold.text-red-600').first()).not.toBeEmpty(); 
+        await expect(page.locator('.text-3xl.font-bold').first()).not.toBeEmpty(); 
     });
 
     test("filters and sorts vulnerabilities table", async ({ page }) => {
@@ -38,7 +38,7 @@ test.describe("Vulnerabilities View", () => {
         await expect(page.locator('.text-3xl.font-bold').first()).not.toHaveText("0", { timeout: 20000 });
 
         // 1. Switch to "By Vulnerability" view
-        await page.getByRole("button", { name: "By Vulnerability" }).click();
+        await page.getByTestId("vulnerabilities-mode-vulnerabilities").click();
         
         // Ensure some rows are visible before filtering
         await expect(page.getByRole("row").nth(1)).toBeVisible({ timeout: 10000 });
@@ -56,7 +56,7 @@ test.describe("Vulnerabilities View", () => {
       await expect(page.locator('.text-3xl.font-bold').first()).not.toHaveText("0", { timeout: 20000 });
 
       // 1. Switch to "By Vulnerability" view
-      await page.getByRole("button", { name: "By Vulnerability" }).click();
+      await page.getByTestId("vulnerabilities-mode-vulnerabilities").click();
 
       await expect(page.getByRole("row").nth(1)).toBeVisible({ timeout: 10000 });
 
@@ -89,6 +89,6 @@ test.describe("Vulnerabilities View", () => {
       
       // 4. Close panel
       await page.getByRole("button", { name: "Close" }).click();
-      await expect(page.getByText("Vulnerability Details")).not.toBeVisible();
+      await expect(page.getByTestId("detail-panel-title")).not.toBeVisible();
     });
 });

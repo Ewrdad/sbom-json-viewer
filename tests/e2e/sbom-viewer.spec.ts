@@ -8,11 +8,11 @@ const gotoViewer = async (page: Page) => {
 
   // Now the manifest buttons should be visible
   await expect(
-    page.getByPlaceholder("Self Scan (Latest)"),
+    page.getByTestId("sbom-selector-trigger"),
   ).toBeVisible();
   await expect(
-    page.getByText("Viewing: self/latest"),
-  ).toBeVisible();
+    page.getByTestId("current-file-display"),
+  ).toContainText("self/latest");
 };
 
 test.describe("SBOM Viewer", () => {
@@ -20,27 +20,27 @@ test.describe("SBOM Viewer", () => {
     await gotoViewer(page);
 
     await expect(
-      page.getByText("Viewing: self/latest"),
-    ).toBeVisible();
+      page.getByTestId("current-file-display"),
+    ).toContainText("self/latest");
   });
 
   test("switches between sample and full SBOM files", async ({ page }) => {
     await gotoViewer(page);
 
     // Open the combobox
-    await page.getByPlaceholder("Self Scan (Latest)").click();
+    await page.getByTestId("sbom-selector-trigger").click();
     // Select the option
-    await page.getByLabel("Self Scan").getByRole("option", { name: "TrivyScan", exact: true }).click();
+    await page.getByTestId("sbom-option-self/TrivyScan").click();
     
-    await expect(page.getByText("Viewing: self/TrivyScan")).toBeVisible();
+    await expect(page.getByTestId("current-file-display")).toContainText("self/TrivyScan");
 
     // Switch back
-    await page.getByPlaceholder("TrivyScan").click();
-    await page.getByRole("option", { name: "Self Scan (Latest)", exact: true }).click();
+    await page.getByTestId("sbom-selector-trigger").click();
+    await page.getByTestId("sbom-option-self/latest").click();
     
     await expect(
-      page.getByText("Viewing: self/latest"),
-    ).toBeVisible();
+      page.getByTestId("current-file-display"),
+    ).toContainText("self/latest");
   });
 
   test("shows dashboard KPI cards and charts", async ({ page }) => {
@@ -48,8 +48,8 @@ test.describe("SBOM Viewer", () => {
 
     // Why: ensure dashboard visualizations render for the default SBOM.
     await expect(
-      page.getByRole("heading", { name: "Dashboard" }),
-    ).toBeVisible();
+      page.getByTestId("view-title"),
+    ).toContainText("Dashboard");
     await expect(page.getByText("Total Components")).toBeVisible();
     await expect(page.getByText("Vulnerability Severity")).toBeVisible();
     await expect(page.getByText("Top Licenses")).toBeVisible();
@@ -58,10 +58,10 @@ test.describe("SBOM Viewer", () => {
   test("filters the components table", async ({ page }) => {
     await gotoViewer(page);
 
-    await page.getByRole("button", { name: "Components" }).click();
+    await page.getByTestId("sidebar-link-explorer").click();
     await expect(
-      page.getByRole("heading", { name: "Component Explorer" }),
-    ).toBeVisible();
+      page.getByTestId("view-title"),
+    ).toContainText("Component Explorer");
 
     const searchInput = page.getByPlaceholder("Search components...");
     await searchInput.fill("react");
@@ -80,40 +80,42 @@ test.describe("SBOM Viewer", () => {
   }) => {
     await gotoViewer(page);
 
-    await page.getByRole("button", { name: "Components" }).click();
+    await page.getByTestId("sidebar-link-explorer").click();
     await expect(
-      page.getByRole("heading", { name: "Component Explorer" }),
-    ).toBeVisible();
+      page.getByTestId("view-title"),
+    ).toContainText("Component Explorer");
 
     // Why: validate row selection drives the detail panel.
     const searchInput = page.getByPlaceholder("Search components...");
     await searchInput.fill("react");
-    await page.getByRole("row").filter({ hasText: "react" }).first().click();
-    const detailPanel = page.getByTestId("detail-panel");
+    const row = page.getByRole("row").filter({ hasText: "react" }).first();
+    await expect(row).toBeVisible();
+    await row.getByRole("cell").nth(1).click();
+    
     await expect(
-      detailPanel.getByRole("heading", { name: "Component Details" }),
+      page.getByTestId("detail-panel-title"),
     ).toBeVisible();
-    await expect(detailPanel).toContainText("react");
+    await expect(page.getByTestId("component-detail-panel")).toContainText("react");
   });
 
   test("expands the dependency tree", async ({ page }) => {
     await gotoViewer(page);
 
-    await page.getByRole("button", { name: "Dependency Tree" }).click();
+    await page.getByTestId("sidebar-link-tree").click();
     await expect(
-      page.getByRole("heading", { name: "Dependency Tree" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Severity" }).click();
-    await page.getByRole("button", { name: "Summary" }).click();
+      page.getByTestId("view-title"),
+    ).toContainText("Dependency Tree");
+    await page.getByTestId("tree-mode-severity").click();
+    await page.getByTestId("tree-mode-summary").click();
   });
 
   test("displays the dependency graph controls", async ({ page }) => {
     await gotoViewer(page);
 
-    await page.getByRole("button", { name: "Visual Graph" }).click();
+    await page.getByTestId("sidebar-link-graph").click();
     await expect(
-      page.getByRole("heading", { name: "Dependency Graph" }),
-    ).toBeVisible();
+      page.getByTestId("view-title"),
+    ).toContainText("Dependency Graph");
 
     await expect(
       page.getByRole("button", { name: "Export SVG" }),

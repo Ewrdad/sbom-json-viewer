@@ -16,7 +16,7 @@ test.describe("SBOM Upload", () => {
 
     // 3. Verify the upload triggered a load
     // The "Viewing: " text should update to "Local: latest.sbom.json"
-    await expect(page.getByText(/Local: latest.sbom.json/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("current-file-display")).toContainText("latest.sbom.json", { timeout: 10000 });
     
     // 4. Verify content is loaded
     await expect(page.getByText("Total Components")).toBeVisible();

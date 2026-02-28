@@ -16,7 +16,7 @@ function escapeCSV(str: string): string {
   return `"${escaped}"`;
 }
 
-interface VulnerabilityItem {
+export interface VulnerabilityItem {
   id: string;
   severity: string;
   title?: string;
@@ -26,7 +26,7 @@ interface VulnerabilityItem {
   ratings?: Record<string, unknown>[];
 }
 
-interface ComponentItem {
+export interface ComponentItem {
   name: string;
   version?: string;
   total?: number;

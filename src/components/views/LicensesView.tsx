@@ -18,29 +18,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  ScrollText,
-  FileCheck,
-  ShieldAlert,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUpDown,
-  BookOpen,
-  X,
-  Network,
-  Scale,
-} from "lucide-react";
+import { useSelection } from "../../context/SelectionContext";
+import { cn } from "../../lib/utils";
+import { FileCheck, ShieldAlert, Search, ChevronLeft, ChevronRight, ArrowUpDown, BookOpen, Scale, AlertTriangle } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { ComponentDetailPanel } from "./ComponentDetailPanel";
-import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
-import { Separator } from "@/components/ui/separator";
-import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE, CHART_AXIS_PROPS } from "@/lib/chartTheme";
+import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
+import { checkLicenseConflict as checkConflict } from "../../lib/licenseUtils";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -60,6 +43,11 @@ const CATEGORY_COLORS = {
 export function LicensesView({ sbom, preComputedStats }: { sbom: any; preComputedStats?: SbomStats }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
+  const { 
+    setSelectedComponent, 
+    setSelectedLicense 
+  } = useSelection();
+
   const displayStats: SbomStats = {
     totalComponents: 0,
     vulnerabilityCounts: { critical: 0, high: 0, medium: 0, low: 0, none: 0 },
@@ -75,6 +63,21 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
     ...(preComputedStats ?? stats ?? {}),
   } as SbomStats;
 
+  // Detect potential license conflicts (e.g., Copyleft + Proprietary)
+  const licenseConflicts = useMemo(() => {
+    const hasCopyleft = displayStats.licenseDistribution.copyleft > 0;
+    const hasProprietary = displayStats.licenseDistribution.proprietary > 0;
+    
+    if (hasCopyleft && hasProprietary) {
+      return [{
+        type: 'Copyleft & Proprietary',
+        description: 'Your project contains both Strong Copyleft (e.g. GPL) and Proprietary licenses. This often requires legal review to ensure the proprietary code does not inherit copyleft obligations.',
+        severity: 'high'
+      }];
+    }
+    return [];
+  }, [displayStats.licenseDistribution]);
+
   const [viewMode, setViewMode] = useState<ViewMode>("components");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("name");
@@ -82,10 +85,6 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [licenseSortDir, setLicenseSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
-  const [selectedComponent, setSelectedComponent] = useState<unknown | null>(null);
-  const [selectedLicense, setSelectedLicense] = useState<unknown | null>(null);
-
-  const { analysis } = useDependencyAnalysis(sbom);
 
   const handleSort = (key: SortKey) => {
     if (viewMode === "components") {
@@ -115,7 +114,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
         (c) =>
           c.name.toLowerCase().includes(q) ||
           c.version.toLowerCase().includes(q) ||
-          c.licenses.some(l => l.name.toLowerCase().includes(q) || l.id.toLowerCase().includes(q))
+          c.licenses.some(l => l.name.toLowerCase().includes(q) || l.id.toLowerCase().includes(q) || (l.category && l.category.toLowerCase().includes(q)))
       );
     }
 
@@ -138,7 +137,8 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
       const q = searchQuery.toLowerCase();
       list = list.filter((l) => 
         l.name.toLowerCase().includes(q) || 
-        l.id.toLowerCase().includes(q)
+        l.id.toLowerCase().includes(q) ||
+        (l.category && l.category.toLowerCase().includes(q))
       );
     }
 
@@ -193,36 +193,42 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
   };
 
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="h-full"
-      key={selectedComponent || selectedLicense ? "split" : "single"}
-    >
-      <ResizablePanel
-        defaultSize={selectedComponent || selectedLicense ? 60 : 100}
-        minSize={30}
-      >
-        <ScrollArea className="h-full min-h-0 pr-2">
+    <ScrollArea className="h-full min-h-0 pr-2">
       <div className="pb-6 space-y-6 animate-in fade-in duration-500">
-        <div className="flex items-center gap-3">
-          <ScrollText className="h-7 w-7 text-primary" />
-          <h2 className="text-3xl font-bold tracking-tight">Licenses</h2>
-          {isLoadingStats && (
+        {isLoadingStats && (
+          <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               Computing stats…
             </Badge>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Conflict Warnings */}
+        {licenseConflicts.length > 0 && (
+          <div className="bg-red-50 border-2 border-red-200 dark:bg-red-950/20 dark:border-red-900/50 rounded-xl p-4 flex gap-4 animate-pulse">
+            <div className="bg-red-100 dark:bg-red-900/40 p-3 rounded-full h-fit flex-none">
+              <ShieldAlert className="h-6 w-6 text-red-600" />
+            </div>
+            <div>
+              <h4 className="text-red-900 dark:text-red-300 font-black text-sm uppercase tracking-wider mb-1">Legal Compliance Alert</h4>
+              {licenseConflicts.map((c, i) => (
+                <div key={i} className="text-xs text-red-800/80 dark:text-red-400/80 leading-relaxed">
+                  <span className="font-bold underline">{c.type}:</span> {c.description}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* KPI Cards Row */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          <Card className="border-l-4 border-l-primary/60">
+          <Card className="border-l-4 border-l-primary/60 cursor-pointer hover:shadow-md transition-all group" onClick={() => { setViewMode("licenses"); setSearchQuery(""); setPage(0); }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Unique Licenses
                 <HelpTooltip text="Total number of distinct licenses identified in the SBOM." />
               </CardTitle>
-              <Scale className="h-4 w-4 text-muted-foreground" />
+              <Scale className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{displayStats.allLicenses.length}</div>
@@ -230,13 +236,13 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: CATEGORY_COLORS.permissive }}>
+          <Card className="border-l-4 cursor-pointer hover:shadow-md transition-all group" style={{ borderLeftColor: CATEGORY_COLORS.permissive }} onClick={() => { setViewMode("licenses"); setSearchQuery("permissive"); setPage(0); }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Permissive
                 <HelpTooltip text="Licenses with minimal restrictions (e.g., MIT, Apache-2.0). Business-friendly." />
               </CardTitle>
-              <FileCheck className="h-4 w-4 text-green-600" />
+              <FileCheck className="h-4 w-4 text-green-600 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-green-600">{permissive}</div>
@@ -244,13 +250,13 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: CATEGORY_COLORS.copyleft }}>
+          <Card className="border-l-4 cursor-pointer hover:shadow-md transition-all group" style={{ borderLeftColor: CATEGORY_COLORS.copyleft }} onClick={() => { setViewMode("licenses"); setSearchQuery("copyleft"); setPage(0); }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Copyleft
                 <HelpTooltip text="Licenses requiring derivative works to be open source (e.g., GPL)." />
               </CardTitle>
-              <ShieldAlert className="h-4 w-4 text-red-600" />
+              <ShieldAlert className="h-4 w-4 text-red-600 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-red-600">{copyleft}</div>
@@ -258,13 +264,13 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: CATEGORY_COLORS["weak-copyleft"] }}>
+          <Card className="border-l-4 cursor-pointer hover:shadow-md transition-all group" style={{ borderLeftColor: CATEGORY_COLORS["weak-copyleft"] }} onClick={() => { setViewMode("licenses"); setSearchQuery("weak-copyleft"); setPage(0); }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Weak Copyleft
                 <HelpTooltip text="Licenses requiring changes to the library itself to be shared (e.g., LGPL, MPL)." />
               </CardTitle>
-              <ShieldAlert className="h-4 w-4 text-orange-600" />
+              <ShieldAlert className="h-4 w-4 text-orange-600 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-orange-600">{weakCopyleft}</div>
@@ -272,13 +278,13 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
             </CardContent>
           </Card>
 
-          <Card className="border-l-4" style={{ borderLeftColor: CATEGORY_COLORS.unknown }}>
+          <Card className="border-l-4 cursor-pointer hover:shadow-md transition-all group" style={{ borderLeftColor: CATEGORY_COLORS.unknown }} onClick={() => { setViewMode("licenses"); setSearchQuery("unknown"); setPage(0); }}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 Unknown
                 <HelpTooltip text="Components with no license information or unrecognized license strings." />
               </CardTitle>
-              <BookOpen className="h-4 w-4 text-slate-500" />
+              <BookOpen className="h-4 w-4 text-slate-500 group-hover:scale-110 transition-transform" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-slate-500">{unknown}</div>
@@ -445,57 +451,73 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                       </tr>
                     </thead>
                     <tbody>
-                      {pageItems.map((comp: any, i) => (
-                        <tr
-                          key={`${comp.ref}-${i}`}
-                          className="border-b hover:bg-muted/50 transition-colors"
-                        >
-                           <td className="px-4 py-3 font-medium cursor-pointer hover:underline" onClick={() => {
-                              const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
-                              setSelectedComponent(fullComp || comp);
-                              setSelectedLicense(null);
-                           }}>
-                             {comp.name}
-                           </td>
-                           <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
-                           <td className="px-4 py-3">
-                             <div className="flex flex-wrap gap-1">
-                               {comp.licenses.length > 0 ? (
-                                 comp.licenses.map((l: any, idx: number) => (
-                                   <Badge 
-                                     key={`${idx}`} 
-                                     variant="outline" 
-                                     className="text-[10px] whitespace-nowrap"
-                                     style={{ 
-                                       borderColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "40",
-                                       color: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS],
-                                       backgroundColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "10"
-                                     }}
-                                   >
-                                     {l.id}
-                                   </Badge>
-                                 ))
-                               ) : (
-                                 <Badge variant="secondary" className="text-[10px] opacity-50">Unknown</Badge>
-                               )}
-                             </div>
-                           </td>
-                           <td className="px-4 py-3 text-right pr-6">
-                             <Button
-                               variant="outline"
-                               size="xs"
-                               className="h-7 text-[10px]"
-                               onClick={() => {
-                                 const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
-                                 setSelectedComponent(fullComp || comp);
-                                 setSelectedLicense(null);
-                               }}
-                             >
-                               Details
-                             </Button>
-                           </td>
-                         </tr>
-                      ))}
+                      {pageItems.map((comp: any, i) => {
+                        const cats = comp.licenses.map((l: any) => l.category as any);
+                        const conflict = checkConflict(cats);
+                        
+                        return (
+                          <tr
+                            key={`${comp.ref}-${i}`}
+                            className={cn(
+                              "border-b hover:bg-muted/50 transition-colors",
+                              conflict.hasConflict && "bg-destructive/5"
+                            )}
+                          >
+                             <td className="px-4 py-3 font-medium cursor-pointer hover:underline" onClick={() => {
+                                const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
+                                setSelectedComponent(fullComp || comp);
+                                setSelectedLicense(null);
+                             }}>
+                               <div className="flex items-center gap-2">
+                                 {comp.name}
+                                 {conflict.hasConflict && (
+                                   <div className="flex items-center gap-1">
+                                     <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                                     <HelpTooltip text={conflict.reason || "Potential license conflict detected"} />
+                                   </div>
+                                 )}
+                               </div>
+                             </td>
+                             <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
+                             <td className="px-4 py-3">
+                               <div className="flex flex-wrap gap-1">
+                                 {comp.licenses.length > 0 ? (
+                                   comp.licenses.map((l: any, idx: number) => (
+                                     <Badge 
+                                       key={`${idx}`} 
+                                       variant="outline" 
+                                       className="text-[10px] whitespace-nowrap"
+                                       style={{ 
+                                         borderColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "40",
+                                         color: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS],
+                                         backgroundColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "10"
+                                       }}
+                                     >
+                                       {l.id}
+                                     </Badge>
+                                   ))
+                                 ) : (
+                                   <Badge variant="secondary" className="text-[10px] opacity-50">Unknown</Badge>
+                                 )}
+                               </div>
+                             </td>
+                             <td className="px-4 py-3 text-right pr-6">
+                               <Button
+                                 variant="outline"
+                                 size="xs"
+                                 className="h-7 text-[10px]"
+                                 onClick={() => {
+                                   const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
+                                   setSelectedComponent(fullComp || comp);
+                                   setSelectedLicense(null);
+                                 }}
+                               >
+                                 Details
+                               </Button>
+                             </td>
+                           </tr>
+                        );
+                      })}
                     </tbody>
                     </>
                   ) : (
@@ -608,91 +630,6 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
           </ErrorBoundary>
         </Card>
       </div>
-        </ScrollArea>
-      </ResizablePanel>
-
-      {(!!selectedComponent || !!selectedLicense) && (
-        <>
-          <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/50 transition-colors" />
-          <ResizablePanel defaultSize={40} minSize={20}>
-            <div className="h-full pl-2">
-              <ErrorBoundary 
-                resetKeys={[selectedComponent, selectedLicense]} 
-                fallback={<div className="h-full border-l flex items-center justify-center p-6 text-center text-muted-foreground text-sm">Details panel failed to load.</div>}
-              >
-                {selectedComponent ? (
-                  <ComponentDetailPanel
-                    component={selectedComponent as any}
-                    analysis={analysis}
-                    onClose={() => setSelectedComponent(null)}
-                  />
-                ) : (
-                  <div className="h-full border-l bg-card flex flex-col shadow-2xl z-20">
-                    <div className="flex items-center justify-between p-4 border-b flex-none">
-                      <div className="flex items-center gap-2">
-                        <Scale className="h-5 w-5 text-primary" />
-                        <h3 className="font-semibold text-lg breadcrumb">License Details</h3>
-                      </div>
-                      <Button variant="ghost" size="icon" onClick={() => setSelectedLicense(null)}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <ScrollArea className="flex-1 min-h-0">
-                      <div className="p-4 space-y-6">
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-1">License ID</h4>
-                          <div className="text-xl font-bold font-mono">{(selectedLicense as any).id}</div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Category</h4>
-                          <Badge 
-                            variant="secondary" 
-                            className="text-white border-0 uppercase"
-                            style={{ 
-                              backgroundColor: CATEGORY_COLORS[(selectedLicense as any).category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.unknown
-                            }}
-                          >
-                            {(selectedLicense as any).category}
-                          </Badge>
-                        </div>
-
-                        <Separator />
-
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                            <Network className="h-4 w-4" /> Affected Components ({(selectedLicense as any).affectedCount})
-                          </h4>
-                          <div className="space-y-2">
-                            {displayStats.allLicenseComponents
-                              .filter(c => c.licenses.some((l: any) => l.id === (selectedLicense as any).id))
-                              .slice(0, 15).map((comp: any, i: number) => (
-                                <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border text-sm">
-                                  <span className="font-medium truncate mr-2">{comp.name}</span>
-                                  <Badge variant="outline" className="text-[10px] shrink-0">{comp.version}</Badge>
-                                </div>
-                              ))
-                            }
-                            {(selectedLicense as any).affectedCount > 15 && (
-                              <p className="text-[10px] text-muted-foreground text-center">+ {(selectedLicense as any).affectedCount - 15} more components</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="pt-4 mt-auto">
-                          <Button className="w-full" variant="outline" onClick={() => window.open(`https://spdx.org/licenses/${(selectedLicense as any).id}.html`, '_blank', 'noopener,noreferrer')}>
-                            View SPDX License Terms
-                          </Button>
-                        </div>
-                      </div>
-                    </ScrollArea>
-                  </div>
-                )}
-              </ErrorBoundary>
-            </div>
-          </ResizablePanel>
-        </>
-      )}
-    </ResizablePanelGroup>
+    </ScrollArea>
   );
 }

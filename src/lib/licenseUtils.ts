@@ -89,3 +89,16 @@ export function getLicenseDescription(licenseId: string | null | undefined): str
   
   return `No detailed summary available for ${licenseId}. It is categorized as ${getLicenseCategory(licenseId)}.`;
 }
+
+export function checkLicenseConflict(categories: LicenseCategory[]): { hasConflict: boolean; reason?: string } {
+  const uniqueCategories = new Set(categories);
+  
+  if (uniqueCategories.has("copyleft") && uniqueCategories.has("proprietary")) {
+    return { 
+      hasConflict: true, 
+      reason: "Copyleft licenses (e.g. GPL) generally cannot be combined with Proprietary/Commercial licenses in the same distribution." 
+    };
+  }
+  
+  return { hasConflict: false };
+}

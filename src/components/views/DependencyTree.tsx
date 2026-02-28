@@ -6,37 +6,29 @@ import {
 import { type EnhancedComponent, type formattedSBOM } from "../../types/sbom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronDown, Package, Search, X, Layers, ShieldAlert, Maximize2, Minimize2, Settings2 } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { ChevronRight, ChevronDown, Package, Search, X, Layers, ShieldAlert, AlertTriangle, Info, Settings2 } from "lucide-react";
+import { cn, formatComponentName } from "../../lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import { Virtuoso } from "react-virtuoso";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { ComponentDetailPanel } from "./ComponentDetailPanel";
-import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { useDebounce } from "../../hooks/useDebounce";
+import { useSelection } from "../../context/SelectionContext";
 import { flattenTree, type FlatNode } from "../../lib/treeUtils";
-
-
 
 interface TreeItemRowProps {
   item: FlatNode;
   detailMode: "summary" | "severity" | "license";
   isSelected: boolean;
+  showHeatmap: boolean;
   searchQuery?: string;
   onSelect: (node: EnhancedComponent) => void;
   onToggle: (path: string) => void;
   dependencyGraph: Map<string, string[]>;
 }
 
-function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onToggle, dependencyGraph }: TreeItemRowProps) {
+function TreeItemRow({ item, detailMode, isSelected, showHeatmap, searchQuery, onSelect, onToggle, dependencyGraph }: TreeItemRowProps) {
   const { node, ref, level, hasChildren, isExpanded } = item;
   const childRefs = dependencyGraph.get(ref) || [];
 
@@ -52,6 +44,18 @@ function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onTo
   );
   const totalVulnerabilities = inherentCount + transitiveCount;
 
+  const getHeatmapClass = () => {
+    if (!showHeatmap) return "";
+    
+    // Check direct first, then transitive
+    if (vuls.inherent.Critical.length > 0 || vuls.transitive.Critical.length > 0) return "bg-red-500/10 hover:bg-red-500/20";
+    if (vuls.inherent.High.length > 0 || vuls.transitive.High.length > 0) return "bg-orange-500/10 hover:bg-orange-500/20";
+    if (vuls.inherent.Medium.length > 0 || vuls.transitive.Medium.length > 0) return "bg-yellow-500/10 hover:bg-yellow-500/20";
+    if (vuls.inherent.Low.length > 0 || vuls.transitive.Low.length > 0) return "bg-blue-500/10 hover:bg-blue-500/20";
+    
+    return "";
+  };
+
   const renderSeverityBadge = (
     severity: "Critical" | "High" | "Medium" | "Low",
     colorClass: string,
@@ -64,11 +68,20 @@ function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onTo
       <Badge
         variant="outline"
         className={cn(
-          "h-4 px-1 text-[9px] font-mono border flex gap-1",
+          "h-4 px-1 text-[9px] font-mono border flex items-center gap-1",
           colorClass,
         )}
         title={`${severity}: ${d} direct, ${t} transitive`}
       >
+        {(() => {
+          switch (severity.toLowerCase()) {
+            case 'critical': return <ShieldAlert className="h-2.5 w-2.5" />;
+            case 'high': return <AlertTriangle className="h-2.5 w-2.5" />;
+            case 'medium': return <Info className="h-2.5 w-2.5" />;
+            case 'low': return <Info className="h-2.5 w-2.5 opacity-70" />;
+            default: return null;
+          }
+        })()}
         <span>{d}</span>
         <span className="opacity-60">({t})</span>
       </Badge>
@@ -108,6 +121,7 @@ function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onTo
       <div
         className={cn(
           "flex items-center py-1.5 px-2 hover:bg-muted/50 cursor-pointer rounded-sm group transition-colors",
+          getHeatmapClass(),
           level === 0 &&
             "font-semibold border-b border-muted/50 mb-1 bg-muted/10",
           isSelected && "bg-primary/15 hover:bg-primary/20 ring-1 ring-primary/30 ring-inset"
@@ -138,11 +152,11 @@ function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onTo
           )}
         />
 
-        <span className="truncate mr-2 text-sm">
+        <span className="truncate mr-2 text-sm" title={node.name}>
           {searchQuery ? (
-            <HighlightedText text={node.name} highlight={searchQuery} />
+            <HighlightedText text={formatComponentName(node.name)} highlight={searchQuery} />
           ) : (
-            node.name
+            formatComponentName(node.name)
           )}
         </span>
         <span className="text-xs text-muted-foreground/60 font-mono shrink-0">
@@ -207,7 +221,7 @@ function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onTo
                 <Badge
                   variant="destructive"
                   className="h-4 px-1 text-[9px] font-bold border-0"
-                  title="Direct vulnerabilities"
+                  title={`This component has ${inherentCount} direct security vulnerabilities.`}
                 >
                   {inherentCount}d
                 </Badge>
@@ -216,14 +230,17 @@ function TreeItemRow({ item, detailMode, isSelected, searchQuery, onSelect, onTo
                 <Badge
                   variant="secondary"
                   className="h-4 px-1 text-[9px] font-medium opacity-80"
-                  title="Transitive vulnerabilities"
+                  title={`This component brings in ${transitiveCount} vulnerabilities via its dependency subtree.`}
                 >
                   {transitiveCount}t
                 </Badge>
               )}
               {totalVulnerabilities === 0 && (
-                <div className="h-4 w-4 flex items-center justify-center">
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-500/30" />
+                <div 
+                  className="h-4 w-4 flex items-center justify-center group/dot relative" 
+                  title={`0 Vulnerabilities Found. License: ${Array.from(node.licenses || []).map((l: any) => l.id || l.name).join(", ") || "None declared"}`}
+                >
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-500/40 group-hover/dot:scale-125 transition-transform" />
                 </div>
               )}
             </>
@@ -281,11 +298,21 @@ export function DependencyTree({
     message: "Preparing tree...",
   });
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
-  const [selectedComponent, setSelectedComponent] = useState<EnhancedComponent | null>(null);
+  const { selectedComponent, setSelectedComponent, viewFilters, setViewFilters } = useSelection();
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  useEffect(() => {
+    if (viewFilters.dependencyTree) {
+      const filters = viewFilters.dependencyTree;
+      if (filters.searchQuery !== undefined) {
+        setSearchQuery(filters.searchQuery);
+      }
+      setViewFilters('dependencyTree', null);
+    }
+  }, [viewFilters, setViewFilters]);
   
-  const { analysis } = useDependencyAnalysis(sbom);
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
 
   useEffect(() => {
@@ -553,26 +580,22 @@ export function DependencyTree({
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden pb-6 gap-6">
+    <div className="flex flex-col h-full overflow-hidden pb-2 md:pb-6 gap-4 md:gap-6">
       {/* Header Section */}
-      <div className="flex flex-col gap-1 px-1">
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent flex items-center gap-2">
-          Dependency Tree
-          <HelpTooltip text="Hierarchical view of all components and their dependencies. Shows how components bring in other components (transitive dependencies)." />
-        </h2>
+      <div className="hidden md:flex flex-col gap-1 px-1">
         <p className="text-sm text-muted-foreground">
           Explore {componentCount.toLocaleString()} components hierarchically through depth analysis and threat detection.
         </p>
       </div>
 
       {/* Unified Action Bar */}
-      <div className="flex items-center gap-3 p-2 rounded-xl bg-card border border-muted/50 shadow-sm flex-none">
+      <div className="flex flex-wrap items-center gap-2 md:gap-3 p-2 rounded-xl bg-card border border-muted/50 shadow-sm flex-none">
         {/* Search Group */}
-        <div className="relative w-72">
+        <div className="relative flex-1 min-w-[200px] md:flex-none md:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
           <Input
             placeholder="Search name, group or CVE..."
-            className="pl-10 h-10 bg-muted/20 border-transparent focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-all rounded-lg"
+            className="pl-10 h-9 md:h-10 bg-muted/20 border-transparent focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-all rounded-lg text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -580,7 +603,7 @@ export function DependencyTree({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50 rounded-md"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 md:h-8 md:w-8 hover:bg-muted/50 rounded-md"
               onClick={() => setSearchQuery("")}
             >
               <X className="h-4 w-4 text-muted-foreground/50" />
@@ -589,30 +612,30 @@ export function DependencyTree({
         </div>
 
         {/* Divider */}
-        <div className="w-px h-6 bg-muted-foreground/20 mx-1" />
+        <div className="hidden md:block w-px h-6 bg-muted-foreground/20 mx-1" />
 
         {/* Detail Level Group */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2">
+        <div className="flex items-center gap-1 md:gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 px-2">
             <Settings2 className="h-4 w-4 text-muted-foreground/70" />
             <span className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">Mode:</span>
-            <HelpTooltip text="Summary: Show vulnerability counts. Severity: Show breakdown by severity. License: Show license types." />
           </div>
           <div className="flex items-center bg-muted/40 p-1 rounded-lg border border-muted-foreground/10">
             {[
-              { id: 'summary', label: 'Summary' },
-              { id: 'severity', label: 'Severity' },
-              { id: 'license', label: 'License' }
+              { id: 'summary', label: 'Sum' },
+              { id: 'severity', label: 'Sev' },
+              { id: 'license', label: 'Lic' }
             ].map((mode) => (
               <Button
                 key={mode.id}
                 variant={detailMode === mode.id ? "secondary" : "ghost"}
                 size="sm"
                 className={cn(
-                  "h-8 text-[11px] px-3 font-medium transition-all rounded-md",
+                  "h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 font-medium transition-all rounded-md",
                   detailMode === mode.id ? "shadow-sm bg-background border border-muted/20" : "text-muted-foreground hover:text-foreground"
                 )}
                 onClick={() => setDetailMode(mode.id as any)}
+                data-testid={`tree-mode-${mode.id}`}
               >
                 {mode.label}
               </Button>
@@ -621,31 +644,29 @@ export function DependencyTree({
         </div>
 
         {/* Divider */}
-        <div className="w-px h-6 bg-muted-foreground/20 mx-1" />
+        <div className="hidden md:block w-px h-6 bg-muted-foreground/20 mx-1" />
 
         {/* Explorer Group */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2">
+        <div className="flex items-center gap-1 md:gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 px-2">
             <Layers className="h-4 w-4 text-muted-foreground/70" />
             <span className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">Depth:</span>
-            <HelpTooltip text="Control how many levels of dependencies are expanded." />
           </div>
           
           <div className="flex items-center gap-1">
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 text-[11px] px-3 hover:bg-muted/50 font-medium"
+              className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 hover:bg-muted/50 font-medium"
               onClick={collapseAll}
               title="Collapse all to roots"
             >
-              <Minimize2 className="h-3.5 w-3.5 mr-2 opacity-60" />
               Roots
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 text-[11px] px-3 hover:bg-muted/50 font-medium"
+              className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 hover:bg-muted/50 font-medium"
               onClick={() => expandToLevel(1)}
             >
               L1
@@ -653,7 +674,7 @@ export function DependencyTree({
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 text-[11px] px-3 hover:bg-muted/50 font-medium"
+              className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 hover:bg-muted/50 font-medium border-r border-muted-foreground/10 mr-1"
               onClick={() => expandToLevel(2)}
             >
               L2
@@ -661,97 +682,85 @@ export function DependencyTree({
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 text-[11px] px-3 hover:bg-muted/50 font-medium border-l border-muted-foreground/10"
+              className="h-7 md:h-8 text-[10px] md:text-[11px] px-2 md:px-3 hover:bg-muted/50 font-medium"
               onClick={expandAll}
             >
-              <Maximize2 className="h-3.5 w-3.5 mr-2 opacity-60" />
               Full
             </Button>
           </div>
         </div>
 
         {/* Vulnerability Focus - Right Aligned */}
-        <div className="ml-auto flex items-center pr-1">
+        <div className="flex items-center gap-2 ml-auto">
+          <Button 
+            variant={showHeatmap ? "secondary" : "outline"} 
+            size="sm" 
+            className={cn(
+              "h-8 md:h-9 text-[10px] md:text-[11px] px-2 md:px-4 transition-all font-semibold rounded-lg shadow-sm active:scale-95",
+              showHeatmap ? "bg-orange-500/20 text-orange-600 border-orange-500/30 hover:bg-orange-500/30" : ""
+            )}
+            onClick={() => setShowHeatmap(!showHeatmap)}
+          >
+            <Layers className="h-3.5 w-3.5 md:mr-2" />
+            <span className="hidden sm:inline">Heatmap</span>
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="h-9 text-[11px] px-4 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-600 transition-all font-semibold rounded-lg shadow-sm active:scale-95"
+            className="h-8 md:h-9 text-[10px] md:text-[11px] px-2 md:px-4 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:text-red-600 transition-all font-semibold rounded-lg shadow-sm active:scale-95"
             onClick={expandVulnerableOnly}
           >
-            <ShieldAlert className="h-4 w-4 mr-2 animate-pulse" />
-            Reveal Threats
+            <ShieldAlert className="h-3.5 w-3.5 md:mr-2" />
+            <span className="hidden sm:inline">Threats</span>
           </Button>
         </div>
       </div>
 
-    <ResizablePanelGroup
-        direction="horizontal"
-        className="flex-1 overflow-hidden"
-        key={selectedComponent ? "split" : "single"}
-      >
-        <ResizablePanel 
-          defaultSize={selectedComponent ? 60 : 100} 
-          minSize={20}
-          className="flex flex-col"
-        >
-          <Card className="flex-1 overflow-hidden bg-card/30 border border-muted/50 flex flex-col shadow-sm relative">
-            {flatNodes.length > 0 ? (
-              <Virtuoso
-                style={{ height: "100%" }}
-                totalCount={flatNodes.length}
-                data={flatNodes}
-                itemContent={(index, item) => (
-                  <TreeItemRow
-                    key={item.path}
-                    item={item}
-                    detailMode={detailMode}
-                    isSelected={!!selectedComponent && (selectedComponent.bomRef?.value || (selectedComponent.bomRef as any) || selectedComponent.name) === item.ref}
-                    searchQuery={searchQuery}
-                    onSelect={setSelectedComponent}
-                    onToggle={toggleNode}
-                    dependencyGraph={formattedData.dependencyGraph}
-                  />
-                )}
+      <Card className="flex-1 overflow-hidden bg-card/30 border border-muted/50 flex flex-col shadow-sm relative">
+        {flatNodes.length > 0 ? (
+          <Virtuoso
+            style={{ height: "100%" }}
+            totalCount={flatNodes.length}
+            data={flatNodes}
+            itemContent={(index, item) => (
+              <TreeItemRow
+                key={item.path}
+                item={item}
+                detailMode={detailMode}
+                showHeatmap={showHeatmap}
+                isSelected={!!selectedComponent && (selectedComponent.bomRef?.value || (selectedComponent.bomRef as any) || selectedComponent.name) === item.ref}
+                searchQuery={searchQuery}
+                onSelect={(node) => setSelectedComponent(node)}
+                onToggle={toggleNode}
+                dependencyGraph={formattedData.dependencyGraph}
               />
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-muted-foreground animate-in fade-in duration-300">
-                <Search className="h-10 w-10 mb-4 opacity-20" />
-                <p className="text-lg font-medium">No components found</p>
-                <p className="text-sm opacity-70">
-                  Try a different search term or clear the filter.
-                </p>
-                {searchQuery && (
-                  <Button 
-                    variant="link" 
-                    onClick={() => setSearchQuery("")}
-                    className="mt-2"
-                  >
-                    Clear search
-                  </Button>
-                )}
-              </div>
             )}
-          </Card>
-        </ResizablePanel>
-
-        {selectedComponent && (
-          <>
-            <ResizableHandle
-              withHandle
-              className="w-2 bg-border hover:bg-primary/50 transition-colors mx-1"
-            />
-            <ResizablePanel defaultSize={40} minSize={20}>
-              <div className="h-full pl-2">
-                <ComponentDetailPanel
-                  component={selectedComponent} // Ensure 'component' prop is passed correctly
-                  analysis={analysis}
-                  onClose={() => setSelectedComponent(null)}
-                />
-              </div>
-            </ResizablePanel>
-          </>
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground animate-in fade-in duration-300">
+            <Search className="h-10 w-10 mb-4 opacity-20" />
+            <p className="text-lg font-medium">No components found</p>
+            <p className="text-sm opacity-70">
+              Try a different search term or clear the filter.
+            </p>
+            <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10 max-w-sm">
+              <p className="text-[10px] uppercase font-black text-primary mb-1 tracking-widest text-left">Pro-tip</p>
+              <p className="text-xs text-left leading-relaxed">
+                Use the <span className="font-bold">Reveal Threats</span> button to automatically expand only the branches that contain security vulnerabilities.
+              </p>
+            </div>
+            {searchQuery && (
+              <Button 
+                variant="link" 
+                onClick={() => setSearchQuery("")}
+                className="mt-2 text-primary"
+              >
+                Clear search
+              </Button>
+            )}
+          </div>
         )}
-      </ResizablePanelGroup>
+      </Card>
     </div>
   );
 }

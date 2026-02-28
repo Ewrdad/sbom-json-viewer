@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:693a8ac9-99b2-48ee-b9aa-be5acf3eec52",
+  "serialNumber": "urn:uuid:af487b21-c186-4778-a9c3-cd35bc0cc263",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-24T21:09:29Z",
+    "timestamp": "2026-02-26T11:14:30Z",
     "tools": {
       "components": [
         {
@@ -22010,6 +22010,73 @@
       "ref": "pkg:npm/vscode-languageserver@9.0.1?package-id=pkg%3Anpm%2Fvscode-languageserver%409.0.1%3Fpackage-id%3Dfc1eb1a12ac3d23c",
       "dependsOn": [
         "pkg:npm/vscode-languageserver-protocol@3.17.5?package-id=pkg%3Anpm%2Fvscode-languageserver-protocol%403.17.5%3Fpackage-id%3D39528849d6581bbf"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "bom-ref": "urn:uuid:7c03548c-a9dd-4fb7-bfd8-6b2cc9a9e0b8",
+      "id": "GHSA-mw96-cpmx-2vgc",
+      "source": {
+        "name": "github-language-javascript",
+        "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc"
+      },
+      "references": [
+        {
+          "id": "GHSA-mw96-cpmx-2vgc",
+          "source": {
+            "name": "github-language-javascript",
+            "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc"
+          }
+        }
+      ],
+      "ratings": [
+        {
+          "score": 8.8,
+          "severity": "high",
+          "method": "other",
+          "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:P"
+        },
+        {
+          "source": {
+            "name": "FIRST",
+            "url": "https://www.first.org/epss/"
+          },
+          "score": 0.0039,
+          "method": "other"
+        }
+      ],
+      "description": "Rollup 4 has Arbitrary File Write via Path Traversal",
+      "advisories": [
+        {
+          "url": "https://github.com/rollup/rollup/security/advisories/GHSA-mw96-cpmx-2vgc"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27606"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/c60770d7aaf750e512c1b2774989ea4596e660b2"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/c8cf1f9c48c516285758c1e11f08a54f304fd44e"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/d6dee5e99bb82aac0bee1df4ab9efbde455452c3"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v2.80.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v3.30.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v4.59.0"
+        }
+      ],
+      "affects": [
+        {
+          "ref": "pkg:npm/rollup@4.57.1?package-id=pkg%3Anpm%2Frollup%404.57.1%3Fpackage-id%3D60b4a1ddaf60f615"
+        }
       ]
     }
   ]

@@ -3,6 +3,9 @@ import { DashboardView } from './DashboardView';
 import { describe, it, expect, vi } from 'vitest';
 import { Bom, Component } from '@cyclonedx/cyclonedx-library/Models';
 import type { SbomStats } from '@/types/sbom';
+import { ViewProvider } from '../../context/ViewContext';
+import { SelectionProvider } from '../../context/SelectionContext';
+import { SbomProvider } from '../../context/SbomContext';
 
 // Mock Recharts to avoid responsive container issues in jsdom
 vi.mock('recharts', async () => {
@@ -39,6 +42,7 @@ describe('DashboardView', () => {
             allLicenses: [],
             allLicenseComponents: [],
             uniqueVulnerabilityCount: 0,
+            totalVulnerabilityInstances: 0,
             avgVulnerabilitiesPerComponent: 0,
             dependencyStats: { direct: 2, transitive: 0 },
             dependentsDistribution: {},
@@ -47,7 +51,15 @@ describe('DashboardView', () => {
             sourceCounts: {}
         };
 
-        render(<DashboardView sbom={sbom} preComputedStats={mockStats} />);
+        render(
+            <ViewProvider>
+                <SelectionProvider>
+                    <SbomProvider value={{ sbom, formattedSbom: null, sbomStats: mockStats, scoreHistory: [80, 85, 90] }}>
+                        <DashboardView sbom={sbom} preComputedStats={mockStats} />
+                    </SbomProvider>
+                </SelectionProvider>
+            </ViewProvider>
+        );
 
         // Check for 'Total Components' card value
         const titleElement = screen.getByText('Total Components');

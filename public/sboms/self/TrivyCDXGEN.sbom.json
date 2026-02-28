@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:987f9826-312a-45eb-af61-670c3278ec99",
+  "serialNumber": "urn:uuid:b9fb487f-ac93-4257-ac26-05e83cc8196d",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-24T21:09:46+00:00",
+    "timestamp": "2026-02-26T11:14:50+00:00",
     "tools": {
       "components": [
         {
@@ -1237,7 +1237,7 @@
       "properties": [
         {
           "name": "ImportedModules",
-          "value": "@base-ui/react/accordion,Accordion,@base-ui/react/accordion/Accordion,@base-ui/react/alert-dialog,AlertDialog,@base-ui/react/alert-dialog/AlertDialog,@base-ui/react/merge-props,mergeProps,@base-ui/react/merge-props/mergeProps,@base-ui/react/use-render,useRender,@base-ui/react/use-render/useRender,@base-ui/react/button,Button,@base-ui/react/button/Button,@base-ui/react/collapsible,Collapsible,@base-ui/react/collapsible/Collapsible,@base-ui/react,Combobox,@base-ui/react/Combobox,@base-ui/react/dialog,Dialog,@base-ui/react/dialog/Dialog,@base-ui/react/menu,Menu,@base-ui/react/menu/Menu,@base-ui/react/input,Input,@base-ui/react/input/Input,@base-ui/react/scroll-area,ScrollArea,@base-ui/react/scroll-area/ScrollArea,@base-ui/react/select,Select,@base-ui/react/select/Select,@base-ui/react/separator,Separator,@base-ui/react/separator/Separator"
+          "value": "@base-ui/react/accordion,Accordion,@base-ui/react/accordion/Accordion,@base-ui/react/alert-dialog,AlertDialog,@base-ui/react/alert-dialog/AlertDialog,@base-ui/react/merge-props,mergeProps,@base-ui/react/merge-props/mergeProps,@base-ui/react/use-render,useRender,@base-ui/react/use-render/useRender,@base-ui/react/button,Button,@base-ui/react/button/Button,@base-ui/react/collapsible,Collapsible,@base-ui/react/collapsible/Collapsible,@base-ui/react,Combobox,@base-ui/react/Combobox,@base-ui/react/dialog,Dialog,@base-ui/react/dialog/Dialog,@base-ui/react/menu,Menu,@base-ui/react/menu/Menu,@base-ui/react/input,Input,@base-ui/react/input/Input,@base-ui/react/scroll-area,ScrollArea,@base-ui/react/scroll-area/ScrollArea,@base-ui/react/select,Select,@base-ui/react/select/Select,@base-ui/react/separator,Separator,@base-ui/react/separator/Separator,@base-ui/react/tabs,Tabs,@base-ui/react/tabs/Tabs"
         },
         {
           "name": "ResolvedUrl",
@@ -18278,7 +18278,7 @@
       "properties": [
         {
           "name": "ImportedModules",
-          "value": "lucide-react,Upload,lucide-react/Upload,Download,lucide-react/Download,HelpCircle,lucide-react/HelpCircle,FileText,lucide-react/FileText,Info,lucide-react/Info,CheckCircle,lucide-react/CheckCircle,Lightbulb,lucide-react/Lightbulb,CircleHelp,lucide-react/CircleHelp,Search,lucide-react/Search,ChevronDown,lucide-react/ChevronDown,Settings,lucide-react/Settings,ExternalLink,lucide-react/ExternalLink,LayoutDashboard,lucide-react/LayoutDashboard,List,lucide-react/List,Network,lucide-react/Network,ShieldAlert,lucide-react/ShieldAlert,ScrollText,lucide-react/ScrollText,GitGraph,lucide-react/GitGraph,Wrench,lucide-react/Wrench,lucide-react/X,Package,lucide-react/Package,Copy,lucide-react/Copy,Check,lucide-react/Check,ChevronRight,lucide-react/ChevronRight,ChevronLeft,lucide-react/ChevronLeft,ArrowUpDown,lucide-react/ArrowUpDown,ShieldCheck,lucide-react/ShieldCheck,Fingerprint,lucide-react/Fingerprint,Scale,lucide-react/Scale,Layers,lucide-react/Layers,RefreshCw,lucide-react/RefreshCw,Maximize2,lucide-react/Maximize2,Minimize2,lucide-react/Minimize2,Settings2,lucide-react/Settings2,Boxes,lucide-react/Boxes,FileCheck,lucide-react/FileCheck,BookOpen,lucide-react/BookOpen,Calendar,lucide-react/Calendar,User,lucide-react/User,Building2,lucide-react/Building2,Hash,lucide-react/Hash,ArrowRight,lucide-react/ArrowRight,Filter,lucide-react/Filter,ChevronUp,lucide-react/ChevronUp,AlertTriangle,lucide-react/AlertTriangle,AlertCircle,lucide-react/AlertCircle,Building,lucide-react/Building,CheckCircle2,lucide-react/CheckCircle2,XCircle,lucide-react/XCircle,FileImage,lucide-react/FileImage"
+          "value": "lucide-react,Upload,lucide-react/Upload,Download,lucide-react/Download,Globe,lucide-react/Globe,LayoutDashboard,lucide-react/LayoutDashboard,ShieldAlert,lucide-react/ShieldAlert,Scale,lucide-react/Scale,Search,lucide-react/Search,Network,lucide-react/Network,Info,lucide-react/Info,BarChart3,lucide-react/BarChart3,GitGraph,lucide-react/GitGraph,Wrench,lucide-react/Wrench,HelpCircle,lucide-react/HelpCircle,FileText,lucide-react/FileText,CheckCircle,lucide-react/CheckCircle,Lightbulb,lucide-react/Lightbulb,ShieldCheck,lucide-react/ShieldCheck,CircleHelp,lucide-react/CircleHelp,Terminal,lucide-react/Terminal,Copy,lucide-react/Copy,Check,lucide-react/Check,ChevronDown,lucide-react/ChevronDown,Settings,lucide-react/Settings,ExternalLink,lucide-react/ExternalLink,ChevronRight,lucide-react/ChevronRight,List,lucide-react/List,ScrollText,lucide-react/ScrollText,lucide-react/X,Package,lucide-react/Package,ChevronLeft,lucide-react/ChevronLeft,ArrowUpDown,lucide-react/ArrowUpDown,Fingerprint,lucide-react/Fingerprint,Layers,lucide-react/Layers,RefreshCw,lucide-react/RefreshCw,AlertTriangle,lucide-react/AlertTriangle,Maximize2,lucide-react/Maximize2,Minimize2,lucide-react/Minimize2,Settings2,lucide-react/Settings2,Boxes,lucide-react/Boxes,FileCheck,lucide-react/FileCheck,BookOpen,lucide-react/BookOpen,Calendar,lucide-react/Calendar,User,lucide-react/User,Building2,lucide-react/Building2,Hash,lucide-react/Hash,ArrowRight,lucide-react/ArrowRight,Filter,lucide-react/Filter,ChevronUp,lucide-react/ChevronUp,AlertCircle,lucide-react/AlertCircle,Building,lucide-react/Building,FileJson,lucide-react/FileJson,CheckCircle2,lucide-react/CheckCircle2,XCircle,lucide-react/XCircle,FileImage,lucide-react/FileImage"
         },
         {
           "name": "ResolvedUrl",
@@ -21188,7 +21188,7 @@
       "properties": [
         {
           "name": "ImportedModules",
-          "value": "recharts,recharts/Bar,BarChart,recharts/BarChart,ResponsiveContainer,recharts/ResponsiveContainer,XAxis,recharts/XAxis,YAxis,recharts/YAxis,Tooltip,recharts/Tooltip,recharts/Pie,PieChart,recharts/PieChart,Cell,recharts/Cell"
+          "value": "recharts,recharts/Bar,BarChart,recharts/BarChart,ResponsiveContainer,recharts/ResponsiveContainer,XAxis,recharts/XAxis,YAxis,recharts/YAxis,Tooltip,recharts/Tooltip,recharts/Pie,PieChart,recharts/PieChart,Cell,recharts/Cell,CartesianGrid,recharts/CartesianGrid,Legend,recharts/Legend"
         },
         {
           "name": "ResolvedUrl",
@@ -30709,5 +30709,89 @@
       "dependsOn": []
     }
   ],
-  "vulnerabilities": []
+  "vulnerabilities": [
+    {
+      "id": "CVE-2026-27606",
+      "source": {
+        "name": "ghsa",
+        "url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+      },
+      "ratings": [
+        {
+          "source": {
+            "name": "nvd"
+          },
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "source": {
+            "name": "redhat"
+          },
+          "score": 9.1,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N"
+        }
+      ],
+      "cwes": [
+        22
+      ],
+      "description": "Rollup is a module bundler for JavaScript. Versions prior to 2.80.0, 3.30.0, and 4.59.0 of the Rollup module bundler (specifically v4.x and present in current source) is vulnerable to an Arbitrary File Write via Path Traversal. Insecure file name sanitization in the core engine allows an attacker to control output filenames (e.g., via CLI named inputs, manual chunk aliases, or malicious plugins) and use traversal sequences (`../`) to overwrite files anywhere on the host filesystem that the build process has permissions for. This can lead to persistent Remote Code Execution (RCE) by overwriting critical system or user configuration files. Versions 2.80.0, 3.30.0, and 4.59.0 contain a patch for the issue.",
+      "recommendation": "Upgrade rollup to version 2.80.0, 3.30.0, 4.59.0",
+      "advisories": [
+        {
+          "url": "https://avd.aquasec.com/nvd/cve-2026-27606"
+        },
+        {
+          "url": "https://access.redhat.com/security/cve/CVE-2026-27606"
+        },
+        {
+          "url": "https://github.com/rollup/rollup"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/c60770d7aaf750e512c1b2774989ea4596e660b2"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/c8cf1f9c48c516285758c1e11f08a54f304fd44e"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/commit/d6dee5e99bb82aac0bee1df4ab9efbde455452c3"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v2.80.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v3.30.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/releases/tag/v4.59.0"
+        },
+        {
+          "url": "https://github.com/rollup/rollup/security/advisories/GHSA-mw96-cpmx-2vgc"
+        },
+        {
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27606"
+        },
+        {
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-27606"
+        }
+      ],
+      "published": "2026-02-25T03:16:04+00:00",
+      "updated": "2026-02-25T16:05:11+00:00",
+      "affects": [
+        {
+          "ref": "pkg:npm/rollup@4.57.1",
+          "versions": [
+            {
+              "version": "4.57.1",
+              "status": "affected"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

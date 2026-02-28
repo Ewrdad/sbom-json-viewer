@@ -44,6 +44,7 @@ export interface SbomStats {
   allVulnerabilities: {
     id: string;
     severity: string;
+    severitySource?: string;
     affectedCount: number;
     title?: string;
     description?: string;
@@ -83,6 +84,8 @@ export interface SbomStats {
       versions?: { version: string; status: string }[];
     }[];
     affectedComponentRefs: string[];
+    _raw?: any;
+    _rawSources?: any[];
   }[];
   allLicenses: {
     id: string;
@@ -97,6 +100,7 @@ export interface SbomStats {
     licenses: { id: string; name: string; category: string }[];
   }[];
   uniqueVulnerabilityCount: number;
+  totalVulnerabilityInstances: number;
   avgVulnerabilitiesPerComponent: number;
   dependencyStats: {
     direct: number;
@@ -111,11 +115,41 @@ export interface SbomStats {
 }
 
 export interface MultiSbomStats {
-  sources: { name: string; componentsFound: number; vulnerabilitiesFound: number }[];
+  sources: { 
+    name: string; 
+    componentsFound: number; 
+    vulnerabilitiesFound: number;
+    criticalCount: number;
+    highCount: number;
+    mediumCount: number;
+    lowCount: number;
+    metadataScore: number;
+    metadataGrade: string;
+    isBest?: boolean;
+    rank?: number;
+    uniqueComponents?: number;
+    uniqueVulnerabilities?: number;
+  }[];
   overlap: {
-    components: { unique: 0; shared: 0; total: 0 };
-    vulnerabilities: { unique: 0; shared: 0; total: 0 };
+    components: { unique: number; shared: number; total: number };
+    vulnerabilities: { unique: number; shared: number; total: number };
   };
+  gaps?: {
+    sourceName: string;
+    uniqueComponents: { name: string; version: string; purl?: string }[];
+    uniqueVulnerabilities: { id: string; severity: string; componentName: string }[];
+  }[];
+  crossSourceComponents?: {
+    name: string;
+    version: string;
+    purl?: string;
+    foundBy: string[];
+    metadataBySource: Record<string, {
+      hasPurl: boolean;
+      hasLicenses: boolean;
+      hasHashes: boolean;
+    }>;
+  }[];
 }
 
 export interface DeveloperStats {
@@ -181,6 +215,10 @@ export interface EnhancedComponent extends Omit<Component, "supplier" | "author"
   };
   licenseDistribution: LicenseDistribution;
   transitiveLicenseDistribution: LicenseDistribution;
+  /**
+   * Maps vulnerability ID to the bom-ref of the component where it was first found in the dependency tree
+   */
+  _transitiveSources?: Map<string, string>;
   // Extended fields that might be present in JSON from varying cyclonedx versions
   author?: string;
   authors?: Array<{ name?: string; email?: string }>;

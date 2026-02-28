@@ -27,4 +27,8 @@ export default defineConfig({
       "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
     },
   },
+  build: {
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000,
+  },
 })

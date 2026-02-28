@@ -1,8 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
 import type { VersionConflict } from "@/types/sbom";
+import { useView } from "../../../context/ViewContext";
+import { useSelection } from "../../../context/SelectionContext";
 
 export function VersionConflictCard({ conflicts }: { conflicts: VersionConflict[] }) {
+  const { setActiveView } = useView();
+  const { setViewFilters } = useSelection();
+
   if (conflicts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg bg-muted/30">
@@ -18,7 +23,12 @@ export function VersionConflictCard({ conflicts }: { conflicts: VersionConflict[
   return (
     <div className="space-y-4">
       {conflicts.map((conflict, i) => (
-        <div key={i} className="group border rounded-lg overflow-hidden border-orange-500/20 bg-orange-500/[0.02] hover:bg-orange-500/[0.04] transition-colors">
+        <div key={i} 
+             className="group border rounded-lg overflow-hidden border-orange-500/20 bg-orange-500/[0.02] hover:bg-orange-500/[0.04] transition-colors cursor-pointer"
+             onClick={() => {
+               setViewFilters('dependencyTree', { searchQuery: conflict.name });
+               setActiveView('tree');
+             }}>
           <div className="p-4 flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">

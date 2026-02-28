@@ -1,4 +1,5 @@
 import type { EnhancedComponent, formattedSBOM } from "../../types/sbom";
+import { formatComponentName } from "../utils";
 
 export type MermaidBuildOptions = {
   maxDepth: number;
@@ -64,7 +65,7 @@ const sanitizeLabelText = (value: string) =>
     .replace(/\n/g, "<br/>"); // Use <br/> for newlines in Mermaid
 
 const buildLabel = (component: EnhancedComponent, maxLabelLength: number) => {
-  const name = sanitizeLabelText(component.name || "Unnamed Component");
+  const name = sanitizeLabelText(formatComponentName(component.name || "Unnamed Component"));
   const version = component.version ? sanitizeLabelText(component.version) : "";
   const { inherent, transitive } = component.vulnerabilities;
   const inherentTotal =

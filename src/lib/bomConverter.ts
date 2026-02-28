@@ -6,6 +6,8 @@ import { batchProcess, tick } from "./asyncUtils";
 export const convertJsonToBom = async (
   rawJson: Record<string, any>,
 ): Promise<Bom> => {
+  const warnings: string[] = [];
+  
   const bom = new Bom({
     metadata: rawJson.metadata as any,
   });
@@ -34,6 +36,10 @@ export const convertJsonToBom = async (
     bom.components.add(rootComponent);
   }
 
+  if (rawJson.components && !Array.isArray(rawJson.components)) {
+    warnings.push("The 'components' section is present but is not an array. Individual components could not be parsed.");
+  }
+
   const componentsArray = Array.isArray(rawJson.components)
     ? rawJson.components
     : [];
@@ -59,6 +65,9 @@ export const convertJsonToBom = async (
     }
 
     (component as any)._raw = compData;
+    if (compData._rawSources) {
+      (component as any)._rawSources = compData._rawSources;
+    }
     bom.components.add(component);
   });
 
@@ -68,6 +77,10 @@ export const convertJsonToBom = async (
     if (component.bomRef?.value) {
       componentLookup.set(component.bomRef.value, component);
     }
+  }
+
+  if (rawJson.dependencies && !Array.isArray(rawJson.dependencies)) {
+    warnings.push("The 'dependencies' section is present but is not an array. Dependency links were ignored.");
   }
 
   const dependenciesArray = Array.isArray(rawJson.dependencies)
@@ -94,6 +107,10 @@ export const convertJsonToBom = async (
     }
   });
 
+  if (rawJson.vulnerabilities && !Array.isArray(rawJson.vulnerabilities)) {
+    warnings.push("The 'vulnerabilities' section is present but is not an array. Vulnerability data was ignored.");
+  }
+
   const vulnerabilitiesArray = Array.isArray(rawJson.vulnerabilities)
     ? rawJson.vulnerabilities
     : [];
@@ -118,16 +135,18 @@ export const convertJsonToBom = async (
       proofOfConcept: vulnData.proofOfConcept,
       references: new Set(vulnData.references || []),
       properties: new Set(vulnData.properties || []),
-      affects: new Set((vulnData.affects || []).map((affect: any) => ({
-        ref: new BomRef(affect.ref?.value || affect.ref),
-        versions: new Set(affect.versions || []),
-      }))),
-    };
-
-    bom.vulnerabilities.add(vuln as any);
-  });
+              affects: new Set((vulnData.affects || []).map((affect: any) => ({
+                ref: new BomRef(affect.ref?.value || affect.ref),
+                versions: new Set(affect.versions || []),
+              }))),
+              _rawSources: vulnData._rawSources,
+              _raw: vulnData,
+            };
+      
+            bom.vulnerabilities.add(vuln as any);  });
 
   (bom as any)._raw = rawJson;
+  (bom as any)._parsingWarnings = warnings;
 
   await tick();
   return bom;

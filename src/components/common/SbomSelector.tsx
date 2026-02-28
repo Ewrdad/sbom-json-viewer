@@ -67,7 +67,7 @@ export function SbomSelector({
     : selectedFile?.name || "Select SBOM...";
 
   return (
-    <div className="w-[250px]">
+    <div className="w-full">
       <Combobox
         value={selectedFile ? selectedFile.id : null}
         onValueChange={(val) => {
@@ -91,7 +91,11 @@ export function SbomSelector({
               <ComboboxGroup key={group}>
                 <ComboboxLabel>{group}</ComboboxLabel>
                 {files.map((file) => (
-                  <ComboboxItem key={file.id} value={file.id}>
+                  <ComboboxItem 
+                    key={file.id} 
+                    value={file.id}
+                    data-testid={`sbom-option-${file.id}`}
+                  >
                     {file.name}
                   </ComboboxItem>
                 ))}

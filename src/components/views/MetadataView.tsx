@@ -9,7 +9,8 @@ import {
   Building2, 
   Package, 
   ExternalLink,
-  Hash
+  Hash,
+  AlertTriangle
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 
@@ -44,11 +45,24 @@ export function MetadataView({ sbom }: { sbom: any }) {
     <ScrollArea className="h-full">
       <div className="pb-6 space-y-6 animate-in fade-in duration-500">
         <div className="flex items-center gap-2">
-          <h2 className="text-3xl font-bold tracking-tight">Metadata</h2>
           <Badge variant="outline" className="text-xs">
             {sbom.specVersion || "Unknown"} CycloneDX
           </Badge>
         </div>
+
+        {sbom._parsingWarnings && sbom._parsingWarnings.length > 0 && (
+          <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-950/20 dark:border-amber-900/50 dark:text-amber-200 space-y-2 animate-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-2 font-bold text-sm">
+              <AlertTriangle className="h-4 w-4" />
+              Parsing Warnings
+            </div>
+            <ul className="list-disc pl-5 text-xs space-y-1 opacity-90">
+              {sbom._parsingWarnings.map((warning: string, i: number) => (
+                <li key={i}>{warning}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* General Info */}

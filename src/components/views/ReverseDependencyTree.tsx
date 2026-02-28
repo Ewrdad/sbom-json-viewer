@@ -294,12 +294,11 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
 
       {/* Main Visualization Area */}
       <Card className="flex-1 flex flex-col h-full">
-        <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-                <GitGraph className="h-5 w-5" />
-                Reverse Dependency Tree
-            </CardTitle>
-        </CardHeader>
+        <div className="px-6 pt-6">
+          <p className="text-sm text-muted-foreground italic">
+            Select a component from the list to analyze its upstream impact
+          </p>
+        </div>
         <CardContent className="flex-1 overflow-auto p-6">
             <ErrorBoundary 
                 resetKeys={[selectedComponentId]} 

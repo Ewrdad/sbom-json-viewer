@@ -20,18 +20,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { ChevronLeft, ChevronRight, ArrowUpDown, Search } from "lucide-react";
-import { ComponentDetailPanel } from "./ComponentDetailPanel";
-import { cn } from "../../lib/utils";
+import { ChevronLeft, ChevronRight, ArrowUpDown, Search, Filter } from "lucide-react";
+import { CopyButton } from "@/components/common/CopyButton";
+import { useSelection } from "../../context/SelectionContext";
+import { cn, formatComponentName } from "../../lib/utils";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import { type formattedSBOM } from "../../types/sbom";
+import { getLicenseCategory } from "../../lib/licenseUtils";
+
+function HighlightedText({ text, highlight }: { text: string; highlight: string }) {
+  const trimmed = highlight?.trim();
+  if (!trimmed || trimmed.length < 2) return <span>{text}</span>;
+  const regex = new RegExp(`(${trimmed})`, "gi");
+  const parts = text.split(regex);
+  return (
+    <span>
+      {parts.map((part, i) => 
+        regex.test(part) ? (
+          <mark key={i} className="bg-yellow-500/30 text-foreground rounded-sm px-0.5">
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </span>
+  );
+}
 
 export function ComponentExplorer({ 
   sbom,
@@ -42,23 +59,35 @@ export function ComponentExplorer({
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [selectedComponent, setSelectedComponent] = useState<any | null>(
-    null,
-  );
+  const { selectedComponent, setSelectedComponent } = useSelection();
   const deferredFilter = useDeferredValue(globalFilter);
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
 
-  const { analysis, status: dependencyStatus } = useDependencyAnalysis(sbom);
+  const { status: dependencyStatus, analysis } = useDependencyAnalysis(sbom);
+  const [directOnly, setDirectOnly] = useState(false);
 
   // Transform components to Array for the table
   const data = useMemo(() => {
-    return Array.isArray(sbom.components) ? sbom.components : Array.from(sbom.components);
-  }, [sbom]);
+    let list = Array.isArray(sbom.components) ? sbom.components : Array.from(sbom.components);
+    
+    if (directOnly && analysis) {
+      list = list.filter((c: any) => {
+        const ref = (c as any).bomRef?.value || (c as any).bomRef;
+        if (!ref) return true;
+        const upstreams = analysis.inverseDependencyMap.get(ref as string) || [];
+        return upstreams.length === 0;
+      });
+    }
+    
+    return list;
+  }, [sbom, directOnly, analysis]);
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
         accessorKey: "name",
+        size: 300,
+        minSize: 100,
         header: ({ column }) => {
           return (
             <Button
@@ -73,12 +102,42 @@ export function ComponentExplorer({
             </Button>
           );
         },
-        cell: ({ row }) => (
-          <div className="font-medium">{row.getValue("name")}</div>
+        cell: ({ row }) => {
+          const name = row.getValue("name") as string;
+          return (
+            <div className="font-medium truncate" title={name}>
+              <HighlightedText text={formatComponentName(name)} highlight={deferredFilter} />
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "purl",
+        size: 200,
+        minSize: 100,
+        header: () => (
+          <div className="flex items-center gap-1">
+            PURL
+            <HelpTooltip text="Package URL (PURL) - A standardized way to identify and locate a software package." />
+          </div>
         ),
+        cell: ({ row }) => {
+          const purl = row.getValue("purl") as string;
+          if (!purl) return <span className="text-muted-foreground text-[10px]">—</span>;
+          return (
+            <div className="flex items-center gap-1 group/purl overflow-hidden">
+              <code className="text-[10px] bg-muted px-1 py-0.5 rounded truncate flex-1 min-w-0" title={purl}>
+                {purl}
+              </code>
+              <CopyButton value={purl} tooltip="Copy PURL" className="h-5 w-5 opacity-0 group-hover/purl:opacity-100 shrink-0" />
+            </div>
+          );
+        },
       },
       {
         accessorKey: "version",
+        size: 100,
+        minSize: 50,
         header: () => (
           <div className="flex items-center gap-1">
             Version
@@ -88,6 +147,8 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "group",
+        size: 150,
+        minSize: 80,
         header: () => (
           <div className="flex items-center gap-1">
             Group
@@ -97,6 +158,8 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "type",
+        size: 100,
+        minSize: 60,
         header: () => (
           <div className="flex items-center gap-1">
             Type
@@ -106,6 +169,8 @@ export function ComponentExplorer({
       },
       {
         id: "formattedLicenses",
+        size: 150,
+        minSize: 100,
         header: () => (
           <div className="flex items-center gap-1">
             Licenses
@@ -119,21 +184,41 @@ export function ComponentExplorer({
           const count = licenseArray.length;
 
           if (count === 0)
-            return <span className="text-muted-foreground text-xs">None</span>;
+            return <Badge variant="secondary" className="text-[10px] px-1 py-0 h-5 opacity-50 font-normal">None</Badge>;
 
           return (
             <div className="flex flex-wrap gap-1">
               {licenseArray
                 .slice(0, 2)
-                .map((l, i) => (
-                  <Badge
-                    key={i}
-                    variant="secondary"
-                    className="text-[10px] px-1 py-0 h-5"
-                  >
-                    {l.id || l.name || "Unknown"}
-                  </Badge>
-                ))}
+                .map((l, i) => {
+                  const id = l.id || l.name;
+                  const name = id || "Unknown";
+                  const category = getLicenseCategory(id);
+                  
+                  let badgeVariant: "secondary" | "destructive" | "outline" | "default" = "secondary";
+                  let customClassName = "text-[10px] px-1 py-0 h-5 font-mono";
+                  
+                  if (category === "copyleft") {
+                    badgeVariant = "destructive";
+                  } else if (category === "weak-copyleft") {
+                    customClassName += " bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800";
+                  } else if (category === "permissive") {
+                    customClassName += " bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+                  } else if (category === "unknown") {
+                    badgeVariant = "outline";
+                  }
+
+                  return (
+                    <Badge
+                      key={i}
+                      variant={badgeVariant}
+                      className={customClassName}
+                      title={`${name} (${category})`}
+                    >
+                      {name}
+                    </Badge>
+                  );
+                })}
               {count > 2 && (
                 <span className="text-xs text-muted-foreground">
                   +{count - 2}
@@ -150,6 +235,7 @@ export function ComponentExplorer({
   const table = useReactTable({
     data,
     columns,
+    columnResizeMode: "onChange",
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -173,21 +259,8 @@ export function ComponentExplorer({
 
   return (
     <div className="h-full flex flex-col overflow-hidden pb-6">
-      <ResizablePanelGroup
-        direction="horizontal"
-        key={selectedComponent ? "split" : "single"}
-      >
-        <ResizablePanel
-          defaultSize={selectedComponent ? 50 : 100}
-          minSize={10}
-          id="explorer-panel"
-        >
-          <div className="h-full flex flex-col pr-2 min-w-0">
-            <div className="flex items-center justify-between mb-4 flex-none">
-              <h2 className="text-3xl font-bold tracking-tight">
-                Component Explorer
-                <HelpTooltip text="Searchable list of all components found in the SBOM." />
-              </h2>
+      <div className="h-full flex flex-col pr-2 min-w-0">
+        <div className="flex items-center justify-between mb-4 flex-none">
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-[10px]">
                   {componentCount.toLocaleString()} components
@@ -204,27 +277,57 @@ export function ComponentExplorer({
                   onChange={(e) => setGlobalFilter(e.target.value)}
                   className="w-[180px] lg:w-[250px]"
                 />
+                <HelpTooltip text="Searches across Name, PURL, Version, Group, Type, and Licenses." />
               </div>
-              {dependencyStatus === "processing" && (
-                <Badge variant="outline" className="text-[10px] capitalize">
-                  Building dependency map …
-                </Badge>
-              )}
+
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant={directOnly ? "default" : "outline"} 
+                  size="sm" 
+                  className="h-8 gap-2"
+                  onClick={() => setDirectOnly(!directOnly)}
+                  disabled={dependencyStatus === "processing"}
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">
+                    {directOnly ? "Showing Direct" : "Show Direct Only"}
+                  </span>
+                </Button>
+                
+                {dependencyStatus === "processing" && (
+                  <Badge variant="outline" className="text-[10px] capitalize">
+                    Building dependency map …
+                  </Badge>
+                )}
+              </div>
             </div>
 
             <div className="rounded-md border flex-1 min-h-0 overflow-auto bg-card scrollbar-thin min-w-0">
-              <Table className="w-full">
+              <Table className="w-full" style={{ width: table.getCenterTotalSize(), tableLayout: 'fixed' }}>
                 <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
-                        <TableHead key={header.id}>
+                        <TableHead 
+                          key={header.id}
+                          style={{ width: header.getSize() }}
+                          className="relative group/header"
+                        >
                           {header.isPlaceholder
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
                                 header.getContext(),
                               )}
+                          {/* Resizer */}
+                          <div
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                            className={cn(
+                              "absolute right-0 top-0 h-full w-1 bg-primary/20 cursor-col-resize opacity-0 group-hover/header:opacity-100 transition-opacity",
+                              header.column.getIsResizing() ? "bg-primary opacity-100 w-1.5" : ""
+                            )}
+                          />
                         </TableHead>
                       ))}
                     </TableRow>
@@ -297,26 +400,6 @@ export function ComponentExplorer({
               </div>
             </div>
           </div>
-        </ResizablePanel>
-
-        {selectedComponent && (
-          <>
-            <ResizableHandle
-              withHandle
-              className="w-2 bg-border hover:bg-primary/50 transition-colors"
-            />
-            <ResizablePanel defaultSize={50} minSize={15} id="detail-panel">
-              <div className="h-full pl-2">
-                <ComponentDetailPanel
-                  component={selectedComponent}
-                  analysis={analysis}
-                  onClose={() => setSelectedComponent(null)}
-                />
-              </div>
-            </ResizablePanel>
-          </>
-        )}
-      </ResizablePanelGroup>
     </div>
   );
 }

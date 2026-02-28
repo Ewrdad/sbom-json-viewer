@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:96011693-1354-4c99-94f0-448fbb7f0e6e",
+  "serialNumber": "urn:uuid:3e034c3e-754b-45f8-a749-554cadc4c880",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-24T21:09:17+00:00",
+    "timestamp": "2026-02-26T11:12:58+00:00",
     "tools": {
       "components": [
         {
@@ -20,7 +20,7 @@
       ]
     },
     "component": {
-      "bom-ref": "1155adfa-8611-47a6-953d-8d3f1f3c8ec9",
+      "bom-ref": "0f23a951-914b-4247-a9f0-5f5b8ac0449d",
       "type": "application",
       "name": ".",
       "properties": [
@@ -33,7 +33,7 @@
   },
   "components": [
     {
-      "bom-ref": "fbd2bf84-ad8d-4b61-8af8-8c1c832103f5",
+      "bom-ref": "d1cb3658-d4e6-4590-be08-d83164998693",
       "type": "application",
       "name": "package-lock.json",
       "properties": [
@@ -8240,13 +8240,13 @@
   ],
   "dependencies": [
     {
-      "ref": "1155adfa-8611-47a6-953d-8d3f1f3c8ec9",
+      "ref": "0f23a951-914b-4247-a9f0-5f5b8ac0449d",
       "dependsOn": [
-        "fbd2bf84-ad8d-4b61-8af8-8c1c832103f5"
+        "d1cb3658-d4e6-4590-be08-d83164998693"
       ]
     },
     {
-      "ref": "fbd2bf84-ad8d-4b61-8af8-8c1c832103f5",
+      "ref": "d1cb3658-d4e6-4590-be08-d83164998693",
       "dependsOn": [
         "pkg:npm/%40base-ui/react@1.1.0",
         "pkg:npm/%40cyclonedx/cyclonedx-library@9.4.1",

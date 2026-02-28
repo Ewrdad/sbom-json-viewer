@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Wrench, Boxes, FileCheck } from "lucide-react";
+import { Boxes, FileCheck, ArrowRight } from "lucide-react";
 import { VersionConflictCard } from "./developer/VersionConflictCard";
 import { MetadataQualityCard } from "./developer/MetadataQualityCard";
 import type { SbomStats } from "@/types/sbom";
 import { useSbomStats } from "../../hooks/useSbomStats";
+import { useView } from "../../context/ViewContext";
+import { useSelection } from "../../context/SelectionContext";
 
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 
@@ -16,6 +18,8 @@ export default function DeveloperView({
   sbom: Bom; 
   preComputedStats?: SbomStats; 
 }) {
+  const { setActiveView } = useView();
+  const { setViewFilters } = useSelection();
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const displayStats = preComputedStats ?? stats;
 
@@ -53,10 +57,6 @@ export default function DeveloperView({
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-6 animate-in fade-in duration-500 pb-12">
-        <div className="flex items-center gap-2">
-          <Wrench className="h-6 w-6 text-primary" />
-          <h2 className="text-3xl font-bold tracking-tight">Developer Insights</h2>
-        </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="md:col-span-1 border-primary/10 bg-primary/5">
@@ -151,12 +151,22 @@ export default function DeveloperView({
                     <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Top Offenders</span>
                     <div className="space-y-1.5">
                       {topConflicts.map((c, i) => (
-                        <div key={i} className="flex items-center justify-between text-sm p-2 rounded bg-muted/30 border border-transparent hover:border-orange-500/20 transition-colors">
-                          <span className="font-medium truncate mr-2">{c.name}</span>
-                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                        <button 
+                          key={i} 
+                          className="w-full flex items-center justify-between text-sm p-2 rounded bg-muted/30 border border-transparent hover:border-orange-500/50 hover:bg-orange-500/5 transition-all group"
+                          onClick={() => {
+                            setViewFilters('dependencyTree', { searchQuery: c.name });
+                            setActiveView('tree');
+                          }}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="font-medium truncate">{c.name}</span>
+                            <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-orange-500" />
+                          </div>
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
                             {c.versions.length} versions
                           </Badge>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>

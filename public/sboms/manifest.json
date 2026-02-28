@@ -8,6 +8,12 @@
       "group": "Examples"
     },
     {
+      "name": "Sample Simple 2",
+      "path": "sboms/examples/sample-simple-2.sbom.json",
+      "id": "examples/sample-simple-2",
+      "group": "Examples"
+    },
+    {
       "name": "Full SBOM",
       "path": "sboms/examples/sbom-full.sbom.json",
       "id": "examples/sbom-full",

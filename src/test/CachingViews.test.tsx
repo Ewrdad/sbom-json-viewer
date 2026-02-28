@@ -2,11 +2,17 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { App } from "../App";
 import { ViewProvider } from "../context/ViewContext";
+import { SelectionProvider } from "../context/SelectionContext";
 import React from "react";
 
 // Mock lazy-loaded views to avoid Suspense issues and speed up tests
 vi.mock("../components/views/DashboardView", () => ({
-  DashboardView: () => <div data-testid="dashboard-view">Dashboard View Content</div>
+  DashboardView: () => <div data-testid="dashboard-view">Dashboard View Content</div>,
+  DashboardSkeleton: () => <div data-testid="dashboard-skeleton">Dashboard Skeleton</div>
+}));
+vi.mock("../components/views/VulnerabilitiesView", () => ({
+  VulnerabilitiesView: () => <div data-testid="vulnerabilities-view">Vulnerabilities View</div>,
+  VulnerabilitiesSkeleton: () => <div data-testid="vulnerabilities-skeleton">Vulnerabilities Skeleton</div>
 }));
 vi.mock("../components/views/ComponentExplorer", () => {
   return {
@@ -116,7 +122,9 @@ describe("View Caching Integration", () => {
   it("should preserve Component Explorer search state when switching views", async () => {
     render(
       <ViewProvider>
-        <App />
+        <SelectionProvider>
+          <App />
+        </SelectionProvider>
       </ViewProvider>
     );
 
@@ -124,7 +132,7 @@ describe("View Caching Integration", () => {
       expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
     }, { timeout: 5000 });
 
-    const explorerBtn = screen.getByRole("button", { name: /Components/i });
+    const explorerBtn = screen.getAllByTestId("sidebar-link-explorer")[0];
     fireEvent.click(explorerBtn);
 
     await waitFor(() => {
@@ -155,13 +163,15 @@ describe("View Caching Integration", () => {
   it("should preserve Dependency Tree expansion state when switching views", async () => {
     render(
       <ViewProvider>
-        <App />
+        <SelectionProvider>
+          <App />
+        </SelectionProvider>
       </ViewProvider>
     );
 
     await waitFor(() => expect(screen.getByTestId("dashboard-view")).toBeInTheDocument());
 
-    const treeBtn = screen.getByRole("button", { name: /Dependency Tree/i });
+    const treeBtn = screen.getByTestId("sidebar-link-tree");
     fireEvent.click(treeBtn);
 
     await waitFor(() => expect(screen.getByTestId("tree-view")).toBeInTheDocument());

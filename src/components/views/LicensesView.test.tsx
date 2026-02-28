@@ -3,6 +3,9 @@ import { LicensesView } from './LicensesView';
 import { describe, it, expect, vi } from 'vitest';
 import type { SbomStats } from '@/types/sbom';
 import userEvent from '@testing-library/user-event';
+import { SettingsProvider } from "../../context/SettingsContext";
+import { ViewProvider } from "../../context/ViewContext";
+import { SelectionProvider } from "../../context/SelectionContext";
 
 // Mock Recharts to avoid responsive container issues in jsdom
 vi.mock('recharts', async () => {
@@ -40,6 +43,7 @@ const mockStats: SbomStats = {
         { name: 'express', version: '4.17.1', ref: 'ref-express', licenses: [{ id: 'MIT', name: 'MIT', category: 'permissive' }] },
     ],
     uniqueVulnerabilityCount: 0,
+    totalVulnerabilityInstances: 50,
     avgVulnerabilitiesPerComponent: 0,
     dependencyStats: { direct: 50, transitive: 50 },
     dependentsDistribution: { 0: 50, 1: 50 },
@@ -52,7 +56,15 @@ const mockStats: SbomStats = {
 describe('LicensesView', () => {
     it('should render KPI cards with correct counts', () => {
         vi.setConfig({ testTimeout: 15000 });
-        render(<LicensesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <ViewProvider>
+                    <SelectionProvider>
+                        <LicensesView sbom={null} preComputedStats={mockStats} />
+                    </SelectionProvider>
+                </ViewProvider>
+            </SettingsProvider>
+        );
 
         expect(screen.getByText('Unique Licenses')).toBeInTheDocument();
         expect(screen.getByText('3')).toBeInTheDocument(); // total unique licenses
@@ -63,7 +75,15 @@ describe('LicensesView', () => {
     });
 
     it('should render license components table', () => {
-        render(<LicensesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <ViewProvider>
+                    <SelectionProvider>
+                        <LicensesView sbom={null} preComputedStats={mockStats} />
+                    </SelectionProvider>
+                </ViewProvider>
+            </SettingsProvider>
+        );
 
         expect(screen.getByText('react')).toBeInTheDocument();
         expect(screen.getByText('express')).toBeInTheDocument();
@@ -71,7 +91,15 @@ describe('LicensesView', () => {
 
     it('should filter components when searching', async () => {
         const user = userEvent.setup();
-        render(<LicensesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <ViewProvider>
+                    <SelectionProvider>
+                        <LicensesView sbom={null} preComputedStats={mockStats} />
+                    </SelectionProvider>
+                </ViewProvider>
+            </SettingsProvider>
+        );
 
         const searchInput = screen.getByPlaceholderText('Search components or licenses...');
         await user.type(searchInput, 'react');
@@ -82,7 +110,15 @@ describe('LicensesView', () => {
 
     it('should switch to license registry view and show licenses', async () => {
         const user = userEvent.setup();
-        render(<LicensesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <ViewProvider>
+                    <SelectionProvider>
+                        <LicensesView sbom={null} preComputedStats={mockStats} />
+                    </SelectionProvider>
+                </ViewProvider>
+            </SettingsProvider>
+        );
 
         const switchBtn = screen.getByText('By License');
         await user.click(switchBtn);
@@ -94,7 +130,15 @@ describe('LicensesView', () => {
 
     it('should filter licenses when searching in license view', async () => {
         const user = userEvent.setup();
-        render(<LicensesView sbom={null} preComputedStats={mockStats} />);
+        render(
+            <SettingsProvider>
+                <ViewProvider>
+                    <SelectionProvider>
+                        <LicensesView sbom={null} preComputedStats={mockStats} />
+                    </SelectionProvider>
+                </ViewProvider>
+            </SettingsProvider>
+        );
 
         const switchBtn = screen.getByText('By License');
         await user.click(switchBtn);
