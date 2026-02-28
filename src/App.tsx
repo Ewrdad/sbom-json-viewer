@@ -61,6 +61,11 @@ const MultiSbomStatsView = lazy(() =>
     default: module.MultiSbomStatsView,
   })),
 );
+const SupplyChainRiskView = lazy(() =>
+  import("./components/views/SupplyChainRiskView").then((module) => ({
+    default: module.SupplyChainRiskView,
+  })),
+);
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 import {
   type SbomStats,
@@ -124,7 +129,8 @@ function AppContent({
     "reverse-tree": "Reverse Tree",
     metadata: "Metadata",
     developer: "Developer Insights",
-    "multi-stats": "Multi-SBOM Stats"
+    "multi-stats": "Multi-SBOM Stats",
+    risk: "Supply Chain Risk"
   };
 
   const getSkeleton = () => {
@@ -209,6 +215,12 @@ function AppContent({
           <KeepAliveView activeView={activeView} viewKey="multi-stats">
             <ErrorBoundary resetKeys={[sbom]}>
               <MultiSbomStatsView stats={sbomStats || undefined} />
+            </ErrorBoundary>
+          </KeepAliveView>
+
+          <KeepAliveView activeView={activeView} viewKey="risk">
+            <ErrorBoundary resetKeys={[sbom]}>
+              <SupplyChainRiskView />
             </ErrorBoundary>
           </KeepAliveView>
         </Suspense>

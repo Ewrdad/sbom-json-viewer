@@ -18,7 +18,8 @@ export function Breadcrumbs() {
     "reverse-tree": "Reverse Tree",
     metadata: "Metadata",
     developer: "Developer Insights",
-    "multi-stats": "Multi-SBOM Stats"
+    "multi-stats": "Multi-SBOM Stats",
+    risk: "Supply Chain Risk"
   };
 
   const navigateToView = (view: ViewType) => {

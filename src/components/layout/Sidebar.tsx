@@ -1,8 +1,8 @@
-import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info, GitGraph, Wrench, ChevronLeft, ChevronRight, Eye, X, Upload, Database } from "lucide-react";
+import { LayoutDashboard, List, Network, ShieldAlert, ScrollText, Info, GitGraph, Wrench, ChevronLeft, ChevronRight, Eye, X, Upload, Database, AlertTriangle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useView } from "../../context/ViewContext";
 import { useSbom } from "../../context/SbomContext";
 import type { ViewType } from "../../types";
@@ -28,12 +28,93 @@ export function Sidebar({
   const { isMobile } = useLayout();
   
   const { activeView, setActiveView, isMultiSbom } = useView();
-  const { sbomStats } = useSbom();
+  const { sbomStats, manifest, currentFile, onImport } = useSbom();
   const { highContrast, setHighContrast } = useSettings();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isAltPressed, setIsAltPressed] = useState(false);
   
   const criticalCount = sbomStats?.vulnerabilityCounts?.critical || 0;
+
+  const navItems = useMemo(() => {
+    const items: { id: ViewType; label: string; icon: React.ReactNode; description: string; badge?: React.ReactNode }[] = [
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: <LayoutDashboard className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Overview of SBOM metrics and health",
+      },
+      {
+        id: "vulnerabilities",
+        label: "Vulnerabilities",
+        icon: <ShieldAlert className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Security vulnerabilities found in components",
+        badge: criticalCount > 0 ? (
+          <span className="ml-auto bg-destructive text-destructive-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-none">
+            {criticalCount}
+          </span>
+        ) : null,
+      },
+      {
+        id: "risk",
+        label: "Supply Chain Risk",
+        icon: <AlertTriangle className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Analyze component risk by impact and security",
+      },
+      {
+        id: "licenses",
+        label: "Licenses",
+        icon: <ScrollText className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "License usage and compliance oversight",
+      },
+      {
+        id: "explorer",
+        label: "Components",
+        icon: <List className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Detailed list of all software components",
+      },
+      {
+        id: "tree",
+        label: "Dependency Tree",
+        icon: <Network className={cn("h-4 w-4 rotate-90", !isCollapsed && "mr-2")} />,
+        description: "Hierarchical view of component dependencies",
+      },
+      {
+        id: "graph",
+        label: "Visual Graph",
+        icon: <Network className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Interactive graph visualization of dependencies",
+      },
+      {
+        id: "reverse-tree",
+        label: "Reverse Tree",
+        icon: <GitGraph className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Trace dependencies from leaf to root",
+      },
+      {
+        id: "metadata",
+        label: "Metadata",
+        icon: <Info className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Metadata about the SBOM file itself",
+      },
+      {
+        id: "developer",
+        label: "Developer Insights",
+        icon: <Wrench className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Package hygiene, version conflicts, and metadata quality",
+      },
+    ];
+
+    if (isMultiSbom) {
+      items.push({
+        id: "multi-stats",
+        label: "Multi-SBOM Stats",
+        icon: <LayoutDashboard className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
+        description: "Compare overlaps and tool efficacy across multiple SBOMs",
+      });
+    }
+    return items;
+  }, [isCollapsed, criticalCount, isMultiSbom]);
+
 
   // Sync isCollapsed with isMobile
   useEffect(() => {
@@ -64,78 +145,7 @@ export function Sidebar({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [setActiveView, isMultiSbom, isMobile, setMobileOpen]); // Re-run if navItems changes (isMultiSbom)
-
-  const navItems: { id: ViewType; label: string; icon: React.ReactNode; description: string; badge?: React.ReactNode }[] = [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Overview of SBOM metrics and health",
-    },
-    {
-      id: "vulnerabilities",
-      label: "Vulnerabilities",
-      icon: <ShieldAlert className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Security vulnerabilities found in components",
-      badge: criticalCount > 0 ? (
-        <span className="ml-auto bg-destructive text-destructive-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-none">
-          {criticalCount}
-        </span>
-      ) : null,
-    },
-    {
-      id: "licenses",
-      label: "Licenses",
-      icon: <ScrollText className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "License usage and compliance oversight",
-    },
-    {
-      id: "explorer",
-      label: "Components",
-      icon: <List className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Detailed list of all software components",
-    },
-    {
-      id: "tree",
-      label: "Dependency Tree",
-      icon: <Network className={cn("h-4 w-4 rotate-90", !isCollapsed && "mr-2")} />,
-      description: "Hierarchical view of component dependencies",
-    },
-    {
-      id: "graph",
-      label: "Visual Graph",
-      icon: <Network className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Interactive graph visualization of dependencies",
-    },
-    {
-      id: "reverse-tree",
-      label: "Reverse Tree",
-      icon: <GitGraph className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Trace dependencies from leaf to root",
-    },
-    {
-      id: "metadata",
-      label: "Metadata",
-      icon: <Info className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Metadata about the SBOM file itself",
-    },
-    {
-      id: "developer",
-      label: "Developer Insights",
-      icon: <Wrench className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Package hygiene, version conflicts, and metadata quality",
-    },
-  ];
-
-  if (isMultiSbom) {
-    navItems.push({
-      id: "multi-stats",
-      label: "Multi-SBOM Stats",
-      icon: <LayoutDashboard className={cn("h-4 w-4", !isCollapsed && "mr-2")} />,
-      description: "Compare overlaps and tool efficacy across multiple SBOMs",
-    });
-  }
+  }, [setActiveView, isMultiSbom, isMobile, setMobileOpen, navItems]); // Re-run if navItems changes (isMultiSbom)
 
   const handleNavClick = (viewId: ViewType) => {
     setActiveView(viewId);
@@ -144,7 +154,6 @@ export function Sidebar({
     }
   };
 
-  const { manifest, currentFile, onImport } = useSbom();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImportClick = () => {

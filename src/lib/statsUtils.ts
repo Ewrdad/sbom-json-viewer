@@ -104,8 +104,8 @@ export function calculateSbomStats(bom: any): SbomStats {
   const components = Array.isArray(bom.components) ? bom.components : Array.from(bom.components || []);
   const vulnerabilities = Array.isArray(bom.vulnerabilities) ? bom.vulnerabilities : Array.from(bom.vulnerabilities || []);
 
-  let totalInstances = 0;
   // 1. Process vulnerabilities (Finding-based counting)
+  let totalInstances = 0;
   for (const vuln of vulnerabilities) {
     let maxSeverity = "none";
     
@@ -155,7 +155,6 @@ export function calculateSbomStats(bom: any): SbomStats {
       }
     }
 
-  let totalInstances = 0;
   for (const affect of ensureArray<any>(vuln.affects)) {
       const ref = affect.ref?.value || affect.ref;
       if (!ref) continue;
