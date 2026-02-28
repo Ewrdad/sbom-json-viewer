@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSbomStats } from "../../hooks/useSbomStats";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
   ResponsiveContainer,
@@ -297,7 +297,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {/* Category Donut */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <ErrorBoundary fallback={<div className="h-[220px] flex items-center justify-center text-muted-foreground text-sm">License distribution unavailable</div>}>
+            <SectionErrorBoundary title="License distribution unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-lg">License Distribution</CardTitle>
               </CardHeader>
@@ -341,12 +341,12 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                   </div>
                 </div>
               </CardContent>
-            </ErrorBoundary>
+            </SectionErrorBoundary>
           </Card>
 
           {/* Top Licenses Bar Chart */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <ErrorBoundary fallback={<div className="h-[220px] flex items-center justify-center text-muted-foreground text-sm">Top licenses chart unavailable</div>}>
+            <SectionErrorBoundary title="Top licenses chart unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-lg">Top 5 Licenses</CardTitle>
               </CardHeader>
@@ -373,13 +373,13 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                   </ResponsiveContainer>
                 </div>
               </CardContent>
-            </ErrorBoundary>
+            </SectionErrorBoundary>
           </Card>
         </div>
 
         {/* Table Card */}
         <Card className="shadow-sm border-muted-foreground/10">
-          <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">License list unavailable due to a rendering error.</div>}>
+          <SectionErrorBoundary title="License list unavailable" resetKeys={[sbom]}>
             <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
@@ -627,7 +627,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                 </div>
               )}
             </CardContent>
-          </ErrorBoundary>
+          </SectionErrorBoundary>
         </Card>
       </div>
     </ScrollArea>

@@ -70,7 +70,7 @@ test.describe("SBOM Viewer", () => {
     await expect(page.getByText("react").first()).toBeVisible();
 
     await searchInput.fill("no-matches-here");
-    await expect(page.getByText("No results.")).toBeVisible();
+    await expect(page.getByText("No components found.")).toBeVisible();
 
     // Clear search and just verify table populates again (any row beyond the header)
     await searchInput.fill("");

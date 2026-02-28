@@ -5,6 +5,7 @@ import {
   useState,
 } from "react";
 import { Button } from "@/components/ui/button";
+import { AlertCircle, RotateCcw } from "lucide-react";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SettingsProvider } from "./context/SettingsContext";
 import { VexProvider } from "./context/VexContext";
@@ -287,10 +288,44 @@ export function App() {
   );
 
   const errorScreen = (
-    <div className="h-full flex flex-col items-center justify-center gap-4 px-6 text-center bg-muted/10">
-      <h1 className="text-2xl font-bold text-red-600">Error Loading SBOM</h1>
-      <p className="text-gray-600">{error}</p>
-      <Button onClick={retry}>Retry</Button>
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-background animate-in fade-in duration-500">
+      <div className="max-w-md w-full p-8 border border-destructive/20 bg-destructive/5 rounded-2xl shadow-lg">
+        <div className="bg-destructive/10 p-4 rounded-full w-fit mx-auto mb-6">
+          <AlertCircle className="h-10 w-10 text-destructive" />
+        </div>
+        <h1 className="text-2xl font-bold text-foreground mb-3">Error Loading SBOM</h1>
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          {error || "We encountered an unexpected problem while loading the SBOM data. Please verify the file format and try again."}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button 
+            onClick={retry} 
+            className="gap-2 px-8 py-6 h-auto text-lg font-semibold shadow-md"
+          >
+            <RotateCcw className="h-5 w-5" />
+            Try Again
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            className="gap-2 px-8 py-6 h-auto text-lg font-semibold"
+          >
+            Reload App
+          </Button>
+        </div>
+        {import.meta.env.DEV && (
+           <div className="mt-8 text-left">
+             <details className="text-[10px] p-2 bg-background/50 border rounded font-mono">
+               <summary className="cursor-pointer text-muted-foreground hover:text-foreground mb-1">
+                 Stack trace (Dev only)
+               </summary>
+               <pre className="whitespace-pre-wrap overflow-auto max-h-40">
+                 {new Error().stack}
+               </pre>
+             </details>
+           </div>
+        )}
+      </div>
     </div>
   );
 

@@ -134,6 +134,8 @@ export interface MultiSbomStats {
     components: { unique: number; shared: number; total: number };
     vulnerabilities: { unique: number; shared: number; total: number };
   };
+  trustScore: number;
+  discoveryDensity: number;
   gaps?: {
     sourceName: string;
     uniqueComponents: { name: string; version: string; purl?: string }[];

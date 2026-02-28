@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useSbomStats } from "../../hooks/useSbomStats";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
   Tooltip as RechartsTooltip,
@@ -789,7 +789,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         </div>
 
         <Card className="shadow-sm border-muted-foreground/10">
-          <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">Vulnerabilities list unavailable due to a rendering error.</div>}>
+          <SectionErrorBoundary title="Vulnerabilities list unavailable" resetKeys={[sbom]}>
             <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
@@ -1227,7 +1227,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 </div>
               )}
             </CardContent>
-          </ErrorBoundary>
+          </SectionErrorBoundary>
         </Card>
       </div>
     </ScrollArea>

@@ -22,7 +22,7 @@ test.describe("UI Audit Features (v0.5.0)", () => {
         await expect(page.getByRole("row").nth(1)).toBeVisible({ timeout: 10000 });
         
         const firstRow = page.getByRole("row").nth(1);
-        const componentName = await firstRow.locator("td").nth(2).innerText(); // nth(2) because nth(1) is checkbox
+        const componentName = await firstRow.locator("td").nth(0).innerText(); // nth(0) is name in Explorer
         await firstRow.click();
         
         // Verify detail panel is open

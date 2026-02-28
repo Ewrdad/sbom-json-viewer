@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
 import { useSbomStats } from "../../hooks/useSbomStats";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
 import { ReportGenerator } from "./reports/ReportGenerator";
 import type { SbomStats } from "@/types/sbom";
 import {
@@ -327,7 +327,7 @@ export function DashboardView({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
           {/* Severity Chart */}
           <Card className="lg:col-span-8 shadow-sm border-muted-foreground/10">
-            <ErrorBoundary fallback={<div className="h-[300px] flex items-center justify-center text-muted-foreground text-sm">Severity chart unavailable</div>}>
+            <SectionErrorBoundary title="Severity chart unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
                   Vulnerability Severity
@@ -367,12 +367,12 @@ export function DashboardView({
                   )}
                 </div>
               </CardContent>
-            </ErrorBoundary>
+            </SectionErrorBoundary>
           </Card>
 
           {/* Dependency Composition */}
           <Card className="lg:col-span-4 shadow-sm border-muted-foreground/10">
-            <ErrorBoundary fallback={<div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">Dependency distribution chart unavailable</div>}>
+            <SectionErrorBoundary title="Dependency distribution chart unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
                   Dependency Centrality
@@ -414,12 +414,12 @@ export function DashboardView({
                   ))}
                 </div>
               </CardContent>
-            </ErrorBoundary>
+            </SectionErrorBoundary>
           </Card>
 
           {/* License Pie Chart */}
           <Card className="lg:col-span-12 xl:col-span-4 shadow-sm border-muted-foreground/10">
-            <ErrorBoundary fallback={<div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">License distribution chart unavailable</div>}>
+            <SectionErrorBoundary title="License distribution chart unavailable" resetKeys={[sbom]}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xl flex items-center gap-2">
                   License Distribution
@@ -463,7 +463,7 @@ export function DashboardView({
                   ))}
                 </div>
               </CardContent>
-            </ErrorBoundary>
+            </SectionErrorBoundary>
           </Card>
 
           {/* Top Licenses */}
@@ -547,7 +547,7 @@ export function DashboardView({
         {/* Most Vulnerable Components Table */}
         <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
           <Card className="shadow-sm border-muted-foreground/10 overflow-hidden">
-            <ErrorBoundary fallback={<div className="p-10 text-center text-muted-foreground">Components table unavailable due to a rendering error.</div>}>
+            <SectionErrorBoundary title="Components table unavailable" description="There was an error loading the vulnerable components list." resetKeys={[sbom]}>
               <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-3">
                 <CardTitle className="text-xl">
                   Most Vulnerable Components
@@ -646,7 +646,7 @@ export function DashboardView({
                   </table>
                 </div>
               </CardContent>
-            </ErrorBoundary>
+            </SectionErrorBoundary>
           </Card>
         </div>
         <ReportGenerator stats={displayStats} />

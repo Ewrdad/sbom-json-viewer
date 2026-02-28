@@ -5,7 +5,7 @@ import { Bom } from '@cyclonedx/cyclonedx-library/Models';
 import { ViewProvider } from '../../context/ViewContext';
 import { SelectionProvider } from '../../context/SelectionContext';
 import { SbomProvider } from '../../context/SbomContext';
-import type { formattedSBOM, EnhancedComponent } from '../../types/sbom';
+import type { formattedSBOM, EnhancedComponent, SbomStats } from '../../types/sbom';
 
 // Mock Recharts
 vi.mock('recharts', async () => {
@@ -17,6 +17,16 @@ vi.mock('recharts', async () => {
         ),
     };
 });
+
+// Mock useSbomStats
+vi.mock('../../hooks/useSbomStats', () => ({
+    useSbomStats: (sbom: any) => ({
+        developerStats: {
+            versionConflicts: [],
+            metadataQuality: { score: 80, grade: 'A', checks: {} }
+        }
+    } as SbomStats)
+}));
 
 describe('SupplyChainRiskView', () => {
     const mockComponent: Partial<EnhancedComponent> = {
@@ -39,7 +49,8 @@ describe('SupplyChainRiskView', () => {
                 Informational: []
             }
         },
-        licenses: [{ id: 'MIT' }] as any
+        licenses: [{ id: 'MIT' }] as any,
+        purl: 'pkg:npm/test-pkg@1.0.0'
     };
 
     const mockFormattedSbom: Partial<formattedSBOM> = {
@@ -47,7 +58,7 @@ describe('SupplyChainRiskView', () => {
         blastRadius: new Map([['pkg:npm/test-pkg@1.0.0', 5]]),
     };
 
-    it('renders risk score and leaderboard', () => {
+    it('renders security posture and leaderboard', () => {
         render(
             <ViewProvider>
                 <SelectionProvider>
@@ -63,15 +74,17 @@ describe('SupplyChainRiskView', () => {
             </ViewProvider>
         );
 
-        expect(screen.getByText('Supply Chain Risk')).toBeInTheDocument();
+        expect(screen.getByText('Security Posture')).toBeInTheDocument();
         expect(screen.getAllByText('test-pkg')[0]).toBeInTheDocument();
+        
         // Risk score calculation: 
-        // vScore = 1 * 10 = 10
-        // blastRadius = 5
-        // lScore (MIT) = 0
-        // cScore = log1p(5) * 2 = 1.79 * 2 = 3.58
-        // totalScore = (10 * (1 + 5/100)) + 0 + 3.58 = 10.5 + 3.58 = 14.08 -> 14.1
-        expect(screen.getAllByText('14.1')[0]).toBeInTheDocument();
+        // securityScore: 1 Critical -> rawVScore=10 -> securityScore=100
+        // impactScore: blastRadius=5 -> (5/20)*100 = 25
+        // complianceScore: MIT -> 0
+        // qualityScore: hasConflict=false, hasPurl=true, hasSupplier=false (no author/supplier in mock) -> 0 + 0 + 25 = 25
+        // totalScore = (100 * 0.4) + (25 * 0.3) + (0 * 0.15) + (25 * 0.15) = 40 + 7.5 + 0 + 3.75 = 51.25 -> 51.3
+        
+        expect(screen.getAllByText('51.3')[0]).toBeInTheDocument();
     });
 
     it('filters components based on search input', () => {
@@ -101,7 +114,7 @@ describe('SupplyChainRiskView', () => {
         expect(screen.getAllByText('alpha-pkg')[0]).toBeInTheDocument();
         expect(screen.getAllByText('beta-pkg')[0]).toBeInTheDocument();
 
-        const searchInput = screen.getByPlaceholderText('Search...');
+        const searchInput = screen.getByPlaceholderText('Filter components...');
         fireEvent.change(searchInput, { target: { value: 'alpha' } });
 
         expect(screen.getAllByText('alpha-pkg')[0]).toBeInTheDocument();

@@ -13,6 +13,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
 
 export function MetadataView({ sbom }: { sbom: any }) {
   if (!sbom || !sbom.metadata) {
@@ -67,195 +68,206 @@ export function MetadataView({ sbom }: { sbom: any }) {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* General Info */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">General Information</CardTitle>
-              <Info className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Timestamp
-                  <HelpTooltip text="When this SBOM file was generated." />
-                </p>
-                <p className="text-sm font-medium">
-                  {metadata.timestamp ? new Date(metadata.timestamp).toLocaleString() : "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Format</p>
-                <p className="text-sm font-medium">CycloneDX</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Version</p>
-                <p className="text-sm font-medium">{sbom.specVersion || "N/A"}</p>
-              </div>
-              {sbom.serialNumber && (
+            <SectionErrorBoundary title="General info unavailable">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">General Information</CardTitle>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Serial Number</p>
-                  <p className="text-xs font-mono break-all">{sbom.serialNumber}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Calendar className="h-3 w-3" /> Timestamp
+                    <HelpTooltip text="When this SBOM file was generated." />
+                  </p>
+                  <p className="text-sm font-medium">
+                    {metadata.timestamp ? new Date(metadata.timestamp).toLocaleString() : "N/A"}
+                  </p>
                 </div>
-              )}
-            </CardContent>
+                <div>
+                  <p className="text-xs text-muted-foreground">Format</p>
+                  <p className="text-sm font-medium">CycloneDX</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Version</p>
+                  <p className="text-sm font-medium">{sbom.specVersion || "N/A"}</p>
+                </div>
+                {sbom.serialNumber && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Serial Number</p>
+                    <p className="text-xs font-mono break-all">{sbom.serialNumber}</p>
+                  </div>
+                )}
+              </CardContent>
+            </SectionErrorBoundary>
           </Card>
 
           {/* Root Component */}
           {component && (
             <Card className="shadow-sm border-muted-foreground/10">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  Subject Component
-                  <HelpTooltip text="The primary component described by this SBOM." />
-                </CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-xs text-muted-foreground">Name</p>
-                  <p className="text-sm font-medium">{component.name}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Version</p>
-                  <p className="text-sm font-mono">{component.version || "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Type</p>
-                  <Badge variant="secondary" className="mt-1">
-                    {(component.type || "unknown").toUpperCase()}
-                  </Badge>
-                </div>
-                {component.purl && (
+              <SectionErrorBoundary title="Subject component info unavailable">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    Subject Component
+                    <HelpTooltip text="The primary component described by this SBOM." />
+                  </CardTitle>
+                  <br />
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <ExternalLink className="h-3 w-3" /> PURL
-                    </p>
-                    <p className="text-[10px] font-mono break-all text-muted-foreground">
-                      {component.purl.toString()}
-                    </p>
+                    <p className="text-xs text-muted-foreground">Name</p>
+                    <p className="text-sm font-medium">{component.name}</p>
                   </div>
-                )}
-              </CardContent>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Version</p>
+                    <p className="text-sm font-mono">{component.version || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Type</p>
+                    <Badge variant="secondary" className="mt-1">
+                      {(component.type || "unknown").toUpperCase()}
+                    </Badge>
+                  </div>
+                  {component.purl && (
+                    <div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <ExternalLink className="h-3 w-3" /> PURL
+                      </p>
+                      <p className="text-[10px] font-mono break-all text-muted-foreground">
+                        {component.purl.toString()}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </SectionErrorBoundary>
             </Card>
           )}
 
           {/* Supplier/Manufacturer */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Organization</CardTitle>
-              <Building2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {supplier && (
-                <div>
-                  <p className="text-xs text-muted-foreground">Supplier</p>
-                  <p className="text-sm font-medium">{supplier.name}</p>
-                  {supplier.url?.[0] && (
-                    <a href={supplier.url[0]} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline block truncate">
-                      {supplier.url[0]}
-                    </a>
-                  )}
-                </div>
-              )}
-              {manufacture && (
-                <div>
-                  <p className="text-xs text-muted-foreground">Manufacturer</p>
-                  <p className="text-sm font-medium">{manufacture.name}</p>
-                  {manufacture.url?.[0] && (
-                    <a href={manufacture.url[0]} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline block truncate">
-                      {manufacture.url[0]}
-                    </a>
-                  )}
-                </div>
-              )}
-              {!supplier && !manufacture && (
-                <p className="text-sm text-muted-foreground italic">No organization data available.</p>
-              )}
-            </CardContent>
+            <SectionErrorBoundary title="Organization info unavailable">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Organization</CardTitle>
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {supplier && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Supplier</p>
+                    <p className="text-sm font-medium">{supplier.name}</p>
+                    {supplier.url?.[0] && (
+                      <a href={supplier.url[0]} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline block truncate">
+                        {supplier.url[0]}
+                      </a>
+                    )}
+                  </div>
+                )}
+                {manufacture && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Manufacturer</p>
+                    <p className="text-sm font-medium">{manufacture.name}</p>
+                    {manufacture.url?.[0] && (
+                      <a href={manufacture.url[0]} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline block truncate">
+                        {manufacture.url[0]}
+                      </a>
+                    )}
+                  </div>
+                )}
+                {!supplier && !manufacture && (
+                  <p className="text-sm text-muted-foreground italic">No organization data available.</p>
+                )}
+              </CardContent>
+            </SectionErrorBoundary>
           </Card>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           {/* Tooling */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Generating Tools
-                <HelpTooltip text="Software used to create this SBOM." />
-              </CardTitle>
-              <Wrench className="h-5 w-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {tools.length > 0 ? (
-                  tools.map((tool, idx) => (
-                    <div key={idx} className="p-3 rounded-lg bg-muted/30 border border-muted-foreground/10 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-sm">{tool.name}</p>
-                        <Badge variant="outline" className="text-[10px]">
-                          {tool.version || "Unknown Version"}
-                        </Badge>
-                      </div>
-                      {tool.vendor && (
-                        <p className="text-xs text-muted-foreground">
-                          Vendor: <span className="text-foreground">{tool.vendor}</span>
-                        </p>
-                      )}
-                      {tool.hashes && Array.isArray(tool.hashes) && tool.hashes.length > 0 && (
-                        <div className="pt-1">
-                          <p className="text-[10px] text-muted-foreground flex items-center gap-1 mb-1">
-                            <Hash className="h-2 w-2" /> Hashes
-                          </p>
-                          <div className="space-y-1">
-                            {tool.hashes.map((h: any, i: number) => (
-                              <div key={i} className="flex items-center justify-between text-[9px] font-mono bg-background/50 p-1 rounded">
-                                <span className="text-muted-foreground">{h.alg}:</span>
-                                <span className="truncate ml-2">{h.content}</span>
-                              </div>
-                            ))}
-                          </div>
+            <SectionErrorBoundary title="Tooling info unavailable">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Generating Tools
+                  <HelpTooltip text="Software used to create this SBOM." />
+                </CardTitle>
+                <Wrench className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {tools.length > 0 ? (
+                    tools.map((tool, idx) => (
+                      <div key={idx} className="p-3 rounded-lg bg-muted/30 border border-muted-foreground/10 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-sm">{tool.name}</p>
+                          <Badge variant="outline" className="text-[10px]">
+                            {tool.version || "Unknown Version"}
+                          </Badge>
                         </div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground italic py-4">No tools listed in metadata.</p>
-                )}
-              </div>
-            </CardContent>
+                        {tool.vendor && (
+                          <p className="text-xs text-muted-foreground">
+                            Vendor: <span className="text-foreground">{tool.vendor}</span>
+                          </p>
+                        )}
+                        {tool.hashes && Array.isArray(tool.hashes) && tool.hashes.length > 0 && (
+                          <div className="pt-1">
+                            <p className="text-[10px] text-muted-foreground flex items-center gap-1 mb-1">
+                              <Hash className="h-2 w-2" /> Hashes
+                            </p>
+                            <div className="space-y-1">
+                              {tool.hashes.map((h: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between text-[9px] font-mono bg-background/50 p-1 rounded">
+                                  <span className="text-muted-foreground">{h.alg}:</span>
+                                  <span className="truncate ml-2">{h.content}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic py-4">No tools listed in metadata.</p>
+                  )}
+                </div>
+              </CardContent>
+            </SectionErrorBoundary>
           </Card>
 
           {/* Authors */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                Authors & Contact
-                <HelpTooltip text="Persons or entities responsible for creating this SBOM." />
-              </CardTitle>
-              <User className="h-5 w-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {authors.length > 0 ? (
-                  authors.map((author, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-muted-foreground/10">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-none">
-                        <User className="h-4 w-4 text-primary" />
+            <SectionErrorBoundary title="Author info unavailable">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Authors & Contact
+                  <HelpTooltip text="Persons or entities responsible for creating this SBOM." />
+                </CardTitle>
+                <User className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {authors.length > 0 ? (
+                    authors.map((author, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-muted-foreground/10">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-none">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-sm truncate">{author.name || "Anonymous Author"}</p>
+                          {author.email && (
+                            <p className="text-xs text-muted-foreground underline truncate">{author.email}</p>
+                          )}
+                          {author.phone && (
+                            <p className="text-xs text-muted-foreground">{author.phone}</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm truncate">{author.name || "Anonymous Author"}</p>
-                        {author.email && (
-                          <p className="text-xs text-muted-foreground underline truncate">{author.email}</p>
-                        )}
-                        {author.phone && (
-                          <p className="text-xs text-muted-foreground">{author.phone}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground italic py-4">No authors listed in metadata.</p>
-                )}
-              </div>
-            </CardContent>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic py-4">No authors listed in metadata.</p>
+                  )}
+                </div>
+              </CardContent>
+            </SectionErrorBoundary>
           </Card>
         </div>
 

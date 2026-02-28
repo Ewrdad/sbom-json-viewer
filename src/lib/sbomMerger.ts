@@ -11,7 +11,7 @@ function calculateJsonStats(sbom: any) {
       if (s === "critical") maxSev = "critical";
       else if (s === "high" && maxSev !== "critical") maxSev = "high";
       else if (s === "medium" && maxSev !== "critical" && maxSev !== "high") maxSev = "medium";
-      else if (s === "low" && maxSev === "none") maxSev = "low";
+      else if (s === "low" && (maxSev === "none" || maxSev === "unknown")) maxSev = "low";
     });
     if (maxSev === "critical") vulnCounts.critical++;
     else if (maxSev === "high") vulnCounts.high++;
@@ -25,7 +25,7 @@ function calculateJsonStats(sbom: any) {
     const hasPurl = components.some((c: any) => !!c.purl);
     const hasLicenses = components.some((c: any) => !!c.licenses && c.licenses.length > 0);
     const hasVersions = components.some((c: any) => !!c.version);
-    const hasHashes = components.some((c: any) => !!c.hashes && c.hashes.length > 0);
+    const hasHashes = components.some((c: any) => !!c.hashes && (Array.isArray(c.hashes) ? c.hashes.length > 0 : true));
     
     if (hasVersions) score += 30;
     if (hasLicenses) score += 20;
@@ -70,12 +70,14 @@ export function mergeSBOMs(sboms: Record<string, unknown>[], sourceNames: string
 
   const getSourceName = (idx: number) => sourceNames[idx] || `Source ${idx + 1}`;
 
-  const multiSbomStats = {
+  const multiSbomStats: any = {
     sources: [] as any[],
     overlap: {
       components: { unique: 0, shared: 0, total: 0 },
       vulnerabilities: { unique: 0, shared: 0, total: 0 }
     },
+    trustScore: 0,
+    discoveryDensity: 0,
     gaps: [] as any[],
     crossSourceComponents: [] as any[]
   };
@@ -85,6 +87,7 @@ export function mergeSBOMs(sboms: Record<string, unknown>[], sourceNames: string
     name: getSourceName(idx),
     ...calculateJsonStats(s)
   }));
+
 
   // Ranking logic: More components + More vulnerabilities + Higher metadata score
   const rankedSources = [...allSourceStats].sort((a, b) => {
@@ -274,6 +277,19 @@ export function mergeSBOMs(sboms: Record<string, unknown>[], sourceNames: string
   multiSbomStats.overlap.vulnerabilities.total = baseSbom.vulnerabilities.length;
   multiSbomStats.overlap.vulnerabilities.unique = multiSbomStats.overlap.vulnerabilities.total - multiSbomStats.overlap.vulnerabilities.shared;
 
+  // Calculate high-level consensus metrics
+  const compShared = multiSbomStats.overlap.components.shared;
+  const compTotal = multiSbomStats.overlap.components.total || 1;
+  const vulnShared = multiSbomStats.overlap.vulnerabilities.shared;
+  const vulnTotal = multiSbomStats.overlap.vulnerabilities.total || 1;
+  
+  // Trust Score: Weighted average of component and vulnerability consensus
+  multiSbomStats.trustScore = Math.round(((compShared / compTotal) * 0.4 + (vulnShared / vulnTotal) * 0.6) * 100);
+  
+  // Discovery Density: Average number of sources that found each component
+  const totalFindings = allSourceStats.reduce((sum, s) => sum + s.componentsFound, 0);
+  multiSbomStats.discoveryDensity = parseFloat((totalFindings / compTotal).toFixed(2));
+
   // Gap Analysis: What did ONE scanner find that ALL others missed?
   const actualSourceNames = sboms.map((_, idx) => getSourceName(idx));
   const gaps: any[] = actualSourceNames.map(name => ({
@@ -347,7 +363,7 @@ export function mergeSBOMs(sboms: Record<string, unknown>[], sourceNames: string
   });
   
   // Update sources with unique counts
-  multiSbomStats.sources.forEach((s, idx) => {
+  multiSbomStats.sources.forEach((s: any, idx: number) => {
     if (gaps[idx]) {
       s.uniqueComponents = gaps[idx].uniqueComponents.length;
       s.uniqueVulnerabilities = gaps[idx].uniqueVulnerabilities.length;

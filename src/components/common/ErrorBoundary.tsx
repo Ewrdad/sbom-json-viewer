@@ -2,7 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
+  fallback?: ReactNode | ((error: Error | null, reset: () => void) => ReactNode);
   resetKeys?: Array<unknown>;
 }
 
@@ -55,20 +55,26 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      if (typeof this.props.fallback === "function") {
+        return this.props.fallback(this.state.error, this.reset);
+      }
+
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
       return (
-        <div className="p-10 bg-red-50 text-red-900 border border-red-200 m-4 rounded-lg">
-          <h2 className="text-xl font-bold mb-2">Something went wrong.</h2>
-          <details className="whitespace-pre-wrap font-mono text-sm">
-            {this.state.error && this.state.error.toString()}
-            <br />
+        <div className="p-10 bg-red-50 text-red-900 border border-red-200 m-4 rounded-lg animate-in fade-in duration-300">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+            <span role="img" aria-label="alert">⚠️</span> Something went wrong.
+          </h2>
+          <p className="mb-4 opacity-80">This specific part of the UI encountered an unexpected error and could not be rendered.</p>
+          <details className="whitespace-pre-wrap font-mono text-sm mb-4 bg-white/50 p-4 rounded-md border border-red-100 max-h-[300px] overflow-auto shadow-inner">
+            <p className="font-bold mb-2">Error: {this.state.error && this.state.error.toString()}</p>
             {this.state.errorInfo && this.state.errorInfo.componentStack}
           </details>
           <button
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors shadow-md active:scale-95"
             onClick={() => this.reset()}
           >
             Try Again

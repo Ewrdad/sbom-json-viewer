@@ -22,8 +22,10 @@ import { Search, ChevronLeft, ChevronRight, Filter, ArrowUpDown } from "lucide-r
 import { useSelection } from "../../context/SelectionContext";
 import { getLicenseCategory } from "../../lib/licenseUtils";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import type { formattedSBOM } from "@/types/sbom";
+import { cn } from "@/lib/utils";
 
 /**
  * @function formatComponentName
@@ -84,8 +86,8 @@ export function ComponentExplorer({
 
   const [directOnly, setDirectOnly] = useState(false);
 
-  const dependencyStatus = formattedSbom?.status || "idle";
-  const dependencyGraph = formattedSbom?.graph;
+  const dependencyGraph = formattedSbom?.dependencyGraph;
+  const isProcessing = !formattedSbom;
 
   const data = useMemo(() => {
     let components = Array.from(sbom.components || []);
@@ -93,7 +95,7 @@ export function ComponentExplorer({
     if (directOnly && dependencyGraph) {
       const rootId = sbom.metadata?.component?.bomRef?.value || sbom.metadata?.component?.bomRef;
       if (rootId) {
-        const directRefs = dependencyGraph[rootId] || [];
+        const directRefs = dependencyGraph.get(rootId) || [];
         components = components.filter((c: any) => 
           directRefs.includes(c.bomRef?.value || c.bomRef)
         );
@@ -310,7 +312,7 @@ export function ComponentExplorer({
                   size="sm" 
                   className="h-8 gap-2"
                   onClick={() => setDirectOnly(!directOnly)}
-                  disabled={dependencyStatus === "processing"}
+                  disabled={isProcessing}
                 >
                   <Filter className="h-3.5 w-3.5" />
                   <span className="text-[10px] font-bold uppercase tracking-wider">
@@ -318,7 +320,7 @@ export function ComponentExplorer({
                   </span>
                 </Button>
                 
-                {dependencyStatus === "processing" && (
+                {isProcessing && (
                   <Badge variant="outline" className="text-[10px] capitalize">
                     Building dependency map …
                   </Badge>
@@ -327,8 +329,9 @@ export function ComponentExplorer({
             </div>
 
             <div className="rounded-md border flex-1 min-h-0 overflow-auto bg-card scrollbar-thin min-w-0">
-              <Table className="w-full" style={{ width: table.getCenterTotalSize(), tableLayout: 'fixed' }}>
-                <TableHeader className="bg-muted/50 sticky top-0 z-10">
+              <SectionErrorBoundary title="Component table failed to render" resetKeys={[data.length, globalFilter]}>
+                <Table className="w-full" style={{ width: table.getCenterTotalSize(), tableLayout: 'fixed' }}>
+                  <TableHeader className="bg-muted/50 sticky top-0 z-10">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
@@ -380,7 +383,8 @@ export function ComponentExplorer({
                   )}
                 </TableBody>
               </Table>
-            </div>
+            </SectionErrorBoundary>
+          </div>
 
             <div className="flex items-center justify-between space-x-2 py-4 flex-none">
               <div className="text-xs text-muted-foreground">

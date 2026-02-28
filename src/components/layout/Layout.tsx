@@ -10,7 +10,7 @@ import { ComponentDetailPanel } from "../views/ComponentDetailPanel";
 import { VulnerabilityDetailPanel } from "../views/VulnerabilityDetailPanel";
 import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
 import { useSbomStats } from "../../hooks/useSbomStats";
-import { ErrorBoundary } from "../common/ErrorBoundary";
+import { SectionErrorBoundary } from "../common/SectionErrorBoundary";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -161,11 +161,13 @@ export function Layout({ children, sbom }: { children: ReactNode; sbom?: any }) 
               {/* Mobile Overlay Detail Panel */}
               {hasSelection && (
                 <div className="fixed inset-0 z-50 bg-background animate-in slide-in-from-bottom duration-300">
-                  <ErrorBoundary 
+                  <SectionErrorBoundary 
                     resetKeys={[selectedComponent, selectedVulnerability, selectedLicense]} 
+                    title="Detail Panel Error"
+                    className="h-full border-none"
                   >
                     {renderDetailContent()}
-                  </ErrorBoundary>
+                  </SectionErrorBoundary>
                 </div>
               )}
             </div>
@@ -182,11 +184,13 @@ export function Layout({ children, sbom }: { children: ReactNode; sbom?: any }) 
                   <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/50 transition-colors" />
                   <ResizablePanel defaultSize={40} minSize={20}>
                     <div className="h-full pl-2" data-testid="detail-panel">
-                      <ErrorBoundary 
+                      <SectionErrorBoundary 
                         resetKeys={[selectedComponent, selectedVulnerability, selectedLicense]} 
+                        title="Detail Panel Error"
+                        className="h-full border-none"
                       >
                         {renderDetailContent()}
-                      </ErrorBoundary>
+                      </SectionErrorBoundary>
                     </div>
                   </ResizablePanel>
                 </>

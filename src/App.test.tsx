@@ -122,6 +122,7 @@ vi.mock("lucide-react", () => {
     Menu: () => <div />,
     Maximize2: () => <div />,
     Minimize2: () => <div />,
+    RotateCcw: () => <div />,
   };
   return icons;
 });
