@@ -1,12 +1,10 @@
-import { useDeferredValue, useMemo, useState } from "react";
+import { useState, useMemo, useDeferredValue } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  type ColumnDef,
-  flexRender,
   type SortingState,
 } from "@tanstack/react-table";
 import {
@@ -20,31 +18,39 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, ArrowUpDown, Search, Filter } from "lucide-react";
-import { CopyButton } from "@/components/common/CopyButton";
+import { Search, ChevronLeft, ChevronRight, Filter, ArrowUpDown } from "lucide-react";
 import { useSelection } from "../../context/SelectionContext";
-import { cn, formatComponentName } from "../../lib/utils";
-import { HelpTooltip } from "@/components/common/HelpTooltip";
-import { useDependencyAnalysis } from "../../hooks/useDependencyAnalysis";
-import { getSbomSizeProfile } from "../../lib/sbomSizing";
-import { type formattedSBOM } from "../../types/sbom";
 import { getLicenseCategory } from "../../lib/licenseUtils";
+import { HelpTooltip } from "@/components/common/HelpTooltip";
+import { getSbomSizeProfile } from "../../lib/sbomSizing";
+import type { formattedSBOM } from "@/types/sbom";
 
+/**
+ * @function formatComponentName
+ * @description Helper to format component names for display
+ */
+function formatComponentName(name: string) {
+  return name.split('/').pop() || name;
+}
+
+/**
+ * @function HighlightedText
+ * @description Renders text with highlighted search matches
+ */
 function HighlightedText({ text, highlight }: { text: string; highlight: string }) {
-  const trimmed = highlight?.trim();
-  if (!trimmed || trimmed.length < 2) return <span>{text}</span>;
-  const regex = new RegExp(`(${trimmed})`, "gi");
+  if (!highlight.trim()) return <span>{text}</span>;
+  const regex = new RegExp(`(${highlight})`, "gi");
   const parts = text.split(regex);
   return (
     <span>
-      {parts.map((part, i) => 
+      {parts.map((part, i) =>
         regex.test(part) ? (
-          <mark key={i} className="bg-yellow-500/30 text-foreground rounded-sm px-0.5">
+          <mark key={i} className="bg-yellow-200 dark:bg-yellow-800 text-foreground rounded-sm px-0.5">
             {part}
           </mark>
         ) : (
           <span key={i}>{part}</span>
-        )
+        ),
       )}
     </span>
   );
@@ -76,46 +82,42 @@ export function ComponentExplorer({
   const deferredFilter = useDeferredValue(globalFilter);
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
 
-  const { status: dependencyStatus, analysis } = useDependencyAnalysis(sbom);
   const [directOnly, setDirectOnly] = useState(false);
 
-  // Transform components to Array for the table
+  const dependencyStatus = formattedSbom?.status || "idle";
+  const dependencyGraph = formattedSbom?.graph;
+
   const data = useMemo(() => {
-    let list = Array.isArray(sbom.components) ? sbom.components : Array.from(sbom.components);
+    let components = Array.from(sbom.components || []);
     
-    if (directOnly && analysis) {
-      list = list.filter((c: any) => {
-        const ref = (c as any).bomRef?.value || (c as any).bomRef;
-        if (!ref) return true;
-        const upstreams = analysis.inverseDependencyMap.get(ref as string) || [];
-        return upstreams.length === 0;
-      });
+    if (directOnly && dependencyGraph) {
+      const rootId = sbom.metadata?.component?.bomRef?.value || sbom.metadata?.component?.bomRef;
+      if (rootId) {
+        const directRefs = dependencyGraph[rootId] || [];
+        components = components.filter((c: any) => 
+          directRefs.includes(c.bomRef?.value || c.bomRef)
+        );
+      }
     }
     
-    return list;
-  }, [sbom, directOnly, analysis]);
+    return components;
+  }, [sbom.components, directOnly, dependencyGraph, sbom.metadata?.component]);
 
-  const columns = useMemo<ColumnDef<any>[]>(
+  const columns = useMemo(
     () => [
       {
         accessorKey: "name",
-        size: 300,
-        minSize: 100,
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="pl-0 hover:bg-transparent"
-            >
-              Name
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
-        cell: ({ row }) => {
+        header: ({ column }: any) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 hover:bg-transparent text-xs font-bold uppercase tracking-wider h-auto"
+          >
+            Name
+            <ArrowUpDown className="ml-2 h-3 w-3" />
+          </Button>
+        ),
+        cell: ({ row }: any) => {
           const name = row.getValue("name") as string;
           const rawSources = row.original._rawSources || [];
           const isMerged = rawSources.length > 1;
@@ -150,113 +152,78 @@ export function ComponentExplorer({
         },
       },
       {
-        accessorKey: "purl",
-        size: 200,
-        minSize: 100,
-        header: () => (
-          <div className="flex items-center gap-1">
-            PURL
-            <HelpTooltip text="Package URL (PURL) - A standardized way to identify and locate a software package." />
-          </div>
-        ),
-        cell: ({ row }) => {
-          const purl = row.getValue("purl") as string;
-          if (!purl) return <span className="text-muted-foreground text-[10px]">—</span>;
-          return (
-            <div className="flex items-center gap-1 group/purl overflow-hidden">
-              <code className="text-[10px] bg-muted px-1 py-0.5 rounded truncate flex-1 min-w-0" title={purl}>
-                {purl}
-              </code>
-              <CopyButton value={purl} tooltip="Copy PURL" className="h-5 w-5 opacity-0 group-hover/purl:opacity-100 shrink-0" />
-            </div>
-          );
-        },
-      },
-      {
         accessorKey: "version",
-        size: 100,
-        minSize: 50,
-        header: () => (
-          <div className="flex items-center gap-1">
-            Version
-            <HelpTooltip text="The specific version of the component found." />
+        header: "Version",
+        cell: ({ row }: any) => (
+          <div className="font-mono text-xs text-muted-foreground truncate">
+            {row.getValue("version") || "—"}
           </div>
         ),
       },
       {
         accessorKey: "group",
-        size: 150,
-        minSize: 80,
-        header: () => (
-          <div className="flex items-center gap-1">
-            Group
-            <HelpTooltip text="The vendor or namespace group of the component (e.g. @angular, org.apache)." />
+        header: "Group",
+        cell: ({ row }: any) => (
+          <div className="text-xs text-muted-foreground truncate max-w-[120px]">
+            {row.getValue("group") || "—"}
           </div>
         ),
       },
       {
         accessorKey: "type",
-        size: 100,
-        minSize: 60,
-        header: () => (
-          <div className="flex items-center gap-1">
-            Type
-            <HelpTooltip text="Component type (library, application, framework, container, etc.)." />
+        header: "Type",
+        cell: ({ row }: any) => (
+          <Badge variant="outline" className="capitalize text-[10px] h-5 py-0">
+            {row.getValue("type") || "unknown"}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: "purl",
+        header: "PURL",
+        cell: ({ row }: any) => (
+          <div className="font-mono text-[10px] text-muted-foreground truncate max-w-[200px]" title={row.getValue("purl")}>
+            {row.getValue("purl") || "—"}
           </div>
         ),
       },
       {
         id: "formattedLicenses",
-        size: 150,
-        minSize: 100,
-        header: () => (
-          <div className="flex items-center gap-1">
-            Licenses
-            <HelpTooltip text="Licenses declared by this component." />
-          </div>
-        ),
-        accessorFn: (row) => row.licenses,
-        cell: ({ row }) => {
-          const licenses = row.original.licenses;
-          const licenseArray = Array.isArray(licenses) ? licenses : Array.from(licenses || []);
-          const count = licenseArray.length;
-
-          if (count === 0)
-            return <Badge variant="secondary" className="text-[10px] px-1 py-0 h-5 opacity-50 font-normal">None</Badge>;
-
+        header: "Licenses",
+        accessorFn: (row: any) => {
+          const lics = Array.from(row.licenses || []);
+          return lics.map((l: any) => l.license?.id || l.license?.name || l.expression).join(", ");
+        },
+        cell: ({ row }: any) => {
+          const licenses = Array.from(row.original.licenses || []);
+          const count = licenses.length;
+          if (count === 0) return <span className="text-muted-foreground text-xs">—</span>;
+          
           return (
             <div className="flex flex-wrap gap-1">
-              {licenseArray
-                .slice(0, 2)
-                .map((l, i) => {
-                  const id = l.id || l.name;
-                  const name = id || "Unknown";
-                  const category = getLicenseCategory(id);
-                  
-                  let badgeVariant: "secondary" | "destructive" | "outline" | "default" = "secondary";
-                  let customClassName = "text-[10px] px-1 py-0 h-5 font-mono";
-                  
-                  if (category === "copyleft") {
-                    badgeVariant = "destructive";
-                  } else if (category === "weak-copyleft") {
-                    customClassName += " bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800";
-                  } else if (category === "permissive") {
-                    customClassName += " bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
-                  } else if (category === "unknown") {
-                    badgeVariant = "outline";
-                  }
+              {licenses.slice(0, 2).map((lic: any, i) => {
+                const id = lic.license?.id || lic.license?.name || lic.expression;
+                const name = lic.license?.id || lic.license?.name || lic.expression;
+                const category = getLicenseCategory(id);
+                
+                let badgeVariant: "secondary" | "destructive" | "outline" | "default" = "secondary";
+                let customClassName = "text-[10px] px-1 py-0 h-5 font-mono";
+                
+                if (category === "copyleft") badgeVariant = "destructive";
+                if (category === "weak-copyleft") badgeVariant = "default";
+                if (category === "unknown") badgeVariant = "outline";
 
-                  return (
-                    <Badge
-                      key={i}
-                      variant={badgeVariant}
-                      className={customClassName}
-                      title={`${name} (${category})`}
-                    >
-                      {name}
-                    </Badge>
-                  );
-                })}
+                return (
+                  <Badge 
+                    key={i} 
+                    variant={badgeVariant} 
+                    className={customClassName}
+                    title={`${name} (${category})`}
+                  >
+                    {name}
+                  </Badge>
+                );
+              })}
               {count > 2 && (
                 <span className="text-xs text-muted-foreground">
                   +{count - 2}
@@ -267,7 +234,7 @@ export function ComponentExplorer({
         },
       },
     ],
-    [],
+    [deferredFilter],
   );
 
   const table = useReactTable({
@@ -295,6 +262,25 @@ export function ComponentExplorer({
     },
   });
 
+  const searchableColumns = useMemo(() => {
+    return table.getAllColumns()
+      .filter(col => col.getCanGlobalFilter())
+      .map(col => {
+        const header = col.columnDef.header;
+        if (typeof header === 'string') return header;
+        // Fallbacks for component-based headers
+        if (col.id === 'name') return 'Name';
+        if (col.id === 'purl') return 'PURL';
+        if (col.id === 'version') return 'Version';
+        if (col.id === 'group') return 'Group';
+        if (col.id === 'type') return 'Type';
+        if (col.id === 'formattedLicenses') return 'Licenses';
+        return col.id;
+      })
+      .filter(Boolean)
+      .join(", ");
+  }, [table]);
+
   return (
     <div className="h-full flex flex-col overflow-hidden pb-6">
       <div className="h-full flex flex-col pr-2 min-w-0">
@@ -315,7 +301,7 @@ export function ComponentExplorer({
                   onChange={(e) => setGlobalFilter(e.target.value)}
                   className="w-[180px] lg:w-[250px]"
                 />
-                <HelpTooltip text="Searches across all visible columns (Name, PURL, Version, Group, Type, and Licenses)." />
+                <HelpTooltip text={`Searches across ${searchableColumns}.`} />
               </div>
 
               <div className="flex items-center gap-2">
@@ -342,30 +328,20 @@ export function ComponentExplorer({
 
             <div className="rounded-md border flex-1 min-h-0 overflow-auto bg-card scrollbar-thin min-w-0">
               <Table className="w-full" style={{ width: table.getCenterTotalSize(), tableLayout: 'fixed' }}>
-                <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
+                <TableHeader className="bg-muted/50 sticky top-0 z-10">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
                         <TableHead 
-                          key={header.id}
+                          key={header.id} 
+                          className="text-xs font-bold uppercase tracking-wider py-3"
                           style={{ width: header.getSize() }}
-                          className="relative group/header"
                         >
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                          {/* Resizer */}
-                          <div
-                            onMouseDown={header.getResizeHandler()}
-                            onTouchStart={header.getResizeHandler()}
-                            className={cn(
-                              "absolute right-0 top-0 h-full w-1 bg-primary/20 cursor-col-resize opacity-0 group-hover/header:opacity-100 transition-opacity",
-                              header.column.getIsResizing() ? "bg-primary opacity-100 w-1.5" : ""
-                            )}
-                          />
+                            : typeof header.column.columnDef.header === "function"
+                            ? header.column.columnDef.header(header.getContext())
+                            : header.column.columnDef.header}
                         </TableHead>
                       ))}
                     </TableRow>
@@ -376,25 +352,18 @@ export function ComponentExplorer({
                     table.getRowModel().rows.map((row) => (
                       <TableRow
                         key={row.id}
-                        data-state={
-                          row.original === selectedComponent
-                            ? "selected"
-                            : undefined
-                        }
+                        data-state={row.getIsSelected() && "selected"}
                         className={cn(
                           "cursor-pointer transition-colors",
-                          row.original === selectedComponent
-                            ? "bg-primary/20 hover:bg-primary/30"
-                            : "hover:bg-muted/50",
+                          selectedComponent?.bomRef?.value === (row.original as any).bomRef?.value && "bg-primary/5"
                         )}
                         onClick={() => setSelectedComponent(row.original)}
                       >
                         {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
+                          <TableCell key={cell.id} className="py-2.5">
+                            {typeof cell.column.columnDef.cell === "function"
+                              ? cell.column.columnDef.cell(cell.getContext())
+                              : cell.getValue() as any}
                           </TableCell>
                         ))}
                       </TableRow>
@@ -403,9 +372,9 @@ export function ComponentExplorer({
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center"
+                        className="h-24 text-center text-muted-foreground italic"
                       >
-                        No results.
+                        No components found.
                       </TableCell>
                     </TableRow>
                   )}
@@ -413,12 +382,11 @@ export function ComponentExplorer({
               </Table>
             </div>
 
-            <div className="flex items-center justify-end space-x-2 py-4 flex-none">
-              <div className="text-sm text-muted-foreground">
-                Page {table.getState().pagination.pageIndex + 1} of{" "}
-                {table.getPageCount()}
+            <div className="flex items-center justify-between space-x-2 py-4 flex-none">
+              <div className="text-xs text-muted-foreground">
+                Showing {table.getRowModel().rows.length} of {data.length} components
               </div>
-              <div className="space-x-2">
+              <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -427,6 +395,9 @@ export function ComponentExplorer({
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
+                <div className="text-xs font-medium">
+                  Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -437,7 +408,7 @@ export function ComponentExplorer({
                 </Button>
               </div>
             </div>
-          </div>
+      </div>
     </div>
   );
 }
