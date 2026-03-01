@@ -11,6 +11,7 @@ export interface VexAssessment {
 
 interface VexContextType {
   assessments: Record<string, VexAssessment>;
+  updateAssessment: (vulnId: string, assessment: Partial<VexAssessment>) => void;
   setAssessment: (vulnId: string, status: VexStatus, justification: string) => void;
   getAssessment: (vulnId: string) => VexAssessment | undefined;
   clearAssessments: () => void;
@@ -28,24 +29,29 @@ export function VexProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('sbom_viewer_vex_assessments', JSON.stringify(assessments));
   }, [assessments]);
 
-  const setAssessment = useCallback((vulnId: string, status: VexStatus, justification: string) => {
+  const updateAssessment = useCallback((vulnId: string, assessment: Partial<VexAssessment>) => {
     setAssessments(prev => {
-      if (status === 'none') {
-        const next = { ...prev };
-        delete next[vulnId];
-        return next;
-      }
+      const current = prev[vulnId] || {
+        status: 'none',
+        justification: '',
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'Local User'
+      };
+      
       return {
         ...prev,
         [vulnId]: {
-          status,
-          justification,
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'Local User'
+          ...current,
+          ...assessment,
+          updatedAt: new Date().toISOString()
         }
       };
     });
   }, []);
+
+  const setAssessment = useCallback((vulnId: string, status: VexStatus, justification: string) => {
+    updateAssessment(vulnId, { status, justification });
+  }, [updateAssessment]);
 
   const getAssessment = useCallback((vulnId: string) => {
     return assessments[vulnId];
@@ -56,7 +62,7 @@ export function VexProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <VexContext.Provider value={{ assessments, setAssessment, getAssessment, clearAssessments }}>
+    <VexContext.Provider value={{ assessments, updateAssessment, setAssessment, getAssessment, clearAssessments }}>
       {children}
     </VexContext.Provider>
   );

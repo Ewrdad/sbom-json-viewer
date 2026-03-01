@@ -13,7 +13,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
-import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 export function MetadataView({ sbom }: { sbom: any }) {
   if (!sbom || !sbom.metadata) {
@@ -68,7 +68,7 @@ export function MetadataView({ sbom }: { sbom: any }) {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* General Info */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="General info unavailable">
+            <ErrorBoundary title="General info unavailable">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">General Information</CardTitle>
                 <Info className="h-4 w-4 text-muted-foreground" />
@@ -98,13 +98,13 @@ export function MetadataView({ sbom }: { sbom: any }) {
                   </div>
                 )}
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
 
           {/* Root Component */}
           {component && (
             <Card className="shadow-sm border-muted-foreground/10">
-              <SectionErrorBoundary title="Subject component info unavailable">
+              <ErrorBoundary title="Subject component info unavailable">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     Subject Component
@@ -139,13 +139,13 @@ export function MetadataView({ sbom }: { sbom: any }) {
                     </div>
                   )}
                 </CardContent>
-              </SectionErrorBoundary>
+              </ErrorBoundary>
             </Card>
           )}
 
           {/* Supplier/Manufacturer */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="Organization info unavailable">
+            <ErrorBoundary title="Organization info unavailable">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Organization</CardTitle>
                 <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -177,14 +177,14 @@ export function MetadataView({ sbom }: { sbom: any }) {
                   <p className="text-sm text-muted-foreground italic">No organization data available.</p>
                 )}
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           {/* Tooling */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="Tooling info unavailable">
+            <ErrorBoundary title="Tooling info unavailable">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   Generating Tools
@@ -230,12 +230,12 @@ export function MetadataView({ sbom }: { sbom: any }) {
                   )}
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
 
           {/* Authors */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="Author info unavailable">
+            <ErrorBoundary title="Author info unavailable">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   Authors & Contact
@@ -267,7 +267,7 @@ export function MetadataView({ sbom }: { sbom: any }) {
                   )}
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
         </div>
 

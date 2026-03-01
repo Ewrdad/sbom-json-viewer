@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSbomStats } from "../../hooks/useSbomStats";
-import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
   ResponsiveContainer,
@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import { useSelection } from "../../context/SelectionContext";
 import { cn } from "../../lib/utils";
+import { HighlightText } from "@/components/common/HighlightText";
 import { FileCheck, ShieldAlert, Search, ChevronLeft, ChevronRight, ArrowUpDown, BookOpen, Scale, AlertTriangle } from "lucide-react";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
@@ -45,7 +46,9 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
   const isLoadingStats = !preComputedStats && !stats;
   const { 
     setSelectedComponent, 
-    setSelectedLicense 
+    setSelectedLicense,
+    viewFilters,
+    setViewFilters
   } = useSelection();
 
   const displayStats: SbomStats = {
@@ -80,8 +83,18 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
 
   const [viewMode, setViewMode] = useState<ViewMode>("components");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("name");
-  const [licenseSortKey, setLicenseSortKey] = useState<SortKey>("affectedCount");
+
+  // Handle incoming filters from Dashboard
+  useEffect(() => {
+    if (viewFilters.licenses?.category) {
+      setViewMode("licenses");
+      setSearchQuery(viewFilters.licenses.category);
+      // Clear the filter once applied so it doesn't re-trigger
+      setViewFilters('licenses', { ...viewFilters.licenses, category: undefined });
+    }
+  }, [viewFilters.licenses, setViewFilters]);
+
+  const [sortKey, setSortKey] = useState<SortKey>("name");  const [licenseSortKey, setLicenseSortKey] = useState<SortKey>("affectedCount");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [licenseSortDir, setLicenseSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
@@ -297,7 +310,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {/* Category Donut */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="License distribution unavailable" resetKeys={[sbom]}>
+            <ErrorBoundary title="License distribution unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-lg">License Distribution</CardTitle>
               </CardHeader>
@@ -341,12 +354,12 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                   </div>
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
 
           {/* Top Licenses Bar Chart */}
           <Card className="shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="Top licenses chart unavailable" resetKeys={[sbom]}>
+            <ErrorBoundary title="Top licenses chart unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-lg">Top 5 Licenses</CardTitle>
               </CardHeader>
@@ -373,13 +386,13 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                   </ResponsiveContainer>
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
         </div>
 
         {/* Table Card */}
         <Card className="shadow-sm border-muted-foreground/10">
-          <SectionErrorBoundary title="License list unavailable" resetKeys={[sbom]}>
+          <ErrorBoundary title="License list unavailable" resetKeys={[sbom]}>
             <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
@@ -469,7 +482,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                                 setSelectedLicense(null);
                              }}>
                                <div className="flex items-center gap-2">
-                                 {comp.name}
+                                 <HighlightText text={comp.name} highlight={searchQuery} />
                                  {conflict.hasConflict && (
                                    <div className="flex items-center gap-1">
                                      <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
@@ -478,7 +491,9 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                                  )}
                                </div>
                              </td>
-                             <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
+                             <td className="px-4 py-3 font-mono text-xs">
+                               <HighlightText text={comp.version || "—"} highlight={searchQuery} />
+                             </td>
                              <td className="px-4 py-3">
                                <div className="flex flex-wrap gap-1">
                                  {comp.licenses.length > 0 ? (
@@ -493,7 +508,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                                          backgroundColor: CATEGORY_COLORS[l.category as keyof typeof CATEGORY_COLORS] + "10"
                                        }}
                                      >
-                                       {l.id}
+                                       <HighlightText text={l.id} highlight={searchQuery} />
                                      </Badge>
                                    ))
                                  ) : (
@@ -549,7 +564,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                           className="border-b hover:bg-muted/50 transition-colors"
                         >
                           <td className="px-4 py-3 font-bold font-mono text-xs">
-                            {license.id}
+                            <HighlightText text={license.id} highlight={searchQuery} />
                           </td>
                           <td className="px-4 py-3">
                             <Badge 
@@ -559,7 +574,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                                 backgroundColor: CATEGORY_COLORS[license.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.unknown
                               }}
                             >
-                              {license.category}
+                              <HighlightText text={license.category} highlight={searchQuery} />
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-center font-bold">
@@ -627,7 +642,7 @@ export function LicensesView({ sbom, preComputedStats }: { sbom: any; preCompute
                 </div>
               )}
             </CardContent>
-          </SectionErrorBoundary>
+          </ErrorBoundary>
         </Card>
       </div>
     </ScrollArea>

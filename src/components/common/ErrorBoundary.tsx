@@ -1,7 +1,13 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { AlertTriangle, RefreshCcw } from "lucide-react";
+import { Button } from "../ui/button";
+import { cn } from "../../lib/utils";
 
 interface Props {
   children: ReactNode;
+  title?: string;
+  description?: string;
+  className?: string;
   fallback?: ReactNode | ((error: Error | null, reset: () => void) => ReactNode);
   resetKeys?: Array<unknown>;
 }
@@ -12,6 +18,16 @@ interface State {
   errorInfo: ErrorInfo | null;
 }
 
+/**
+ * @description Enhanced ErrorBoundary with granular isolation and "Revamped" styling.
+ * Prevents local UI failures from crashing the entire application.
+ * Supports custom fallbacks, retry logic, and technical detail disclosure.
+ * 
+ * @example
+ * <ErrorBoundary title="User Profile" description="Could not load profile data.">
+ *   <UserProfile />
+ * </ErrorBoundary>
+ */
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
@@ -24,7 +40,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    console.error(`UI Error [${this.props.title || 'Component'}]:`, error, errorInfo);
     this.setState({ errorInfo });
   }
 
@@ -56,7 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       if (typeof this.props.fallback === "function") {
-        return this.props.fallback(this.state.error, this.reset);
+        return (this.props.fallback as any)(this.state.error, this.reset);
       }
 
       if (this.props.fallback) {
@@ -64,21 +80,44 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="p-10 bg-red-50 text-red-900 border border-red-200 m-4 rounded-lg animate-in fade-in duration-300">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-            <span role="img" aria-label="alert">⚠️</span> Something went wrong.
-          </h2>
-          <p className="mb-4 opacity-80">This specific part of the UI encountered an unexpected error and could not be rendered.</p>
-          <details className="whitespace-pre-wrap font-mono text-sm mb-4 bg-white/50 p-4 rounded-md border border-red-100 max-h-[300px] overflow-auto shadow-inner">
-            <p className="font-bold mb-2">Error: {this.state.error && this.state.error.toString()}</p>
-            {this.state.errorInfo && this.state.errorInfo.componentStack}
-          </details>
-          <button
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors shadow-md active:scale-95"
-            onClick={() => this.reset()}
-          >
-            Try Again
-          </button>
+        <div className={cn(
+          "p-8 border border-destructive/20 bg-destructive/5 m-4 rounded-xl flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in-95 duration-300 min-h-[200px]",
+          this.props.className
+        )}>
+          <div className="p-3 bg-destructive/10 rounded-full">
+            <AlertTriangle className="h-6 w-6 text-destructive" />
+          </div>
+          <div className="space-y-2 max-w-md">
+            <h2 className="text-lg font-bold text-foreground uppercase tracking-tight">
+              {this.props.title || "Section"} Rendering Error
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {this.props.description || "This specific part of the UI encountered an unexpected error. The rest of the application remains functional."}
+            </p>
+          </div>
+          
+          <div className="flex flex-col gap-3 w-full max-w-xs">
+            <Button 
+              variant="default" 
+              className="gap-2 shadow-sm"
+              onClick={this.reset}
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Retry Component
+            </Button>
+            
+            <details className="text-left">
+              <summary className="text-[10px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors text-center list-none uppercase font-bold tracking-tighter opacity-50">
+                Technical Details
+              </summary>
+              <div className="mt-2 p-3 bg-background/50 border rounded-md font-mono text-[10px] overflow-auto max-h-[200px] shadow-inner">
+                <p className="font-bold text-destructive mb-1">Error: {this.state.error?.message}</p>
+                <pre className="opacity-70 whitespace-pre-wrap">
+                  {this.state.errorInfo?.componentStack}
+                </pre>
+              </div>
+            </details>
+          </div>
         </div>
       );
     }
@@ -86,4 +125,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-

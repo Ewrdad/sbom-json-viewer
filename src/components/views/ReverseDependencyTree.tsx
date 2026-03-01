@@ -16,7 +16,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "../ui/select";
-import { SectionErrorBoundary } from "../common/SectionErrorBoundary";
+import { ErrorBoundary } from "../common/ErrorBoundary";
 import { HelpTooltip } from "../common/HelpTooltip";
 
 interface ReverseDependencyTreeProps {
@@ -231,7 +231,7 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
           )}
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">
-          <SectionErrorBoundary title="Component list unavailable" resetKeys={[sortedComponents.length]}>
+          <ErrorBoundary title="Component list unavailable" resetKeys={[sortedComponents.length]}>
             {sortedComponents.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 No components found
@@ -288,7 +288,7 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                 }}
               />
             )}
-          </SectionErrorBoundary>
+          </ErrorBoundary>
         </CardContent>
       </Card>
 
@@ -300,7 +300,7 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
           </p>
         </div>
         <CardContent className="flex-1 overflow-auto p-6">
-            <SectionErrorBoundary 
+            <ErrorBoundary 
                 resetKeys={[selectedComponentId]} 
                 title="Visualization failed to load"
             >
@@ -435,7 +435,7 @@ export const ReverseDependencyTree: React.FC<ReverseDependencyTreeProps> = ({
                         </div>
                     </div>
                 )}
-            </SectionErrorBoundary>
+            </ErrorBoundary>
         </CardContent>
       </Card>
     </div>

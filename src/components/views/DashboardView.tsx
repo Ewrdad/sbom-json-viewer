@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
 import { useSbomStats } from "../../hooks/useSbomStats";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
-import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { ReportGenerator } from "./reports/ReportGenerator";
 import type { SbomStats } from "@/types/sbom";
 import {
@@ -327,7 +327,7 @@ export function DashboardView({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
           {/* Severity Chart */}
           <Card className="lg:col-span-8 shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="Severity chart unavailable" resetKeys={[sbom]}>
+            <ErrorBoundary title="Severity chart unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
                   Vulnerability Severity
@@ -358,21 +358,33 @@ export function DashboardView({
                     </ResponsiveContainer>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-muted/10 rounded-lg border-2 border-dashed border-muted">
-                      <ShieldCheck className="h-12 w-12 text-green-500/50 mb-3" />
-                      <p className="text-sm font-medium text-foreground">No Vulnerabilities Detected</p>
-                      <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">
-                        Clean scan results! This SBOM contains no known security vulnerabilities in its metadata.
-                      </p>
+                      <ShieldCheck className="h-10 w-10 text-green-500/50 mb-3" />
+                      <p className="text-sm font-black text-foreground uppercase tracking-widest mb-4">No Vulnerabilities Detected</p>
+                      <div className="text-left space-y-2 max-w-[300px] mx-auto">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase border-b pb-1 mb-2">Verification Checklist</p>
+                        <div className="flex items-center gap-2">
+                           <div className="h-3 w-3 rounded-full border border-green-500/50 flex items-center justify-center"><div className="h-1 w-1 bg-green-500 rounded-full"/></div>
+                           <span className="text-[10px] text-muted-foreground leading-tight">SBOM file is in a supported format (CycloneDX v1.4+)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <div className="h-3 w-3 rounded-full border border-green-500/50 flex items-center justify-center"><div className="h-1 w-1 bg-green-500 rounded-full"/></div>
+                           <span className="text-[10px] text-muted-foreground leading-tight">A security scan was performed during SBOM generation</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <div className="h-3 w-3 rounded-full border border-green-500/50 flex items-center justify-center"><div className="h-1 w-1 bg-green-500 rounded-full"/></div>
+                           <span className="text-[10px] text-muted-foreground leading-tight">Scanner output was correctly mapped to the 'vulnerabilities' key</span>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
 
           {/* Dependency Composition */}
           <Card className="lg:col-span-4 shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="Dependency distribution chart unavailable" resetKeys={[sbom]}>
+            <ErrorBoundary title="Dependency distribution chart unavailable" resetKeys={[sbom]}>
               <CardHeader>
                 <CardTitle className="text-xl flex items-center gap-2">
                   Dependency Centrality
@@ -414,12 +426,12 @@ export function DashboardView({
                   ))}
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
 
           {/* License Pie Chart */}
           <Card className="lg:col-span-12 xl:col-span-4 shadow-sm border-muted-foreground/10">
-            <SectionErrorBoundary title="License distribution chart unavailable" resetKeys={[sbom]}>
+            <ErrorBoundary title="License distribution chart unavailable" resetKeys={[sbom]}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xl flex items-center gap-2">
                   License Distribution
@@ -438,6 +450,14 @@ export function DashboardView({
                         outerRadius={80}
                         paddingAngle={5}
                         dataKey="value"
+                        className="cursor-pointer"
+                        onClick={(entry) => {
+                          if (entry && entry.name) {
+                            const category = entry.name.toLowerCase().replace(' ', '-');
+                            setViewFilters('licenses', { category });
+                            setActiveView('licenses');
+                          }
+                        }}
                       >
                         {licenseDistData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -453,9 +473,17 @@ export function DashboardView({
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   {licenseDistData.map((entry) => (
-                    <div key={entry.name} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                      <span className="text-[10px] font-medium truncate">{entry.name}</span>
+                    <div 
+                      key={entry.name} 
+                      className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1 rounded transition-colors group/license-item"
+                      onClick={() => {
+                        const category = entry.name.toLowerCase().replace(' ', '-');
+                        setViewFilters('licenses', { category });
+                        setActiveView('licenses');
+                      }}
+                    >
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                      <span className="text-[10px] font-medium truncate group-hover/license-item:text-primary transition-colors">{entry.name}</span>
                       <span className="text-[10px] text-muted-foreground ml-auto">
                         {Math.round((entry.value / (totalLicenseCount || 1)) * 100)}%
                       </span>
@@ -463,7 +491,7 @@ export function DashboardView({
                   ))}
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
 
           {/* Top Licenses */}
@@ -547,7 +575,7 @@ export function DashboardView({
         {/* Most Vulnerable Components Table */}
         <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
           <Card className="shadow-sm border-muted-foreground/10 overflow-hidden">
-            <SectionErrorBoundary title="Components table unavailable" description="There was an error loading the vulnerable components list." resetKeys={[sbom]}>
+            <ErrorBoundary title="Components table unavailable" description="There was an error loading the vulnerable components list." resetKeys={[sbom]}>
               <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-3">
                 <CardTitle className="text-xl">
                   Most Vulnerable Components
@@ -646,7 +674,7 @@ export function DashboardView({
                   </table>
                 </div>
               </CardContent>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </Card>
         </div>
         <ReportGenerator stats={displayStats} />

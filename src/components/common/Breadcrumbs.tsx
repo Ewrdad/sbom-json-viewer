@@ -6,7 +6,12 @@ import type { ViewType } from "../../types";
 
 export function Breadcrumbs() {
   const { activeView, setActiveView } = useView();
-  const { selectedComponent, selectedVulnerability, clearSelection } = useSelection();
+  const { 
+    selectedComponent, 
+    selectedVulnerability, 
+    setSelectedVulnerability,
+    clearSelection 
+  } = useSelection();
 
   const viewLabels: Record<ViewType, string> = {
     dashboard: "Dashboard",
@@ -55,20 +60,31 @@ export function Breadcrumbs() {
       {selectedComponent && (
         <>
           <ChevronRight className="h-3 w-3 shrink-0" />
-          <div className="flex items-center gap-1 truncate font-bold text-foreground min-w-0" title={`${selectedComponent.name}@${selectedComponent.version}`}>
-            <Package className="h-3 w-3 shrink-0" />
-            <span className="truncate">{formatComponentName(selectedComponent.name)}@{selectedComponent.version}</span>
-          </div>
+          <button 
+            onClick={() => {
+              // Clicking the component name in breadcrumbs just ensures it stays selected 
+              // and potentially scrolls to it if we implement that, but for now 
+              // it mainly serves as a "reset to component level" if vulns were shown
+              setSelectedVulnerability(null);
+            }}
+            className="hover:text-foreground transition-colors flex items-center gap-1 truncate font-bold text-foreground min-w-0 group" 
+            title={`${selectedComponent.name}@${selectedComponent.version}`}
+          >
+            <Package className="h-3 w-3 shrink-0 group-hover:text-primary transition-colors" />
+            <span className="truncate group-hover:underline">{formatComponentName(selectedComponent.name)}@{selectedComponent.version}</span>
+          </button>
         </>
       )}
 
       {selectedVulnerability && (
         <>
           <ChevronRight className="h-3 w-3 shrink-0" />
-          <div className="flex items-center gap-1 truncate font-bold text-foreground min-w-0">
+          <button 
+            className="flex items-center gap-1 truncate font-bold text-foreground min-w-0 cursor-default"
+          >
             <ShieldAlert className="h-3 w-3 shrink-0 text-destructive" />
             <span className="truncate">{selectedVulnerability.id}</span>
-          </div>
+          </button>
         </>
       )}
     </nav>

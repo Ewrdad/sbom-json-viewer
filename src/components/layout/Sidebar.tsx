@@ -5,10 +5,21 @@ import { Button } from "../ui/button";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useView } from "../../context/ViewContext";
 import { useSbom } from "../../context/SbomContext";
+import { useSelection } from "../../context/SelectionContext";
 import type { ViewType } from "../../types";
 import { useSettings } from "../../context/SettingsContext";
 import { SbomSelector } from "../common/SbomSelector";
 import { useLayout } from "../../context/LayoutContext";
+import { SidebarRss } from "./SidebarRss";
+import { ErrorBoundary } from "../common/ErrorBoundary";
+import packageJson from "../../../package.json";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 /**
  * Sidebar component that provides navigation, SBOM selection, and settings toggles.
@@ -29,11 +40,17 @@ export function Sidebar({
   
   const { activeView, setActiveView, isMultiSbom } = useView();
   const { sbomStats, manifest, currentFile, onImport } = useSbom();
+  const { sourceFilter, setSourceFilter } = useSelection();
   const { highContrast, setHighContrast } = useSettings();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isAltPressed, setIsAltPressed] = useState(false);
   
   const criticalCount = sbomStats?.vulnerabilityCounts?.critical || 0;
+
+  const scanners = useMemo(() => {
+    if (!sbomStats?.sourceCounts) return [];
+    return Object.keys(sbomStats.sourceCounts).sort();
+  }, [sbomStats?.sourceCounts]);
 
   const navItems = useMemo(() => {
     const items: { id: ViewType; label: string; icon: React.ReactNode; description: string; badge?: React.ReactNode }[] = [
@@ -176,36 +193,58 @@ export function Sidebar({
         isMobile && "border-none shadow-2xl"
       )}
     >
-      <div className={cn("p-4 border-b flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
+      <div className={cn("p-4 border-b flex flex-col gap-1", isCollapsed ? "items-center" : "items-start")}>
+        <div className={cn("flex items-center w-full", isCollapsed ? "justify-center" : "justify-between")}>
+          {!isCollapsed && (
+            <div className="flex flex-col">
+              <h1 className="font-bold text-lg flex items-center gap-2 truncate">
+                <span>📦</span> SBOM Viewer
+              </h1>
+              <span className="text-[9px] font-mono font-bold text-muted-foreground/50 ml-7 -mt-1">
+                v{packageJson.version}
+              </span>
+            </div>
+          )}
+          {isCollapsed && (
+            <span className="text-[8px] font-mono font-bold text-muted-foreground/50 absolute bottom-1">
+              v{packageJson.version.split('.').slice(0, 2).join('.')}
+            </span>
+          )}
+          {!isMobile ? (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8" 
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </Button>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8" 
+              onClick={() => setMobileOpen?.(false)}
+              title="Close sidebar"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
         {!isCollapsed && (
-          <h1 className="font-bold text-lg flex items-center gap-2 truncate">
-            <span>📦</span> SBOM Viewer
-          </h1>
-        )}
-        {!isMobile ? (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8" 
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          <a 
+            href="https://www.linkedin.com/in/ewrdad/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[9px] text-muted-foreground/60 hover:text-primary flex items-center gap-1.5 font-bold transition-colors ml-7 animate-in fade-in slide-in-from-top-1 duration-500 tracking-wider"
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-        ) : (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8" 
-            onClick={() => setMobileOpen?.(false)}
-            title="Close sidebar"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+            <span>CREATED BY EWRDAD</span>
+          </a>
         )}
       </div>
       <TooltipProvider delayDuration={0}>
-        <nav className="flex-1 p-2 space-y-1 overflow-y-auto scrollbar-none">
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto scrollbar-none">
           {navItems.map((item, index) => (
             <Tooltip key={item.id}>
               <TooltipTrigger asChild>
@@ -245,13 +284,35 @@ export function Sidebar({
       </TooltipProvider>
 
       {/* SBOM Source and Options */}
-      <div className="px-2 pb-2 mt-auto border-t pt-4 space-y-2">
+      <div className="px-2 pb-2 mt-auto border-t pt-2 space-y-1">
+        {isMultiSbom && !isCollapsed && (
+          <div className="px-2 mb-2 animate-in slide-in-from-bottom-2 duration-300">
+            <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1.5 flex items-center gap-2">
+              <Database className="h-3 w-3" /> Source Isolation
+            </p>
+            <Select 
+              value={sourceFilter || "all"} 
+              onValueChange={(v) => setSourceFilter(v === "all" ? null : v)}
+            >
+              <SelectTrigger className="h-7 text-[10px] bg-primary/5 border-primary/20 font-bold uppercase">
+                <SelectValue placeholder="All Sources" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-[10px] font-bold">ALL SOURCES (MERGED)</SelectItem>
+                {scanners.map(s => (
+                  <SelectItem key={s} value={s} className="text-[10px]">{s.toUpperCase()}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         {(!isCollapsed || (isMobile && mobileOpen)) && (
-          <div className="px-2 mb-2" data-testid="sbom-selector-trigger">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+          <div className="px-2 mb-1" data-testid="sbom-selector-trigger">
+            <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-0.5">
               Current SBOM
             </p>
-            <div className="text-[11px] font-semibold text-foreground/80 truncate mb-2" data-testid="current-file-display" title={currentFile}>
+            <div className="text-[11px] font-bold text-foreground/80 truncate mb-1.5" data-testid="current-file-display" title={currentFile}>
               {currentFile}
             </div>
             <SbomSelector
@@ -264,82 +325,92 @@ export function Sidebar({
           </div>
         )}
 
-        <TooltipProvider delayDuration={0}>
-          {isCollapsed && (
+        <div className="space-y-0.5">
+          <TooltipProvider delayDuration={0}>
+            {isCollapsed && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full h-8 justify-center px-0 text-muted-foreground"
+                    onClick={() => setIsCollapsed(false)}
+                    title="Select SBOM"
+                  >
+                    <Database className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p className="font-bold">Select SBOM</p>
+                  <p className="text-xs text-muted-foreground">Expand sidebar to switch</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            <input
+              type="file"
+              multiple
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              className="hidden"
+            />
+            
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-center px-0 text-muted-foreground"
-                  onClick={() => setIsCollapsed(false)}
-                  title="Select SBOM"
+                  className={cn(
+                    "w-full h-8 transition-all text-muted-foreground",
+                    isCollapsed ? "justify-center px-0" : "justify-start px-2"
+                  )}
+                  onClick={handleImportClick}
                 >
-                  <Database className="h-4 w-4" />
+                  <Upload className={cn("h-3.5 w-3.5", !isCollapsed && "mr-2")} />
+                  {!isCollapsed && <span className="truncate text-xs font-medium">Upload SBOM</span>}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">
-                <p className="font-bold">Select SBOM</p>
-                <p className="text-xs text-muted-foreground">Expand sidebar to switch</p>
+              <TooltipContent side="right" hidden={!isCollapsed}>
+                <p className="font-bold">Upload SBOM</p>
+                <p className="text-xs text-muted-foreground">Processed in browser</p>
               </TooltipContent>
             </Tooltip>
-          )}
 
-          <input
-            type="file"
-            multiple
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".json"
-            className="hidden"
-          />
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full transition-all text-muted-foreground",
-                  isCollapsed ? "justify-center px-0" : "justify-start px-4"
-                )}
-                onClick={handleImportClick}
-              >
-                <Upload className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                {!isCollapsed && <span className="truncate">Upload SBOM</span>}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" hidden={!isCollapsed}>
-              <p className="font-bold">Upload SBOM</p>
-              <p className="text-xs text-muted-foreground">Processed in browser</p>
-            </TooltipContent>
-          </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full h-8 transition-all",
+                    isCollapsed ? "justify-center px-0" : "justify-start px-2",
+                    highContrast ? "text-primary bg-primary/10 font-bold" : "text-muted-foreground font-medium"
+                  )}
+                  onClick={() => setHighContrast(!highContrast)}
+                >
+                  <Eye className={cn("h-3.5 w-3.5", !isCollapsed && "mr-2")} />
+                  {!isCollapsed && <span className="truncate text-xs">High Contrast</span>}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" hidden={!isCollapsed}>
+                <p className="font-bold">High Contrast</p>
+                <p className="text-xs text-muted-foreground">Toggle accessible color mode</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full transition-all",
-                  isCollapsed ? "justify-center px-0" : "justify-start px-4",
-                  highContrast ? "text-primary bg-primary/10" : "text-muted-foreground"
-                )}
-                onClick={() => setHighContrast(!highContrast)}
-              >
-                <Eye className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                {!isCollapsed && <span className="truncate">High Contrast</span>}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" hidden={!isCollapsed}>
-              <p className="font-bold">High Contrast</p>
-              <p className="text-xs text-muted-foreground">Toggle accessible color mode</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {!isCollapsed && (
+          <div className="pt-2 px-1">
+            <ErrorBoundary title="Community Feed">
+              <SidebarRss isCollapsed={isCollapsed} />
+            </ErrorBoundary>
+          </div>
+        )}
         
         <div className={cn(
-          "p-2 text-[10px] text-muted-foreground transition-all truncate",
-          isCollapsed ? "text-center px-0" : "px-4"
+          "px-4 py-1.5 flex items-center justify-center transition-all border-t bg-muted/10",
+          isCollapsed && "px-0"
         )}>
-          {isCollapsed ? "v0.2" : "v0.2.0 (Revamped)"}
+          <div className="h-1 w-8 rounded-full bg-muted/20" />
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useSbomStats } from "../../hooks/useSbomStats";
-import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import type { SbomStats } from "@/types/sbom";
 import {
   Tooltip as RechartsTooltip,
@@ -41,15 +41,19 @@ import {
   Info,
   Layers,
   ExternalLink,
-  EyeOff
+  EyeOff,
+  TrendingUp,
+  Network
 } from "lucide-react";
 import { useVex } from "../../context/VexContext";
 import { useSelection } from "../../context/SelectionContext";
+import { useView } from "../../context/ViewContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
 import { CHART_TOOLTIP_STYLE, CHART_CURSOR, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE } from "@/lib/chartTheme";
 import { VulnerabilityLink } from "@/components/common/VulnerabilityLink";
 import { CopyButton } from "@/components/common/CopyButton";
+import { HighlightText } from "@/components/common/HighlightText";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -60,6 +64,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import { generateTicketCSV, downloadCSV, type ExportPlatform, type VulnerabilityItem, type ComponentItem } from "../../lib/ticketExportUtils";
 
 const ITEMS_PER_PAGE = 20;
@@ -91,7 +96,8 @@ const SEVERITY_COLORS = {
 export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; preComputedStats?: SbomStats }) {
   const stats = useSbomStats(preComputedStats ? null : sbom);
   const isLoadingStats = !preComputedStats && !stats;
-  const { assessments } = useVex();
+  const { assessments, updateAssessment } = useVex();
+  const { setActiveView } = useView();
   const [showMuted, setShowMuted] = useState(false);
   
   // High-defensive initialization
@@ -789,7 +795,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
         </div>
 
         <Card className="shadow-sm border-muted-foreground/10">
-          <SectionErrorBoundary title="Vulnerabilities list unavailable" resetKeys={[sbom]}>
+          <ErrorBoundary title="Vulnerabilities list unavailable" resetKeys={[sbom]}>
             <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap pb-2">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
@@ -976,17 +982,12 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           </div>
                         </th>
                         <th className="px-4 py-3">Version</th>
+                        <th className="px-4 py-3 text-center">Severity</th>
                         <th className="px-4 py-3 text-center">
-                          {renderSortHeader("Critical", "critical")}
-                        </th>
-                        <th className="px-4 py-3 text-center">
-                          {renderSortHeader("High", "high")}
-                        </th>
-                        <th className="px-4 py-3 text-center">
-                          {renderSortHeader("Medium", "medium")}
-                        </th>
-                        <th className="px-4 py-3 text-center">
-                          {renderSortHeader("Low", "low")}
+                          <div className="flex items-center justify-center gap-1">
+                            {renderSortHeader("Impact", "total")}
+                            <HelpTooltip text="Blast Radius: The number of components that depend on this package." />
+                          </div>
                         </th>
                         <th className="px-4 py-3 text-center">
                           {renderSortHeader("Total", "total")}
@@ -1010,40 +1011,34 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                             />
                           </td>
                           <td className="px-4 py-3 font-medium max-w-[200px] truncate" title={comp.name}>
-                            {comp.name}
+                            <HighlightText text={comp.name} highlight={searchQuery} />
                           </td>
-                          <td className="px-4 py-3 font-mono text-xs">{comp.version || "—"}</td>
-                          <td className="px-4 py-3 text-center">
-                            {comp.critical > 0 ? (
-                              <Badge variant="destructive" className="h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
-                                <ShieldAlert className="h-3 w-3 shrink-0" />
-                                {comp.critical}
-                              </Badge>
-                            ) : "—"}
+                          <td className="px-4 py-3 font-mono text-xs">
+                            <HighlightText text={comp.version || "—"} highlight={searchQuery} />
                           </td>
                           <td className="px-4 py-3 text-center">
-                            {comp.high > 0 ? (
-                              <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white border-0 h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
-                                <AlertTriangle className="h-3 w-3 shrink-0" />
-                                {comp.high}
-                              </Badge>
-                            ) : "—"}
+                            <div className="flex items-center justify-center gap-1">
+                                {comp.critical > 0 && <Badge variant="destructive" className="h-5 px-1 min-w-[18px] justify-center">{comp.critical}</Badge>}
+                                {comp.high > 0 && <Badge variant="secondary" className="bg-orange-500 text-white border-0 h-5 px-1 min-w-[18px] justify-center">{comp.high}</Badge>}
+                                {comp.medium > 0 && <Badge variant="secondary" className="bg-yellow-500 text-white border-0 h-5 px-1 min-w-[18px] justify-center">{comp.medium}</Badge>}
+                                {comp.low > 0 && <Badge variant="secondary" className="bg-blue-500 text-white border-0 h-5 px-1 min-w-[18px] justify-center">{comp.low}</Badge>}
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            {comp.medium > 0 ? (
-                              <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600 text-white border-0 h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
-                                <Info className="h-3 w-3 shrink-0" />
-                                {comp.medium}
-                              </Badge>
-                            ) : "—"}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {comp.low > 0 ? (
-                              <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white border-0 h-5 min-w-[20px] justify-center flex items-center gap-1 px-1.5">
-                                <Info className="h-3 w-3 shrink-0 opacity-70" />
-                                {comp.low}
-                              </Badge>
-                            ) : "—"}
+                            <div className="flex items-center justify-center gap-1 text-xs font-bold text-muted-foreground group/impact">
+                              <Network className="h-3 w-3 text-primary/60" />
+                              {displayStats.dependentsDistribution[comp.ref] || 0}
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover/impact:opacity-100 transition-opacity ml-1" onClick={() => { setViewFilters('tree', { searchQuery: comp.name }); setActiveView('tree'); }}>
+                                      <Network className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="text-[10px]">View in Graph</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-center font-bold">{comp.total}</td>
                           <td className="px-4 py-3 text-right pr-6">
@@ -1051,6 +1046,7 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                               variant="outline"
                               size="xs"
                               className="h-7 text-[10px]"
+                              data-testid="comp-details-btn"
                               onClick={() => {
                                 const fullComp = Array.from(sbom.components).find((c: any) => c.bomRef?.value === comp.ref || (c as any).bomRef === comp.ref);
                                 setSelectedComponent(fullComp || comp);
@@ -1083,10 +1079,17 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           </div>
                         </th>
                         <th className="px-4 py-3">Severity</th>
+                        <th className="px-4 py-3 text-center">Status</th>
                         <th className="px-4 py-3 text-center">
                           <div className="flex items-center justify-center gap-1">
-                            {renderSortHeader("Affected Components", "affectedCount")}
-                            <HelpTooltip text="Number of components affected by this specific vulnerability." />
+                            {renderSortHeader("Direct", "affectedCount")}
+                            <HelpTooltip text="Number of components directly affected by this specific vulnerability." />
+                          </div>
+                        </th>
+                        <th className="px-4 py-3 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            {renderSortHeader("Reach", "affectedCount")}
+                            <HelpTooltip text="Blast Radius: The total number of components that depend on the affected packages." />
                           </div>
                         </th>
                         <th className="px-4 py-3">Description</th>
@@ -1102,19 +1105,22 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                           <tr
                             key={`${vuln.id}-${i}`}
                             className={cn(
-                              "border-b transition-colors",
+                              "border-b transition-colors cursor-pointer hover:bg-muted/30",
                               getRowClass(vuln),
                               isMuted && "opacity-40",
                               selectedItems.includes(vuln.id) && "bg-primary/5"
                             )}
+                            onClick={() => {
+                              setSelectedVulnerability(vuln);
+                              setSelectedComponent(null);
+                            }}
                           >
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                               <input 
                                 type="checkbox" 
                                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
                                 checked={selectedItems.includes(vuln.id)}
                                 onChange={() => toggleItemSelection(vuln.id)}
-                                onClick={(e) => e.stopPropagation()}
                               />
                             </td>
                             <td className={cn(
@@ -1122,7 +1128,9 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                               isMuted && "line-through text-muted-foreground"
                             )}>
                               <div className="flex items-center gap-1 group/vulnid">
-                                <VulnerabilityLink id={vuln.id} />
+                                <VulnerabilityLink id={vuln.id}>
+                                  <HighlightText text={vuln.id} highlight={searchQuery} />
+                                </VulnerabilityLink>
                                 <CopyButton value={vuln.id} tooltip="Copy ID" className="h-5 w-5 opacity-0 group-hover/vulnid:opacity-100" />
                               </div>
                               {vex && (
@@ -1151,20 +1159,44 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                                 {vuln.severity}
                               </Badge>
                             </td>
+                            <td className="px-4 py-3 text-center">
+                               {vex ? (
+                                 <Badge variant="outline" className="h-5 text-[10px] py-0 px-2 border-primary/20 bg-primary/5 text-primary font-bold uppercase">
+                                   {vex.status.replace('_', ' ')}
+                                 </Badge>
+                               ) : (
+                                 <span className="text-[10px] text-muted-foreground/50 font-bold uppercase tracking-tighter">UNASSESSED</span>
+                               )}
+                            </td>
                             <td className="px-4 py-3 text-center font-bold">
                               {vuln.affectedCount}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {(() => {
+                                const totalReach = (vuln.affectedComponentRefs || []).reduce((sum: number, r: string) => {
+                                  const dist = displayStats.dependentsDistribution as Record<string, number>;
+                                  return sum + (dist[r] || 0);
+                                }, 0);
+                                return (
+                                  <div className="flex items-center justify-center gap-1 text-xs font-bold text-muted-foreground">
+                                    <TrendingUp className="h-3 w-3 text-primary/60" />
+                                    {totalReach}
+                                  </div>
+                                );
+                              })()}
                             </td>
                             <td className={cn(
                               "px-4 py-3 max-w-[300px] truncate text-muted-foreground italic text-xs",
                               isMuted && "line-through"
                             )} title={vuln.title}>
-                              {vuln.title || "No description provided"}
+                              <HighlightText text={vuln.title || "No description provided"} highlight={searchQuery} />
                             </td>
-                            <td className="px-4 py-3 text-right pr-6">
+                            <td className="px-4 py-3 text-right pr-6" onClick={(e) => e.stopPropagation()}>
                               <Button 
                                 variant="outline" 
                                 size="xs" 
                                 className="h-7 text-[10px]"
+                                data-testid="vuln-details-btn"
                                 onClick={() => {
                                   setSelectedVulnerability(vuln);
                                   setSelectedComponent(null);
@@ -1227,8 +1259,66 @@ export function VulnerabilitiesView({ sbom, preComputedStats }: { sbom: any; pre
                 </div>
               )}
             </CardContent>
-          </SectionErrorBoundary>
+          </ErrorBoundary>
         </Card>
+
+        {/* Bulk Action Bar */}
+        {selectedItems.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-300">
+            <div className="bg-foreground text-background px-4 py-3 rounded-full shadow-2xl flex items-center gap-4 border border-border/20 backdrop-blur-md">
+              <div className="flex items-center gap-2 border-r border-background/20 pr-4 mr-2">
+                <Badge variant="secondary" className="bg-background text-foreground hover:bg-background h-6 min-w-[24px] justify-center">
+                  {selectedItems.length}
+                </Badge>
+                <span className="text-xs font-bold uppercase tracking-wider">Selected</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-8 text-xs hover:bg-background/10 hover:text-background font-bold gap-2"
+                  onClick={() => handleExport("Generic")}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export CSV
+                </Button>
+                
+                {viewMode === "vulnerabilities" && (
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="h-8 text-xs hover:bg-background/10 hover:text-background font-bold gap-2"
+                    onClick={() => {
+                      selectedItems.forEach(id => {
+                        updateAssessment(id, { 
+                          status: 'not_affected', 
+                          justification: 'Bulk muted from vulnerabilities view.' 
+                        });
+                      });
+                      setSelectedItems([]);
+                    }}
+                  >
+                    <EyeOff className="h-3.5 w-3.5" />
+                    Mute Selected
+                  </Button>
+                )}
+                
+                <Separator orientation="vertical" className="h-6 bg-background/20" />
+                
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-8 w-8 p-0 hover:bg-background/10 hover:text-background"
+                  onClick={() => setSelectedItems([])}
+                  title="Cancel Selection"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </ScrollArea>
   );

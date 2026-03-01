@@ -19,6 +19,7 @@ stateDiagram-v2
     state "ViewContext.tsx" as ViewContextTsx
     state "LayoutContext.tsx" as LayoutContextTsx
     state "Sidebar.tsx" as SidebarTsx
+    state "SidebarRss.tsx" as SidebarRssTsx
     state "Layout.tsx" as LayoutTsx
     state "useMediaQuery.ts" as UseMediaQueryTs
     state "sbomWorker.ts" as SbomWorkerTs
@@ -106,7 +107,6 @@ stateDiagram-v2
     components --> common
 
     common --> ErrorBoundaryTsx
-    common --> SectionErrorBoundaryTsx
     common --> HelpTooltipTsx
     common --> HelpGuideTsx
     common --> SearchButtonTsx
@@ -116,6 +116,7 @@ stateDiagram-v2
 
     layout --> LayoutTsx
     layout --> SidebarTsx
+    layout --> SidebarRssTsx
 
     views --> DashboardViewTsx
     views --> ComponentExplorerTsx
@@ -169,6 +170,7 @@ Main application component that:
 - Renders `Layout` shell.
 - Lazy-loads view modules to keep initial bundle small.
 - **NEW**: Displays a **Remote Source** indicator when data is fetched from external URLs.
+- **NEW**: Uses granular **ErrorBoundary** wrapping for each major view to ensure local failures don't crash the entire shell.
 
 ### useSbomLoader.ts (Hook)
 
@@ -214,10 +216,6 @@ Web Worker responsible for:
   - **New:** Displays cryptographic hashes (MD5, SHA-256) for file integrity verification.
   - Integrates `SearchButton` for quick external lookups.
   - **Accordion-based Layout**: Organizes detailed information into collapsible sections (Overview, Technical Details, Remediation, Affected Components, Metadata) using `@radix-ui/react-accordion`.
-  - Features include: Detailed timeline (created, published, modified), remediation (recommendations, workarounds), credits, tools, unique CVE analysis (state, justification), and interactive ratings (CVSS method, vector strings).
-  - **Visual Statistics**: Displays Top CWEs and Top Sources alongside the severity breakdown.
-  - **Interactive Filtering**: Includes clickable severity KPI cards and a multi-select filter dropdown for both component and vulnerability views.
-  - Component-centric view: Maps vulnerabilities back to components with specific status tracking (affected vs. not_affected).
   - Individual sections are protected by granular `ErrorBoundary` instances to ensure one bad data field doesn't crash the entire panel.
 
 ### Context & Hooks
@@ -234,10 +232,11 @@ Web Worker responsible for:
 - **Layout.tsx**: Main shell structure. Includes **Privacy-First Notices** for local processing. **NEW**: Automatically adapts to mobile by providing a drawer-based sidebar and rendering detail panels as full-screen overlays instead of side panels.
 - **Header.tsx**: **NEW**: A condensed top navigation bar focusing on the active page title, global search, download actions, and help. Redistributed SBOM selection and upload to the Sidebar to reduce clutter and improve mobile usability.
 - **Sidebar.tsx**: Navigation menu for switching between views. **NEW**: Now houses the **SBOM Selector** and **Upload SBOM** controls at the bottom, separating data management from page navigation. Supports collapsible mode on desktop and full-width drawer mode on mobile. Includes keyboard shortcuts (Alt+1-9).
+- **SidebarRss.tsx**: **NEW**: A subtle component that displays the latest community update from a Substack feed. Isolated by an ErrorBoundary.
 
 ### Common Components
 
-- **ErrorBoundary.tsx**: A reusable error boundary that isolates failures in specific UI sections (charts, tables, details). Supports custom fallbacks and dependency-based resets (`resetKeys`).
+- **ErrorBoundary.tsx**: **ENHANCED**: A reusable error boundary that isolates failures in specific UI sections (charts, tables, details). Supports custom fallbacks, "Revamped" styling, and dependency-based resets (`resetKeys`).
 - **HelpGuide.tsx**: User documentation accessible via the header. Includes **Privacy & Security assurances** detailing local-first data handling.
 - **HelpTooltip.tsx**: Reusable tooltip for in-app documentation.
 - **SearchButton.tsx**: Reusable search component with customizable engine selection and persistence.

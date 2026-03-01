@@ -123,6 +123,13 @@ vi.mock("lucide-react", () => {
     Maximize2: () => <div />,
     Minimize2: () => <div />,
     RotateCcw: () => <div />,
+    Keyboard: () => <div />,
+    TrendingUp: () => <div />,
+    MoreVertical: () => <div />,
+    Linkedin: () => <div />,
+    Rss: () => <div />,
+    Database: () => <div />,
+    RefreshCcw: () => <div />,
   };
   return icons;
 });

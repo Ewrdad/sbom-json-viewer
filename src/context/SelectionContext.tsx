@@ -9,6 +9,8 @@ interface SelectionContextType {
   setSelectedLicense: (license: any | null) => void;
   viewFilters: Record<string, any>;
   setViewFilters: (view: string, filters: any) => void;
+  sourceFilter: string | null;
+  setSourceFilter: (source: string | null) => void;
   clearSelection: () => void;
 }
 
@@ -19,6 +21,7 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
   const [selectedVulnerability, setSelectedVulnerability] = useState<any | null>(null);
   const [selectedLicense, setSelectedLicense] = useState<any | null>(null);
   const [viewFilters, setViewFiltersState] = useState<Record<string, any>>({});
+  const [sourceFilter, setSourceFilter] = useState<string | null>(null);
 
   const setViewFilters = (view: string, filters: any) => {
     setViewFiltersState(prev => ({ ...prev, [view]: filters }));
@@ -66,6 +69,8 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
         setSelectedLicense: handleSetLicense,
         viewFilters,
         setViewFilters,
+        sourceFilter,
+        setSourceFilter,
         clearSelection 
       }}
     >

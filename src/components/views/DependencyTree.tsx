@@ -238,7 +238,7 @@ function TreeItemRow({ item, detailMode, isSelected, showHeatmap, searchQuery, o
               {totalVulnerabilities === 0 && (
                 <div 
                   className="h-4 w-4 flex items-center justify-center group/dot relative" 
-                  title={`0 Vulnerabilities Found. License: ${Array.from(node.licenses || []).map((l: any) => l.id || l.name).join(", ") || "None declared"}`}
+                  title={`0 Vulnerabilities Found.\n\nLicense: ${Array.from(node.licenses || []).map((l: any) => l.id || l.name).join(", ") || "None declared"}\n\nDependencies: ${childRefs.length} direct`}
                 >
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500/40 group-hover/dot:scale-125 transition-transform" />
                 </div>

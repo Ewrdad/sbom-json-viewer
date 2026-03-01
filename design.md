@@ -65,5 +65,13 @@ Front-load the most critical data and reduce the number of clicks needed to achi
 - **Visual Cues:** Use background tinting (low-opacity reds/oranges) to highlight high-severity rows in tables and "Heatmap" nodes in trees.
 - **Progress Feedback:** Use shimmer skeletons during lazy-loading or background analysis to maintain layout stability.
 
+### Actionable Context
+- **Cross-Linking:** Analytical tables (like Risk or Dashboard) should provide direct "Jump" icons to primary data views (Explorer, Tree).
+- **ID Persistence:** Selecting an ID (CVE, PURL) in one view must highlight it in all other views via `SelectionContext`.
+
+### Multi-Source Transparency
+- **Origin Badges:** When multiple SBOMs are loaded, every component and vulnerability must display its origin scanner (e.g., "via Syft").
+- **Consensus Metrics:** Highlight findings that are confirmed by multiple scanners to increase user trust.
+
 ## Future Work & Recommendations
 Refer to the latest UI Audit in `/InternalAudit/UI/` for specific actionable improvements.

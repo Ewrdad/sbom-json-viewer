@@ -21,7 +21,9 @@ import { cn } from "@/lib/utils";
 import { GlobalSearch } from "../common/GlobalSearch";
 import { ProcessingLog } from "../common/ProcessingLog";
 import { HelpGuide } from "../common/HelpGuide";
+import { KeyboardShortcutsModal } from "../common/KeyboardShortcutsModal";
 import { useView } from "../../context/ViewContext";
+import { useSelection } from "../../context/SelectionContext";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import type { Bom } from "@cyclonedx/cyclonedx-library/Models";
 
@@ -61,6 +63,8 @@ export function Header({
   onMenuClick,
 }: HeaderProps) {
   const { activeView } = useView();
+  const { selectedComponent, selectedVulnerability, selectedLicense } = useSelection();
+  const isAnyPanelOpen = !!(selectedComponent || selectedVulnerability || selectedLicense);
   const { componentCount, isLarge } = getSbomSizeProfile(sbom);
   const isRemote = !currentFile.startsWith("Local:");
 
@@ -136,11 +140,17 @@ export function Header({
         </div>
 
         {/* Center: Metadata Badges (conditionally visible) */}
-        <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted/30 border border-border/50">
+        <div className={cn(
+          "items-center gap-2 px-4 py-1.5 rounded-full bg-muted/30 border border-border/50 transition-all",
+          isAnyPanelOpen ? "hidden 3xl:flex" : "hidden lg:flex"
+        )}>
           <TooltipProvider delayDuration={100}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="secondary" className="h-6 text-[10px] cursor-help bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800">
+                <Badge variant="secondary" className={cn(
+                  "h-6 text-[10px] cursor-help bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 shrink-0",
+                  isAnyPanelOpen ? "hidden" : "hidden xl:flex"
+                )}>
                   <ShieldCheck className="h-3 w-3 mr-1" />
                   Privacy First
                 </Badge>
@@ -160,21 +170,30 @@ export function Header({
           </TooltipProvider>
 
           {isRemote && (
-            <Badge variant="secondary" className="h-6 text-[10px] bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
+            <Badge variant="secondary" className={cn(
+              "h-6 text-[10px] bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800 shrink-0",
+              isAnyPanelOpen ? "hidden" : "hidden xl:flex"
+            )}>
               <Globe className="h-3 w-3 mr-1" />
               Remote
             </Badge>
           )}
-          <Badge variant="outline" className="h-6 text-[10px] font-medium border-border/60">
-            {componentCount.toLocaleString()} components
+          <Badge variant="outline" className="h-6 text-[10px] font-medium border-border/60 shrink-0" data-testid="header-component-count">
+            {componentCount.toLocaleString()} 
+            <span className={cn("hidden ml-1", isAnyPanelOpen ? "3xl:inline" : "xl:inline")}>
+              components
+            </span>
           </Badge>
           {isLarge && (
             <Badge 
               variant="outline" 
-              className="h-6 text-[10px] font-medium border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/50"
+              className="h-6 text-[10px] font-medium border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/50 shrink-0"
               data-testid="large-sbom-badge"
             >
-              Large SBOM
+              Large
+              <span className={cn("hidden ml-1", isAnyPanelOpen ? "3xl:inline" : "xl:inline")}>
+                SBOM
+              </span>
             </Badge>
           )}
         </div>
@@ -209,6 +228,7 @@ export function Header({
             {/* Support Tools */}
             <div className="flex items-center gap-0.5 md:gap-1 ml-0.5 md:ml-1">
               <ProcessingLog logs={processingLogs} />
+              <KeyboardShortcutsModal />
               <HelpGuide />
             </div>
           </TooltipProvider>

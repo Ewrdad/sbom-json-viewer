@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Search, Package, ShieldAlert, Command, CornerDownLeft } from "lucide-react";
+import { Search, Package, ShieldAlert, Command, CornerDownLeft, EyeOff } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -12,13 +12,16 @@ import { Badge } from "@/components/ui/badge";
 import { useSbom } from "../../context/SbomContext";
 import { useSelection } from "../../context/SelectionContext";
 import { useView } from "../../context/ViewContext";
+import { useVex } from "../../context/VexContext";
 import { cn } from "@/lib/utils";
 
 export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { sbom, sbomStats } = useSbom();
-  const { setSelectedComponent, setSelectedVulnerability, setViewFilters } = useSelection();
+  const { assessments, updateAssessment } = useVex();
+  const { setSelectedComponent, setSelectedVulnerability, setViewFilters, selectedComponent, selectedVulnerability, selectedLicense } = useSelection();
+  const isAnyPanelOpen = !!(selectedComponent || selectedVulnerability || selectedLicense);
   const { setActiveView } = useView();
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -104,13 +107,22 @@ export function GlobalSearch() {
     <>
       <Button
         variant="outline"
-        className="relative h-9 w-9 p-0 xl:h-10 xl:w-64 xl:justify-start xl:px-3 xl:py-2"
+        className={cn(
+          "relative h-9 w-9 p-0 transition-all duration-300 overflow-hidden",
+          isAnyPanelOpen ? "3xl:w-64 3xl:justify-start 3xl:px-3 3xl:py-2" : "lg:h-9 lg:w-64 lg:justify-start lg:px-3 lg:py-2"
+        )}
         onClick={() => setOpen(true)}
         data-testid="search-trigger"
       >
-        <Search className="h-4 w-4 xl:mr-2" />
-        <span className="hidden xl:inline-flex text-xs text-muted-foreground">Search SBOM...</span>
-        <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 xl:flex">
+        <Search className={cn("h-4 w-4 shrink-0", isAnyPanelOpen ? "3xl:mr-2" : "lg:mr-2")} />
+        <span className={cn(
+          "hidden text-xs text-muted-foreground truncate",
+          isAnyPanelOpen ? "3xl:inline-flex" : "lg:inline-flex"
+        )}>Search SBOM...</span>
+        <kbd className={cn(
+          "pointer-events-none absolute right-1.5 top-1.5 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100",
+          isAnyPanelOpen ? "3xl:flex" : "lg:flex"
+        )}>
           <span className="text-xs">⌘</span>K
         </kbd>
       </Button>
@@ -153,6 +165,9 @@ export function GlobalSearch() {
                         <h4 className="px-2 mb-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Vulnerabilities</h4>
                         {results.vulnerabilities.map((v: any, i) => {
                           const isSelected = allResults.indexOf(v) === selectedIndex;
+                          const vex = assessments[v.id];
+                          const isMuted = vex?.status === 'not_affected';
+                          
                           return (
                             <div
                               key={v.id}
@@ -167,15 +182,39 @@ export function GlobalSearch() {
                               <ShieldAlert className={cn("h-4 w-4 shrink-0", isSelected ? "text-primary-foreground" : "text-destructive")} />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-bold font-mono text-sm">{v.id}</span>
+                                  <span className={cn("font-bold font-mono text-sm", isMuted && "line-through opacity-50")}>{v.id}</span>
                                   <Badge variant="outline" className={cn("text-[9px] px-1 py-0 h-4 border-none", isSelected ? "bg-white/20 text-white" : "bg-destructive/10 text-destructive")}>
                                     {v.severity}
                                   </Badge>
+                                  {isMuted && (
+                                    <Badge variant="outline" className="text-[8px] px-1 py-0 h-4 bg-muted text-muted-foreground border-none">
+                                      MUTED
+                                    </Badge>
+                                  )}
                                 </div>
-                                <p className={cn("text-xs truncate opacity-70", isSelected ? "text-primary-foreground" : "text-muted-foreground")}>
+                                <p className={cn("text-xs truncate opacity-70", isSelected ? "text-primary-foreground" : "text-muted-foreground", isMuted && "line-through")}>
                                   {v.title || "No description"}
                                 </p>
                               </div>
+                              
+                              {/* Quick VEX (Recommendation 20) */}
+                              {isSelected && !isMuted && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 px-2 text-[10px] bg-white/10 hover:bg-white/20 text-white border-white/20"
+                                  onClick={(e: any) => {
+                                    e.stopPropagation();
+                                    updateAssessment(v.id, { 
+                                      status: 'not_affected', 
+                                      justification: 'Quick muted from search.' 
+                                    });
+                                  }}
+                                >
+                                  <EyeOff className="h-3 w-3 mr-1" />
+                                  Mute
+                                </Button>
+                              )}
                               {isSelected && <CornerDownLeft className="h-3 w-3 opacity-50" />}
                             </div>
                           );

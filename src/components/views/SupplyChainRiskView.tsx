@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Activity,
   Layers,
-  Wrench
+  Wrench,
+  Network
 } from "lucide-react";
 import { 
   ScatterChart, 
@@ -38,6 +39,12 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { Badge } from "../../components/ui/badge";
+import {
+  Tooltip as UITooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "../../lib/utils";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_PROPS, CHART_TOOLTIP_LABEL_STYLE, CHART_TOOLTIP_ITEM_STYLE, CHART_CURSOR } from "../../lib/chartTheme";
 
@@ -521,12 +528,29 @@ export const SupplyChainRiskView: React.FC = () => {
                               </div>
                             </div>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                               <Button size="icon" variant="ghost" className="h-7 w-7" title="Explore" onClick={() => { setViewFilters('explorer', { searchQuery: item.name }); setActiveView('explorer'); }}>
-                                 <Search className="h-3.5 w-3.5" />
-                               </Button>
-                               <Button size="icon" variant="ghost" className="h-7 w-7" title="Dependency Graph" onClick={() => { setViewFilters('tree', { searchQuery: item.name }); setActiveView('tree'); }}>
-                                 <GitGraph className="h-3.5 w-3.5" />
-                               </Button>
+                               <TooltipProvider>
+                                 <UITooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setViewFilters('explorer', { searchQuery: item.name }); setActiveView('explorer'); }}>
+                                       <Search className="h-3.5 w-3.5" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent side="top" className="text-[10px]">
+                                     Explore Component
+                                   </TooltipContent>
+                                 </UITooltip>
+                                 
+                                 <UITooltip>
+                                   <TooltipTrigger asChild>
+                                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setViewFilters('tree', { searchQuery: item.name }); setActiveView('tree'); }}>
+                                       <Network className="h-3.5 w-3.5" />
+                                     </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent side="top" className="text-[10px]">
+                                     Dependency Graph
+                                   </TooltipContent>
+                                 </UITooltip>
+                               </TooltipProvider>
                             </div>
                           </div>
                         </td>

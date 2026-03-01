@@ -26,8 +26,44 @@ Implemented a new "Supply Chain Risk" view to help users prioritize remediation 
 - **Predictability**: Used consistent severity colors and icons (`AlertTriangle`, `Target`, `ShieldAlert`) to match the rest of the application.
 - **Efficiency**: Included a search filter in the leaderboard to allow quick lookup of specific components.
 
+## Granular Error Resilience & Community Branding (2026-03-01)
+
+Implemented a more robust error handling architecture and refined the application's personal branding and community integration.
+
+### Key Concepts
+
+- **Granular Error Isolation**: Transitioned from a single global error boundary to a multi-layered approach.
+  - **Component Level**: The sidebar's community feed and main view container now have their own `ErrorBoundary` instances.
+  - **Resilience**: A failure in a non-critical section (like an RSS feed fetch error or a specific chart rendering bug) no longer crashes the entire application shell or navigation.
+  - **UX**: The enhanced `ErrorBoundary` provides clear "Section Rendering Error" feedback with a "Retry" button and technical details for debugging.
+- **Strategic Branding & Community Integration**:
+  - **Visual Hierarchy**: Moved technical versioning and personal credits to the top header to establish clear ownership and "live" status immediately upon load.
+  - **Design Contrast**: Used a vibrant Sky Blue (`sky-400`) for the "Ewrdad's Latest" section to differentiate community content from the primary utility-focused gray/muted sidebar theme.
+  - **Animated Feedback**: Added a pulse indicator and hover-triggered slide animations to the RSS card to make the sidebar feel more "alive" and interactive.
+
+### Technical Implementation
+
+- **Enhanced ErrorBoundary**:
+  - Added support for `description`, `className`, and `resetKeys` to make the boundary highly reusable across different UI contexts (e.g., small sidebar cards vs. large dashboard charts).
+  - Integrated `lucide-react` icons and "Revamped" styling to ensure error states feel like a first-class part of the application design.
+- **Substack RSS Integration**:
+  - Used a public CORS proxy (`allorigins.win`) to fetch the XML feed in a zero-backend environment.
+  - Implemented `DOMParser` to extract the single latest post title and link, ensuring the feed remains focused and minimal.
+- **Automated Versioning**:
+  - Imported the `version` directly from `package.json` into the UI components. This eliminates manual "version drift" and ensures the displayed version always matches the project metadata.
+
+### UI/UX Best Practices
+
+- **Color as a Signal**: Using a lighter blue for community updates ensures they stand out on a dark background without clashing with the primary action colors.
+- **Reducing "Awkward" Gaps**: Tightened vertical spacing in the sidebar's data management section to create a more cohesive "toolbox" feel.
+- **Transparency in Error Handling**: Providing an expandable "Technical Details" section in the error boundary helps developers and advanced users diagnose issues without cluttering the main UI for casual users.
+
 ## General Development Learnings
 
 - **Strict Mode in Playwright**: When multiple elements share the same text (e.g., in a KPI card and a table), `getByText` will fail. Use more specific locators or `first()`/`nth()` if the order is guaranteed.
 - **TS Record Completeness**: When adding a new view, ensure all exhaustive `Record<ViewType, string>` maps (like `viewLabels` in `Breadcrumbs.tsx`) are updated to avoid build failures.
 - **Unused Imports**: Production builds (`tsc -b`) will fail on unused imports or variables if `noUnusedLocals` or `noUnusedParameters` is enabled. Always clean up after refactoring.
+
+- **Responsive Table Layouts with TanStack Table**:
+  - **Fixed Width Restriction**: Avoid using `getCenterTotalSize()` as a fixed pixel width on the `<table>` element if the goal is for the table to fill its container. This often leads to "dead space" on the right for smaller datasets or larger screens.
+  - **Flexible Expansion**: Use `minWidth: '100%'` and `tableLayout: 'fixed'` on the table, while providing sensible `size` values for columns. This allows the browser to expand columns proportionally to fill the container while still respecting relative column weights and ensuring consistent truncation.

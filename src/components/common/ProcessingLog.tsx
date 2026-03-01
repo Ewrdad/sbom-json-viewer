@@ -41,12 +41,26 @@ export function ProcessingLog({ logs }: { logs: string[] }) {
             {copied ? (
               <Check className="h-3 w-3 mr-1.5 text-green-500" />
             ) : (
-              <Copy className="h-3 w-3 mr-1.5" />
+              <Copy className="h-3.5 w-3.5 mr-1.5" />
             )}
             {copied ? "Copied" : "Copy Logs"}
           </Button>
-        </DialogHeader>
-        <div className="mt-4 flex-1 overflow-hidden rounded-md border bg-slate-950 p-4 font-mono text-xs text-slate-200">
+          </DialogHeader>
+
+          {/* Sovereignty Banner */}
+          <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md flex items-start gap-3">
+          <div className="bg-primary/20 p-1.5 rounded-full mt-0.5">
+            <Check className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">Data Sovereignty Verified</h4>
+            <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
+              All analysis is performed <span className="text-foreground font-medium">100% locally</span> in your browser. Your SBOM data never leaves your machine.
+            </p>
+          </div>
+          </div>
+
+          <div className="mt-4 flex-1 overflow-hidden rounded-md border bg-slate-950 p-4 font-mono text-xs text-slate-200">
           <ScrollArea className="h-[50vh]">
             {logs.length > 0 ? (
               <div className="space-y-1">

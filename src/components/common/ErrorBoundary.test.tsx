@@ -1,70 +1,64 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ErrorBoundary } from "./ErrorBoundary";
-import "@testing-library/jest-dom";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// A component that throws an error
-const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
-  if (shouldThrow) {
-    throw new Error("Test Error");
-  }
-  return <div>Safe Component</div>;
+const ThrowError = ({ message = "Test Error" }) => {
+  throw new Error(message);
 };
 
 describe("ErrorBoundary", () => {
   beforeEach(() => {
     // Silence console.error for tests that throw
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it("renders children when there is no error", () => {
     render(
       <ErrorBoundary>
-        <div>Test Content</div>
+        <div data-testid="child">Child Content</div>
       </ErrorBoundary>
     );
-    expect(screen.getByText("Test Content")).toBeInTheDocument();
+    expect(screen.getByTestId("child")).toBeDefined();
   });
 
   it("renders default error UI when an error occurs", () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
+        <ThrowError />
       </ErrorBoundary>
     );
-    expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
-    expect(screen.getByText(/Test Error/)).toBeInTheDocument();
+    expect(screen.getByText(/Rendering Error/i)).toBeDefined();
+    expect(screen.getByText(/unexpected error/i)).toBeDefined();
+    expect(screen.getByText("Retry Component")).toBeDefined();
   });
 
   it("renders custom fallback when provided", () => {
-    const Fallback = <div>Custom Error UI</div>;
+    const fallback = <div data-testid="custom-fallback">Custom Fallback</div>;
     render(
-      <ErrorBoundary fallback={Fallback}>
-        <ThrowError shouldThrow={true} />
+      <ErrorBoundary fallback={fallback}>
+        <ThrowError />
       </ErrorBoundary>
     );
-    expect(screen.getByText("Custom Error UI")).toBeInTheDocument();
-    expect(screen.queryByText("Something went wrong.")).not.toBeInTheDocument();
+    expect(screen.getByTestId("custom-fallback")).toBeDefined();
   });
 
   it("resets state when resetKeys change", () => {
     const { rerender } = render(
       <ErrorBoundary resetKeys={["initial"]}>
-        <ThrowError shouldThrow={true} />
+        <ThrowError />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
+    expect(screen.getByText(/Rendering Error/i)).toBeDefined();
 
-    // Rerender with different resetKey should clear error and try rendering children again
-    // But since it will throw again if we don't change the children, let's change children too
+    // Rerender with different resetKeys and without the throwing component
     rerender(
-      <ErrorBoundary resetKeys={["changed"]}>
-        <ThrowError shouldThrow={false} />
+      <ErrorBoundary resetKeys={["updated"]}>
+        <div data-testid="recovered">Recovered Content</div>
       </ErrorBoundary>
     );
 
-    expect(screen.queryByText("Something went wrong.")).not.toBeInTheDocument();
-    expect(screen.getByText("Safe Component")).toBeInTheDocument();
+    expect(screen.getByTestId("recovered")).toBeDefined();
+    expect(screen.queryByText(/Rendering Error/i)).toBeNull();
   });
 });

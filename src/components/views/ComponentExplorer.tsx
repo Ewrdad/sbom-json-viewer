@@ -22,7 +22,7 @@ import { Search, ChevronLeft, ChevronRight, Filter, ArrowUpDown } from "lucide-r
 import { useSelection } from "../../context/SelectionContext";
 import { getLicenseCategory } from "../../lib/licenseUtils";
 import { HelpTooltip } from "@/components/common/HelpTooltip";
-import { SectionErrorBoundary } from "@/components/common/SectionErrorBoundary";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { getSbomSizeProfile } from "../../lib/sbomSizing";
 import type { formattedSBOM } from "@/types/sbom";
 import { cn } from "@/lib/utils";
@@ -109,6 +109,7 @@ export function ComponentExplorer({
     () => [
       {
         accessorKey: "name",
+        size: 250,
         header: ({ column }: any) => (
           <Button
             variant="ghost"
@@ -155,6 +156,7 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "version",
+        size: 120,
         header: "Version",
         cell: ({ row }: any) => (
           <div className="font-mono text-xs text-muted-foreground truncate">
@@ -164,6 +166,7 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "group",
+        size: 150,
         header: "Group",
         cell: ({ row }: any) => (
           <div className="text-xs text-muted-foreground truncate max-w-[120px]">
@@ -173,6 +176,7 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "type",
+        size: 100,
         header: "Type",
         cell: ({ row }: any) => (
           <Badge variant="outline" className="capitalize text-[10px] h-5 py-0">
@@ -182,6 +186,7 @@ export function ComponentExplorer({
       },
       {
         accessorKey: "purl",
+        size: 200,
         header: "PURL",
         cell: ({ row }: any) => (
           <div className="font-mono text-[10px] text-muted-foreground truncate max-w-[200px]" title={row.getValue("purl")}>
@@ -191,6 +196,7 @@ export function ComponentExplorer({
       },
       {
         id: "formattedLicenses",
+        size: 150,
         header: "Licenses",
         accessorFn: (row: any) => {
           const lics = Array.from(row.licenses || []);
@@ -329,8 +335,8 @@ export function ComponentExplorer({
             </div>
 
             <div className="rounded-md border flex-1 min-h-0 overflow-auto bg-card scrollbar-thin min-w-0">
-              <SectionErrorBoundary title="Component table failed to render" resetKeys={[data.length, globalFilter]}>
-                <Table className="w-full" style={{ width: table.getCenterTotalSize(), tableLayout: 'fixed' }}>
+              <ErrorBoundary title="Component table failed to render" resetKeys={[data.length, globalFilter]}>
+                <Table className="w-full" style={{ minWidth: '100%', tableLayout: 'fixed' }}>
                   <TableHeader className="bg-muted/50 sticky top-0 z-10">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
@@ -383,7 +389,7 @@ export function ComponentExplorer({
                   )}
                 </TableBody>
               </Table>
-            </SectionErrorBoundary>
+            </ErrorBoundary>
           </div>
 
             <div className="flex items-center justify-between space-x-2 py-4 flex-none">

@@ -36,7 +36,7 @@ test.describe("SBOM Performance", () => {
     await expect(dashboardCount).toContainText(/20,001|20001|20,000|20000/);
 
     // Header should also have it
-    await expect(page.locator('header').getByText(/components/)).toContainText(/20,001|20001|20,000|20000/);
+    await expect(page.getByTestId("header-component-count")).toContainText(/20,001|20001|20,000|20000/);
 
     // 3. Switch to Dependency Tree
     await page.getByTestId("sidebar-link-tree").click();

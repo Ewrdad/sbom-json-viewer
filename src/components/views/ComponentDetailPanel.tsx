@@ -2,9 +2,10 @@ import { type Component } from "@cyclonedx/cyclonedx-library/Models";
 import { type EnhancedComponent } from "../../types/sbom";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, GitGraph, X, Network, Package, Copy, Check, ShieldAlert, Info, Download } from "lucide-react";
+import { ChevronRight, GitGraph, X, Network, Package, Copy, Check, ShieldAlert, Info, Download, Search } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { type DependencyAnalysis } from "../../lib/bomUtils";
 import { getLicenseCategory, checkLicenseConflict } from "../../lib/licenseUtils";
@@ -57,9 +58,11 @@ export function ComponentDetailPanel({
   const [copied, setCopied] = useState(false);
   const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
   const [activeRawTab, setActiveRawTab] = useState("combined");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     setActiveRawTab("combined");
+    setSearchTerm("");
   }, [component.bomRef?.value, component.name, component.version, isMultiSbom, component._rawSources?.length]);
 
   const handleCopy = () => {
@@ -87,10 +90,23 @@ export function ComponentDetailPanel({
     setActiveView('graph');
   };
 
-  const propertiesCount = component.properties?.size || (Array.isArray(component.properties) ? component.properties.length : 0);
+  const allProperties = Array.from(component.properties || []);
+  const filteredProperties = allProperties.filter((prop: any) => 
+    !searchTerm || 
+    prop.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    prop.value?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const propertiesCount = filteredProperties.length;
+
+  useEffect(() => {
+    if (searchTerm && propertiesCount > 0) {
+      setIsPropertiesOpen(true);
+    }
+  }, [searchTerm, propertiesCount]);
 
   // Helper to count vulns
-  const getVulnCount = (vulns: Record<string, unknown[]>) => {
+  const getVulnCount = (vulns: Record<string, any[]> | undefined) => {
     if (!vulns) return 0;
     return (vulns.Critical?.length || 0) + (vulns.High?.length || 0) + (vulns.Medium?.length || 0) + (vulns.Low?.length || 0);
   };
@@ -119,6 +135,16 @@ export function ComponentDetailPanel({
       </div>
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-4 space-y-6">
+          <div className="relative group/panel-search">
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground transition-colors group-focus-within/panel-search:text-primary" />
+            <Input
+              placeholder="Search in details..."
+              className="pl-8 h-9 text-xs bg-muted/20"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-1">
               Name
@@ -385,7 +411,8 @@ export function ComponentDetailPanel({
                    {inherentCount > 0 && (
                      <div className="space-y-2">
                        {['Critical', 'High', 'Medium', 'Low'].map(severity => {
-                          const vulns = component.vulnerabilities?.inherent[severity as keyof typeof component.vulnerabilities.inherent] || [];
+                          const vulns = (component.vulnerabilities?.inherent[severity as keyof typeof component.vulnerabilities.inherent] || [])
+                            .filter((v: any) => !searchTerm || v.id?.toLowerCase().includes(searchTerm.toLowerCase()));
                           if (vulns.length === 0) return null;
                           return (
                              <div key={severity} className="bg-destructive/10 rounded-md p-2">
@@ -417,7 +444,8 @@ export function ComponentDetailPanel({
                        </h5>
                        <div className="space-y-2 pl-2 border-l-2 border-muted">
                           {['Critical', 'High', 'Medium', 'Low'].map(severity => {
-                              const vulns = component.vulnerabilities?.transitive[severity as keyof typeof component.vulnerabilities.transitive] || [];
+                              const vulns = (component.vulnerabilities?.transitive[severity as keyof typeof component.vulnerabilities.transitive] || [])
+                                .filter((v: any) => !searchTerm || v.id?.toLowerCase().includes(searchTerm.toLowerCase()));
                               if (vulns.length === 0) return null;
                               return (
                                 <div key={severity}>
@@ -518,7 +546,7 @@ export function ComponentDetailPanel({
             )}
           </div>
 
-          {component.properties && propertiesCount > 0 && (
+          {allProperties.length > 0 && (
             <>
               <Separator />
               <Collapsible
@@ -536,12 +564,16 @@ export function ComponentDetailPanel({
                 </div>
                 <CollapsibleContent className="space-y-2">
                   <div className="rounded-md border p-2 text-xs font-mono bg-muted/50 overflow-auto max-h-[200px]">
-                    {Array.from(component.properties || []).map((prop: {name?: string, value?: string}, i) => (
-                      <div key={i} className="grid grid-cols-3 gap-2 py-1 border-b last:border-0 border-border/50">
-                        <span className="font-semibold text-muted-foreground truncate" title={prop.name}>{prop.name}</span>
-                        <span className="col-span-2 truncate select-all" title={prop.value}>{prop.value}</span>
-                      </div>
-                    ))}
+                    {propertiesCount > 0 ? (
+                      filteredProperties.map((prop: {name?: string, value?: string}, i) => (
+                        <div key={i} className="grid grid-cols-3 gap-2 py-1 border-b last:border-0 border-border/50">
+                          <span className="font-semibold text-muted-foreground truncate" title={prop.name}>{prop.name}</span>
+                          <span className="col-span-2 truncate select-all" title={prop.value}>{prop.value}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-2 text-center text-muted-foreground italic">No property matches</div>
+                    )}
                   </div>
                 </CollapsibleContent>
               </Collapsible>
